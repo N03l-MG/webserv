@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+         #
+#    By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/13 16:17:26 by nmonzon           #+#    #+#              #
-#    Updated: 2025/05/13 16:22:53 by nmonzon          ###   ########.fr        #
+#    Updated: 2025/05/19 13:52:03 by jgraf            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,14 +15,15 @@ NAME = webserv
 CMP = c++
 FLAGS = -Wall -Wextra -Werror -std=c++17 -Iinclude
 
-SRC = src/main.cpp 
+SRC = src/main.cpp src/parse/read_config.cpp
 OBJ_DIR = _obj
 OBJ = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 
 all: info $(OBJ_DIR) $(NAME)
 
 $(OBJ_DIR):
-	@mkdir -p $(OBJ_DIR)/src
+	@mkdir -p $(OBJ_DIR)/src/
+	@mkdir -p $(OBJ_DIR)/src/parse/
 
 $(OBJ_DIR)/%.o: %.cpp
 	@$(CMP) $(FLAGS) -c $< -o $@
