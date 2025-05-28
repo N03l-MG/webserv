@@ -6,7 +6,7 @@
 #    By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/13 16:17:26 by nmonzon           #+#    #+#              #
-#    Updated: 2025/05/19 13:52:03 by jgraf            ###   ########.fr        #
+#    Updated: 2025/05/28 11:31:22 by jgraf            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ NAME = webserv
 CMP = c++
 FLAGS = -Wall -Wextra -Werror -std=c++17 -Iinclude
 
-SRC = src/main.cpp src/parse/read_config.cpp
+SRC = src/main.cpp src/WebServer.cpp src/parse/read_config.cpp
 OBJ_DIR = _obj
 OBJ = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 

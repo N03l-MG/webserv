@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   webserv.hpp                                        :+:      :+:    :+:   */
+/*   exception.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/13 16:28:13 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/05/28 11:43:17 by jgraf            ###   ########.fr       */
+/*   Created: 2025/05/28 11:35:06 by jgraf             #+#    #+#             */
+/*   Updated: 2025/05/28 11:38:55 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,23 @@
 #pragma once
 
 //	Include
-#include <iostream>
-#include <string>
-#include <fstream>
 #include <exception>
-#include <vector>
-#include "exceptions.hpp"
 
+//	Exception
+class WrongFileException : public std::exception
+{
+	public:
+		const char	*what()	const throw()
+		{
+			return ("ERROR!\tFailed to open or read file!");
+		}
+};
 
-//	Definition
-typedef std::vector<std::string> t_vecstr;
-
-
-//	Parsing
-t_vecstr	read_config_file(std::string const &in_file);
+class ParseException : public std::exception
+{
+	public:
+		const char	*what() const throw()
+		{
+			return ("ERROR!\tConfiguration file is invalid!");
+		}
+};

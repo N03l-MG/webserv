@@ -6,11 +6,12 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/05/22 10:00:24 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/05/28 11:41:49 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
+#include "WebServer.hpp"
 
 int main(int ac, char **av)
 {
@@ -24,12 +25,11 @@ int main(int ac, char **av)
 	//try to read input file
 	try
 	{
-		std::vector<std::string>	tokens;
-		read_config_file(av[1], tokens);
-		for (size_t i = 0; i < tokens.size(); i++)
-			std::cout << tokens[i] << std::endl;
+		WebServer	webserver;
+		t_vecstr	tokens = read_config_file(av[1]);
+		webserver.start(tokens);
 	}
-	catch (std::invalid_argument &e)
+	catch (std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
 	}

@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:40:10 by jgraf             #+#    #+#             */
-/*   Updated: 2025/05/22 14:44:20 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/05/28 11:41:15 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static bool	is_separate_char(char chr)
 }
 
 //	Loop through the line and push individual tokens into the vector.
-static void	tokenize(const std::string &line, std::vector<std::string> &tokens)
+static void	tokenize(const std::string &line, t_vecstr &tokens)
 {
 	const std::string	delims = " \t\n;,(){}[]";
 	size_t				i = 0;
@@ -57,17 +57,18 @@ static void	tokenize(const std::string &line, std::vector<std::string> &tokens)
 }
 
 //	Read individual lines and call the tokenisation function on each line.
-void	read_config_file(std::string const &in_file, std::vector<std::string> &output)
+t_vecstr	read_config_file(std::string const &in_file)
 {
-	std::ifstream				file(in_file);
-	std::string					line;
+	t_vecstr		output;
+	std::ifstream	file(in_file);
+	std::string		line;
 
 	//safely open file
 	if (!file.is_open() || file.fail() || std::filesystem::is_directory(in_file))
 	{
 		if (file.is_open())
 			file.close();
-		throw std::invalid_argument("ERROR: Failed to read from file.");
+		throw WrongFileException();
 	}
 
 	//loop through input file
@@ -76,4 +77,5 @@ void	read_config_file(std::string const &in_file, std::vector<std::string> &outp
 
 	//close file to avoid leaking
 	file.close();
+	return (output);
 }

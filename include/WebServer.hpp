@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:32:39 by jgraf             #+#    #+#             */
-/*   Updated: 2025/05/28 10:46:35 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/05/28 11:28:26 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,9 @@
 class	WebServer
 {
 	private:
-		std::string							config_path;
-		bool								is_running;
+		std::string		config_path;
+		t_vecstr		tokens;
+		bool			is_running;
 		//std::vector<ServerConfig>			servers;
 		//std::map<int, ServerSocket>			listeningSockets;
 		//std::map<int, ClientConnection*>	clients;
@@ -45,6 +46,6 @@ class	WebServer
 		WebServer();
 		~WebServer();
 
-		void	start(std::vector<std::string> &tokens);
+		void	start(t_vecstr &tokens);
 		void	shutdown();
 };
