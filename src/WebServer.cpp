@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:34:44 by jgraf             #+#    #+#             */
-/*   Updated: 2025/05/28 11:41:23 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/02 11:55:24 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,17 +35,24 @@ void	WebServer::start(t_vecstr &tokens)
 //	Parse Input
 void	WebServer::parseConfig()
 {
-	int	block_depth = 0;
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
-		if (tokens[i] == "{")
-			block_depth ++;
-		if (tokens[i] == "}")
-			block_depth --;
-		if (tokens[i] == "server"
-		&& block_depth == 0)
-			std::cout << "Entered server block" << std::endl;
+		if (tokens[i] == "server")
+		{
+			ServerConfig *new_server = new ServerConfig;
+			if (addServer(new_server) == 0)
+				new_server->configure(tokens, i);
+			std::cout << new_server->getListen() << "\n" << new_server->getHost() << "\n" << new_server->getRoot() << "\n" << new_server->getIndex() << std::endl;
+		}
 	}
-	if (block_depth != 0)
-		throw ParseException();
+}
+
+
+//	Add new server
+int	WebServer::addServer(ServerConfig *new_server)
+{
+	if (!new_server)
+		return (1);
+	servers.push_back(new_server);
+	return (0);
 }
