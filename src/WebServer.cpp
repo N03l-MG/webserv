@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:34:44 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/02 11:55:24 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/02 13:08:39 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,13 @@ WebServer::WebServer()
 
 
 //	Destructor
-WebServer::~WebServer() {}
+WebServer::~WebServer()
+{
+	//delete all servers to avoid leaking
+	for (ServerConfig* serv : servers)
+		delete serv;
+	servers.clear();
+}
 
 
 //	Start
