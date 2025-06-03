@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/03 13:02:52 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/03 13:18:35 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int SocketManager::createServerSocket(int port, const std::string& host)
 
 void SocketManager::initializeSockets(const std::vector<Server*>& servers)
 {
-	for (Server* server : servers)
+	for (Server *server : servers)
 	{
 		int sock = createServerSocket(server->getPort(), server->getHost());
 		server_sockets.push_back(sock);
