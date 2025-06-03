@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/03 11:23:34 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/03 11:54:47 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,10 @@ Server::Server()
 {
 	this->port = 0;
 	this->host = "";
+	this->name = "";
 	this->root = "";
 	this->index = "";
+	this->autoindex = false;
 }
 
 
