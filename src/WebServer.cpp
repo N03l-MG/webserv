@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:34:44 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/02 13:08:39 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/03 11:20:45 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,36 @@ WebServer::WebServer()
 WebServer::~WebServer()
 {
 	//delete all servers to avoid leaking
-	for (ServerConfig* serv : servers)
+	for (Server* serv : servers)
 		delete serv;
 	servers.clear();
+}
+
+//	Setters
+
+
+//	Getters
+Server	*WebServer::getServer(size_t index)
+{
+	if (index < servers.size())
+		return (servers[index]);
+	return (NULL);
+}
+
+
+std::vector<Server*>	WebServer::getServer()
+{
+	return (servers);
+}
+
+
+//	Add new server
+int	WebServer::addServer(Server *new_server)
+{
+	if (!new_server)
+		return (1);
+	servers.push_back(new_server);
+	return (0);
 }
 
 
@@ -45,20 +72,9 @@ void	WebServer::parseConfig()
 	{
 		if (tokens[i] == "server")
 		{
-			ServerConfig *new_server = new ServerConfig;
+			Server *new_server = new Server;
 			if (addServer(new_server) == 0)
 				new_server->configure(tokens, i);
-			std::cout << new_server->getListen() << "\n" << new_server->getHost() << "\n" << new_server->getRoot() << "\n" << new_server->getIndex() << std::endl;
 		}
 	}
-}
-
-
-//	Add new server
-int	WebServer::addServer(ServerConfig *new_server)
-{
-	if (!new_server)
-		return (1);
-	servers.push_back(new_server);
-	return (0);
 }

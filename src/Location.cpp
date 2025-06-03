@@ -1,37 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/02 13:21:00 by jgraf            ###   ########.fr       */
+/*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
+/*   Updated: 2025/06/03 09:44:26 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "webserv.hpp"
-#include "WebServer.hpp"
+#include "Location.hpp"
 
-int main(int ac, char **av)
+//	Constructor
+Location::Location() {}
+
+
+//	Destructor
+Location::~Location() {}
+
+
+//	Setting
+
+
+
+//	Getting
+
+
+
+//	Config
+void	Location::configure(const t_vecstr &tokens, size_t &i)
 {
-	//input check
-	if (ac != 2)
+	while (tokens[i] != "\0" && tokens[i] != "}")
 	{
-		std::cerr << "Invalid number of arguments! (Expected 1)" << std::endl;
-		return (1);
+		i ++;
 	}
-
-	//try to read input file
-	try
-	{
-		WebServer	webserver;
-		t_vecstr	tokens = read_config_file(av[1]);
-		webserver.start(tokens);
-	}
-	catch (std::exception &e)
-	{
-		std::cerr << e.what() << std::endl;
-	}
-	return (0);
 }
