@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:32:39 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/03 12:29:25 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/03 13:02:56 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,4 +38,5 @@ class	WebServer
 
 		void	start(t_vecstr &tokens);
 		void	shutdown();
+		bool	isRunning() const { return is_running; }
 };
