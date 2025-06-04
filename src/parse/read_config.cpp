@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:40:10 by jgraf             #+#    #+#             */
-/*   Updated: 2025/05/28 11:41:15 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/04 10:12:35 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,11 @@ static bool	is_separate_char(char chr)
 //	Loop through the line and push individual tokens into the vector.
 static void	tokenize(const std::string &line, t_vecstr &tokens)
 {
-	const std::string	delims = " \t\n;,(){}[]";
+	const std::string	delims = " \t\n;,(){}[]#";
 	size_t				i = 0;
 	size_t				len = line.size();
 
+	//read through line
 	while (i < len)
 	{
 		//skip delimiters that are NOT separate chars (whitespace, etc.)
@@ -40,8 +41,7 @@ static void	tokenize(const std::string &line, t_vecstr &tokens)
 		//if at a separate char delimiter, push it as token and advance
 		if (i < len && is_separate_char(line[i]))
 		{
-			tokens.push_back(std::string(1, line[i]));
-			i ++;
+			tokens.push_back(std::string(1, line[i++]));
 			continue;
 		}
 

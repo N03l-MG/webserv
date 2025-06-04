@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/03 12:18:02 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/04 10:15:21 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,8 +146,64 @@ t_vecstr	Location::getCgiext()
 //	Config
 void	Location::configure(const t_vecstr &tokens, size_t &i)
 {
+	//move to start of location block and get path
+	setPath(tokens[++i]);
+	if (tokens[++i] != "{")
+		throw ParseException();
+	
+	//config
 	while (tokens[i] != "\0" && tokens[i] != "}")
 	{
+		if (!is_special_token(tokens[i]) && line_has_semicolon(tokens, i))
+		{
+			if (tokens[i] == "path")
+				setPath(tokens[++i]);
+			else if (tokens[i] == "root")
+				setRoot(tokens[++i]);
+			else if (tokens[i] == "index")
+				setIndex(tokens[++i]);
+			else if (tokens[i] == "return")
+				setReturn(tokens[++i]);
+			else if (tokens[i] == "alias")
+				setAlias(tokens[++i]);
+			else if (tokens[i] == "autoindex")
+			{
+				setAutoindex(false);
+				if (tokens[++i] == "on")
+					setAutoindex(true);
+			}
+		}
+		if (tokens[i] == "allow_methods")
+			while (tokens[++i] != ";")
+				addMethod(tokens[i]);
+		else if (tokens[i] == "cgi_path")
+			while (tokens[++i] != ";")
+				addCgipath(tokens[i]);
+		else if (tokens[i] == "cgi_ext")
+			while (tokens[++i] != ";")
+				addCgiext(tokens[i]);
 		i ++;
 	}
+	print_status();
+}
+
+
+//	Debug
+void	Location::print_status()
+{
+	std::cout << "\n\t--- LOCATION CONFIG ---" << std::endl;
+	std::cout << "Path:\t\t" << getPath() << "\n"
+			<< "Root:\t\t" << getRoot() << "\n"
+			<< "Index:\t\t" << getIndex() << "\n"
+			<< "Return:\t\t" << getReturn() << "\n"
+			<< "Alias:\t\t" << getAlias() << "\n"
+			<< "Autoindex:\t" << getAutoindex() << "\n" << std::endl;
+	
+	
+	for (size_t i = 0; i < allow_methods.size(); i++)
+		std::cout << "Methods:\t" << getMethod(i) << std::endl;
+	for (size_t i = 0; i < cgi_path.size(); i++)
+		std::cout << "CGI Path:\t" << getCgipath(i) << std::endl;
+	for (size_t i = 0; i < cgi_ext.size(); i++)
+		std::cout << "CGI Ext:\t" << getCgiext(i) << std::endl;
 }

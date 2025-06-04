@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/03 11:54:47 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/04 10:13:12 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,17 +123,27 @@ int	Server::addLocation(Location *new_location)
 //	Config
 void	Server::configure(const t_vecstr &tokens, size_t &i)
 {
+	//check if all braces cleanly close
+	if (!brace_check(tokens))
+		throw ParseException();
+	
+	//configure
 	while (tokens[i] != "\0" && tokens[i] != "}")
 	{
-		if (tokens[i] == "listen")
-			setPort(std::stoi(tokens[++i]));
-		else if (tokens[i] == "host")
-			setHost(tokens[++i]);
-		else if (tokens[i] == "root")
-			setRoot(tokens[++i]);
-		else if (tokens[i] == "index")
-			setIndex(tokens[++i]);
-		else if (tokens[i] == "location")
+		if (!is_special_token(tokens[i+1]) && line_has_semicolon(tokens, i))
+		{
+			if (tokens[i] == "listen")
+				setPort(std::stoi(tokens[++i]));
+			else if (tokens[i] == "host")
+				setHost(tokens[++i]);
+			else if (tokens[i] == "server_name")
+				setName(tokens[++i]);
+			else if (tokens[i] == "root")
+				setRoot(tokens[++i]);
+			else if (tokens[i] == "index")
+				setIndex(tokens[++i]);
+		}
+		if (tokens[i] == "location" && !is_special_token(tokens[i+1]))
 		{
 			Location	*new_location = new Location;
 			if (addLocation(new_location) == 0)
@@ -141,4 +151,22 @@ void	Server::configure(const t_vecstr &tokens, size_t &i)
 		}
 		i ++;
 	}
+	print_status();
+}
+
+
+//	Debug
+void	Server::print_status()
+{
+	std::cout << "\n\t--- SERVER CONFIG ---" << std::endl;
+	std::cout << "Port:\t\t" << getPort() << "\n"
+			<< "Host:\t\t" << getHost() << "\n"
+			<< "Name:\t\t" << getName() << "\n"
+			<< "Root:\t\t" << getRoot() << "\n"
+			<< "Index:\t\t" << getIndex() << "\n"
+			<< "Autoindex:\t" << getAutoindex() << "\n" << std::endl;
+	
+	
+	for (size_t i = 0; i < locations.size(); i++)
+		std::cout << "Locations:\t" << getLocation(i) << std::endl;
 }

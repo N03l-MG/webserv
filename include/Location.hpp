@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:49:46 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/03 12:18:04 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/03 13:00:42 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ class	Location
 		t_vecstr	allow_methods;
 		t_vecstr	cgi_path;
 		t_vecstr	cgi_ext;
-
+	
 	public:
 		Location();
 		~Location();
@@ -59,4 +59,5 @@ class	Location
 		t_vecstr	getCgiext();
 
 		void	configure(const t_vecstr &tokens, size_t &i);
+		void	print_status();
 };

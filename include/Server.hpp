@@ -52,4 +52,5 @@ class	Server
 		std::vector<Location*>	getLocation();
 
 		void	configure(const t_vecstr &tokens, size_t &i);
+		void	print_status();
 };
