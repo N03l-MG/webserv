@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:13 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/02 09:35:59 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/04 09:40:07 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,3 +28,6 @@ typedef std::vector<std::string> t_vecstr;
 
 //	Parsing
 t_vecstr	read_config_file(std::string const &in_file);
+bool		brace_check(const t_vecstr tokens);
+bool		is_special_token(const std::string token);
+bool		line_has_semicolon(const t_vecstr tokens, size_t i);
