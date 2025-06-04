@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/04 10:15:21 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/04 11:11:43 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,27 +31,32 @@ Location::~Location() {}
 //	Setters
 void		Location::setPath(std::string path)
 {
-	this->path = path;
+	if (!is_special_token(path))
+		this->path = path;
 }
 
 void		Location::setRoot(std::string root)
 {
-	this->root = root;
+	if (!is_special_token(root))
+		this->root = root;
 }
 
 void		Location::setIndex(std::string index)
 {
-	this->index = index;
+	if (!is_special_token(index))
+		this->index = index;
 }
 
 void		Location::setReturn(std::string _return)
 {
-	this->_return = _return;
+	if (!is_special_token(_return))
+		this->_return = _return;
 }
 
 void		Location::setAlias(std::string alias)
 {
-	this->alias = alias;
+	if (!is_special_token(alias))
+		this->alias = alias;
 }
 
 void		Location::setAutoindex(bool autoindex)
@@ -61,17 +66,20 @@ void		Location::setAutoindex(bool autoindex)
 
 void		Location::addMethod(std::string method)
 {
-	this->allow_methods.push_back(method);
+	if (!is_special_token(method))
+		this->allow_methods.push_back(method);
 }
 
 void		Location::addCgipath(std::string path)
 {
-	this->cgi_path.push_back(path);
+	if (!is_special_token(path))
+		this->cgi_path.push_back(path);
 }
 
 void		Location::addCgiext(std::string ext)
 {
-	this->cgi_ext.push_back(ext);
+	if (!is_special_token(ext))
+		this->cgi_ext.push_back(ext);
 }
 
 
@@ -144,46 +152,36 @@ t_vecstr	Location::getCgiext()
 
 
 //	Config
-void	Location::configure(const t_vecstr &tokens, size_t &i)
+void Location::configure(const t_vecstr &tokens, size_t &i)
 {
 	//move to start of location block and get path
 	setPath(tokens[++i]);
 	if (tokens[++i] != "{")
 		throw ParseException();
-	
-	//config
+
+	//define a map of configuration keywords to lambdas
+	std::map<std::string, std::function<void()>> configMap = {
+		{"path", [&]() { while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}") setPath(tokens[++i]); }},
+		{"root", [&]() { while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}") setRoot(tokens[++i]); }},
+		{"index", [&]() { while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}") setIndex(tokens[++i]); }},
+		{"return", [&]() { while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}") setReturn(tokens[++i]); }},
+		{"alias", [&]() { while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}") setAlias(tokens[++i]); }},
+		{"autoindex", [&]() { while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}") setAutoindex(tokens[++i] == "on"); }},
+		{"allow_methods", [&]() { while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}") addMethod(tokens[++i]); }},
+		{"cgi_path", [&]() { while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}") addCgipath(tokens[++i]); }},
+		{"cgi_ext", [&]() { while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}") addCgiext(tokens[++i]); }}
+	};
+
+	//process tokens
 	while (tokens[i] != "\0" && tokens[i] != "}")
 	{
-		if (!is_special_token(tokens[i]) && line_has_semicolon(tokens, i))
-		{
-			if (tokens[i] == "path")
-				setPath(tokens[++i]);
-			else if (tokens[i] == "root")
-				setRoot(tokens[++i]);
-			else if (tokens[i] == "index")
-				setIndex(tokens[++i]);
-			else if (tokens[i] == "return")
-				setReturn(tokens[++i]);
-			else if (tokens[i] == "alias")
-				setAlias(tokens[++i]);
-			else if (tokens[i] == "autoindex")
-			{
-				setAutoindex(false);
-				if (tokens[++i] == "on")
-					setAutoindex(true);
-			}
-		}
-		if (tokens[i] == "allow_methods")
-			while (tokens[++i] != ";")
-				addMethod(tokens[i]);
-		else if (tokens[i] == "cgi_path")
-			while (tokens[++i] != ";")
-				addCgipath(tokens[i]);
-		else if (tokens[i] == "cgi_ext")
-			while (tokens[++i] != ";")
-				addCgiext(tokens[i]);
-		i ++;
+		if (configMap.find(tokens[i]) != configMap.end())
+			configMap[tokens[i]]();
+		else
+			i ++;
 	}
+
+	//print debug statement
 	print_status();
 }
 
