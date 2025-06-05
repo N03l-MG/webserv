@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/05 09:27:28 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/05 09:38:24 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,17 +159,20 @@ void	Server::configure(const t_vecstr &tokens, size_t &i)
 	//configure
 	while (tokens[i] != "\0" && tokens[i] != "}")
 	{
-		if (!is_special_token(tokens[i+1]) && line_has_semicolon(tokens, i))
-		{
-			if (tokens[i] == "listen")
+		if (tokens[i] == "listen")
+			while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}")
 				setPort(std::stoi(tokens[++i]));
-			else if (tokens[i] == "host")
+		else if (tokens[i] == "host")
+			while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}")
 				setHost(tokens[++i]);
-			else if (tokens[i] == "server_name")
+		else if (tokens[i] == "server_name")
+			while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}")
 				setName(tokens[++i]);
-			else if (tokens[i] == "root")
+		else if (tokens[i] == "root")
+			while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}")
 				setRoot(tokens[++i]);
-			else if (tokens[i] == "index")
+		else if (tokens[i] == "index")
+			while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}")
 				setIndex(tokens[++i]);
 			else if (tokens[i] == "client_max_body_size")
 				setBodysize(std::stoi(tokens[++i]));
