@@ -6,12 +6,11 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:34:44 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/03 13:04:17 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/05 16:05:30 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "WebServer.hpp"
-#include "SocketManager.hpp"
 
 //	Constructor
 WebServer::WebServer()
@@ -63,14 +62,10 @@ void	WebServer::start(t_vecstr &tokens)
 	this->tokens = tokens;
 	parseConfig();
 
-	try {
-		SocketManager socketManager;
-		socketManager.initializeSockets(servers);
-		socketManager.run();
-	} catch (const std::exception& e) {
-		std::cerr << "Socket error: " << e.what() << std::endl;
-		shutdown();
-	}
+	socketManager = new SocketManager(servers);
+
+	for (Server *serv : servers)
+		serv->run(socketManager->sockets[0]->server_fd); // All through one for now
 }
 
 
@@ -88,20 +83,11 @@ void	WebServer::parseConfig()
 	}
 }
 
-
 //	Shutdown
 void WebServer::shutdown()
 {
-	if (!is_running)
-		return;
-		
-	is_running = false;
-	
-	// Clean up all servers
-	for (Server* server : servers)
-		if (server)
-			delete server;
+	for (Server *serv : servers)
+		delete serv;
 	servers.clear();
-	
-	std::cout << "Server shutdown complete" << std::endl;
+	delete socketManager;
 }

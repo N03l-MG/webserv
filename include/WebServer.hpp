@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:32:39 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/03 13:02:56 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/05 16:05:00 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 //	Include
 #include "webserv.hpp"
 #include "Server.hpp"
+#include "SocketManager.hpp"
 
 
 class	WebServer
@@ -25,6 +26,7 @@ class	WebServer
 		t_vecstr				tokens;
 		bool					is_running;
 		std::vector<Server*>	servers;
+		SocketManager			*socketManager;
 
 		void	parseConfig();
 

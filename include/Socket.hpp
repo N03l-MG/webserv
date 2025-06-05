@@ -1,25 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   SocketManager.hpp                                  :+:      :+:    :+:   */
+/*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/03 12:55:11 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/05 16:00:29 by nmonzon          ###   ########.fr       */
+/*   Created: 2025/06/05 14:15:14 by nmonzon           #+#    #+#             */
+/*   Updated: 2025/06/05 16:15:19 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "Socket.hpp"
+#include "Server.hpp"
 
-class SocketManager
+class Socket
 {
 	private:
-		
+		int port;
+		const char *host;
 	public:
-		std::vector<Socket*> sockets;
-		SocketManager(std::vector<Server*> servers);
-		~SocketManager();
+		int server_fd;
+		Socket(Server *serv);
+		~Socket();
+
+		int setupSocket();
 };

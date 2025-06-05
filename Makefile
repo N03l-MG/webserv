@@ -6,7 +6,7 @@
 #    By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/13 16:17:26 by nmonzon           #+#    #+#              #
-#    Updated: 2025/06/03 12:59:09 by nmonzon          ###   ########.fr        #
+#    Updated: 2025/06/05 16:08:45 by nmonzon          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ CMP = c++
 FLAGS = -Wall -Wextra -Werror -std=c++17 -Iinclude
 
 SRC = src/main.cpp src/WebServer.cpp src/Server.cpp src/Location.cpp src/parse/read_config.cpp \
-	  src/SocketManager.cpp
+	  src/SocketManager.cpp src/Socket.cpp
 OBJ_DIR = _obj
 OBJ = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 
