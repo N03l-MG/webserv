@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/04 10:13:12 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/05 09:27:28 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ Server::Server()
 	this->name = "";
 	this->root = "";
 	this->index = "";
+	this->client_max_body_size = 1000000;
 	this->autoindex = false;
 }
 
@@ -29,7 +30,10 @@ Server::~Server()
 {
 	//delete all locations to avoid leaking
 	for (Location* loc : locations)
+	{
 		delete loc;
+		std::cout << "Delete location" << std::endl;
+	}
 	locations.clear();
 }
 
@@ -65,6 +69,16 @@ void	Server::setAutoindex(bool autoindex)
 	this->autoindex = autoindex;
 }
 
+void	Server::setBodysize(size_t size)
+{
+	this->client_max_body_size = size;
+}
+
+void	Server::addErrorpage(size_t code, std::string page)
+{
+	error_pages[code] = page;
+}
+
 
 //	Getter
 int		Server::getPort()
@@ -95,6 +109,21 @@ std::string	Server::getIndex()
 bool	Server::getAutoindex()
 {
 	return (this->autoindex);
+}
+
+size_t	Server::getBodysize()
+{
+	return (this->client_max_body_size);
+}
+
+std::string	Server::getErrorpage(size_t code)
+{
+	return (this->error_pages[code]);
+}
+
+std::map<size_t, std::string>	Server::getErrorpage()
+{
+	return (this->error_pages);
 }
 
 Location	*Server::getLocation(size_t index)
@@ -142,6 +171,13 @@ void	Server::configure(const t_vecstr &tokens, size_t &i)
 				setRoot(tokens[++i]);
 			else if (tokens[i] == "index")
 				setIndex(tokens[++i]);
+			else if (tokens[i] == "client_max_body_size")
+				setBodysize(std::stoi(tokens[++i]));
+			else if (tokens[i] == "error_page" && !is_special_token(tokens[i+2]))
+			{
+				addErrorpage(std::stoi(tokens[i+1]), tokens[i+2]);
+				i += 2;
+			}
 		}
 		if (tokens[i] == "location" && !is_special_token(tokens[i+1]))
 		{
@@ -164,9 +200,12 @@ void	Server::print_status()
 			<< "Name:\t\t" << getName() << "\n"
 			<< "Root:\t\t" << getRoot() << "\n"
 			<< "Index:\t\t" << getIndex() << "\n"
-			<< "Autoindex:\t" << getAutoindex() << "\n" << std::endl;
+			<< "Autoindex:\t" << getAutoindex() << "\n"
+			<< "Body size:\t" << getBodysize() << std::endl;
 	
 	
-	for (size_t i = 0; i < locations.size(); i++)
-		std::cout << "Locations:\t" << getLocation(i) << std::endl;
+		for (size_t i = 0; i < locations.size(); i++)
+			std::cout << "Locations:\t" << getLocation(i) << std::endl;
+		for (std::map<size_t, std::string>::iterator it = error_pages.begin(); it != error_pages.end(); it++)
+			std::cout << "Error Code:\t" << it->first  << "\t-> Page:\t" << it->second << std::endl;
 }

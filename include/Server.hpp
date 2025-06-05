@@ -23,13 +23,15 @@
 class	Server
 {
 	private:
-		int						port;		//the port to listen to
-		std::string				host;		//the host to connect to
-		std::string				name;		//the servers name
-		std::string				root;		//the root repository
-		std::string				index;		//the default page
-		bool					autoindex;	//autoindex
-		std::vector<Location*>	locations;	//list of page locations
+		int								port;					//the port to listen to
+		std::string						host;					//the host to connect to
+		std::string						name;					//the servers name
+		std::string						root;					//the root repository
+		std::string						index;					//the default page
+		bool							autoindex;				//autoindex
+		size_t							client_max_body_size;	//max body size
+		std::map<size_t, std::string>	error_pages;			//List of error pages
+		std::vector<Location*>			locations;				//list of page locations
 	
 	public:
 		Server();
@@ -41,6 +43,8 @@ class	Server
 		void		setRoot(std::string root);
 		void		setIndex(std::string index);
 		void		setAutoindex(bool autoindex);
+		void		setBodysize(size_t size);
+		void		addErrorpage(size_t cide, std::string page);
 		int			addLocation(Location *new_location);
 		int			getPort();
 		std::string	getHost();
@@ -48,7 +52,10 @@ class	Server
 		std::string	getRoot();
 		std::string	getIndex();
 		bool		getAutoindex();
-		Location	*getLocation(size_t index);
+		size_t		getBodysize();
+		std::string						getErrorpage(size_t code);
+		std::map<size_t, std::string>	getErrorpage();
+		Location				*getLocation(size_t index);
 		std::vector<Location*>	getLocation();
 
 		void	configure(const t_vecstr &tokens, size_t &i);

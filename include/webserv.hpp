@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:13 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/04 09:40:07 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/05 09:06:27 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <fstream>
 #include <exception>
 #include <vector>
+#include <map>
 #include "exceptions.hpp"
 
 

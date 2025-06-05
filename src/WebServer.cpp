@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:34:44 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/03 11:20:45 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/05 08:36:34 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,10 @@ WebServer::~WebServer()
 {
 	//delete all servers to avoid leaking
 	for (Server* serv : servers)
+	{
+		std::cout << "Delete server" << std::endl;
 		delete serv;
+	}
 	servers.clear();
 }
 
