@@ -6,12 +6,13 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/03 13:18:35 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/05 12:17:50 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "SocketManager.hpp"
 #include <arpa/inet.h>
+#include <cerrno>
 
 SocketManager::SocketManager() : max_fd(0) {}
 
@@ -43,8 +44,10 @@ int SocketManager::createServerSocket(int port, const std::string& host)
 	address.sin_port = htons(port);
 	address.sin_addr.s_addr = inet_addr(host.c_str());
 
-	if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0)
-		throw std::runtime_error("Bind failed");
+	if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
+        std::cerr << "Bind failed with error: " << strerror(errno) << std::endl;
+        throw std::runtime_error("Bind failed");
+    }
 
 	if (listen(server_fd, SOMAXCONN) < 0)
 		throw std::runtime_error("Listen failed");
