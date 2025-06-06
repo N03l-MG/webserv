@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/06 13:17:49 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/06 14:28:10 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,11 +72,10 @@ void SocketManager::run()
 	}
 }
 
-void SocketManager::checkSockets(fd_set read_fds, std::map<int, Socket*> socket_map,
-					std::map<int, int> client_to_server, int max_fd)
+void SocketManager::checkSockets(fd_set &read_fds, t_client_socket &sock_map, t_client_server &client_server_map, int &max_fd)
 {
 	// Check each socket for activity
-	for (const auto &pair : socket_map) {
+	for (const auto &pair : sock_map) {
 		int server_fd = pair.first;
 		
 		if (FD_ISSET(server_fd, &read_fds)) {
@@ -96,19 +95,18 @@ void SocketManager::checkSockets(fd_set read_fds, std::map<int, Socket*> socket_
 			fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
 
 			// Add client socket to our maps
-			client_to_server[client_fd] = server_fd;
+			client_server_map[client_fd] = server_fd;
 			if (client_fd > max_fd)
 				max_fd = client_fd;
 		}
 	}
 }
 
-std::vector<int> SocketManager::checkClient(fd_set read_fds, std::map<int, Socket*> socket_map,
-					std::map<int, int> client_to_server)
+std::vector<int> SocketManager::checkClient(fd_set &read_fds, t_client_socket &sock_map, t_client_server &client_server_map)
 {
 	// Check client sockets for activity
 	std::vector<int> to_remove;
-	for (const auto& pair : client_to_server) {
+	for (const auto& pair : client_server_map) {
 		int client_fd = pair.first;
 		
 		if (FD_ISSET(client_fd, &read_fds)) {
@@ -124,7 +122,7 @@ std::vector<int> SocketManager::checkClient(fd_set read_fds, std::map<int, Socke
 
 			// Find the associated server and respond
 			int server_fd = pair.second;
-			Socket* socket = socket_map[server_fd];
+			Socket* socket = sock_map[server_fd];
 			// Assuming Socket has a pointer to its Server
 			socket->server->respond(client_fd);
 		}
