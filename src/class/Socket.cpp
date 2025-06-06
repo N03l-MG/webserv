@@ -6,13 +6,13 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 14:14:48 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/05 16:15:39 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/06 13:00:22 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Socket.hpp"
 
-Socket::Socket(Server *serv)
+Socket::Socket(Server *serv) : server(serv)
 {
 	host = serv->getHost().c_str();
 	port = serv->getPort();
@@ -23,7 +23,7 @@ Socket::Socket(Server *serv)
 		return;
 	}
 	if (setupSocket() != 0)
-		exit(1); //idk
+		exit(1); // FIXME: bullshit way to handle this
 }
 
 Socket::~Socket() {}
@@ -40,6 +40,9 @@ int Socket::setupSocket()
 		close(server_fd);
 		return 1;
 	}
+
+	int flags = fcntl(server_fd, F_GETFL, 0);
+	fcntl(server_fd, F_SETFL, flags | O_NONBLOCK);
 
 	if (listen(server_fd, SOMAXCONN) < 0) {
 		std::cerr << "Listen failed\n";

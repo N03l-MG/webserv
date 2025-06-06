@@ -62,9 +62,7 @@ void	WebServ::start(t_vecstr &tokens)
 	parseConfig();
 
 	socketManager = new SocketManager(servers);
-
-	for (Server *serv : servers)
-		serv->run(socketManager->sockets[0]->server_fd); // All through one for now
+	socketManager->run();
 }
 
 
