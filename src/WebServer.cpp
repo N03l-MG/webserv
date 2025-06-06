@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:34:44 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/05 08:36:34 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/06 10:18:46 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,24 +32,11 @@ WebServer::~WebServer()
 }
 
 //	Setters
-
-
-//	Getters
-Server	*WebServer::getServer(size_t index)
+void	WebServer::setTokens(std::vector<t_tokens> tokens)
 {
-	if (index < servers.size())
-		return (servers[index]);
-	return (NULL);
+	this->tokens = tokens;
 }
 
-
-std::vector<Server*>	WebServer::getServer()
-{
-	return (servers);
-}
-
-
-//	Add new server
 int	WebServer::addServer(Server *new_server)
 {
 	if (!new_server)
@@ -59,11 +46,36 @@ int	WebServer::addServer(Server *new_server)
 }
 
 
+//	Getters
+t_tokens	*WebServer::getToken(size_t index)
+{
+	if (index < tokens.size())
+		return (&tokens[index]);
+	return (NULL);
+}
+
+std::vector<t_tokens>	WebServer::getTokens()
+{
+	return (this->tokens);
+}
+
+Server	*WebServer::getServer(size_t index)
+{
+	if (index < servers.size())
+		return (servers[index]);
+	return (NULL);
+}
+
+std::vector<Server*>	WebServer::getServer()
+{
+	return (servers);
+}
+
+
 //	Start
-void	WebServer::start(t_vecstr &tokens)
+void	WebServer::start()
 {
 	is_running = true;
-	this->tokens = tokens;
 	parseConfig();
 }
 
@@ -73,11 +85,12 @@ void	WebServer::parseConfig()
 {
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
-		if (tokens[i] == "server")
+		std::cout << tokens[i].type << "\t" << tokens[i].token << std::endl;
+		/*if (tokens[i] == "server")
 		{
 			Server *new_server = new Server;
 			if (addServer(new_server) == 0)
 				new_server->configure(tokens, i);
-		}
+		}*/
 	}
 }

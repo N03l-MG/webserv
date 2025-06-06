@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/02 13:21:00 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/06 09:57:17 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ int main(int ac, char **av)
 	try
 	{
 		WebServer	webserver;
-		t_vecstr	tokens = read_config_file(av[1]);
-		webserver.start(tokens);
+		webserver.setTokens(read_config_file(av[1]));
+		webserver.start();
 	}
 	catch (std::exception &e)
 	{

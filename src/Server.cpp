@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/05 09:47:11 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/06 10:08:02 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,6 @@ Server::Server()
 	this->name = "";
 	this->root = "";
 	this->index = "";
-	this->client_max_body_size = 1000000;
-	this->autoindex = false;
 }
 
 
@@ -64,19 +62,9 @@ void	Server::setIndex(std::string index)
 	this->index = index;
 }
 
-void	Server::setAutoindex(bool autoindex)
-{
-	this->autoindex = autoindex;
-}
-
-void	Server::setBodysize(size_t size)
-{
-	this->client_max_body_size = size;
-}
-
 void	Server::addErrorpage(size_t code, std::string page)
 {
-	error_pages[code] = page;
+	error_page[code] = page;
 }
 
 
@@ -106,24 +94,14 @@ std::string	Server::getIndex()
 	return (this->index);
 }
 
-bool	Server::getAutoindex()
-{
-	return (this->autoindex);
-}
-
-size_t	Server::getBodysize()
-{
-	return (this->client_max_body_size);
-}
-
 std::string	Server::getErrorpage(size_t code)
 {
-	return (this->error_pages[code]);
+	return (this->error_page[code]);
 }
 
 std::map<size_t, std::string>	Server::getErrorpage()
 {
-	return (this->error_pages);
+	return (this->error_page);
 }
 
 Location	*Server::getLocation(size_t index)
@@ -152,46 +130,13 @@ int	Server::addLocation(Location *new_location)
 //	Config
 void	Server::configure(const t_vecstr &tokens, size_t &i)
 {
+	(void)i;
 	//check if all braces cleanly close
 	if (!brace_check(tokens))
 		throw ParseException();
 	
 	//configure
-	while (tokens[i] != "\0" && tokens[i] != "}")
-	{
-		if (!is_special_token(tokens[i+1]) && has_semicolon(tokens, i))
-		{
-			if (tokens[i] == "listen")
-				while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}")
-					setPort(std::stoi(tokens[++i]));
-			else if (tokens[i] == "host")
-				while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}")
-					setHost(tokens[++i]);
-			else if (tokens[i] == "server_name")
-				while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}")
-					setName(tokens[++i]);
-			else if (tokens[i] == "root")
-				while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}")
-					setRoot(tokens[++i]);
-			else if (tokens[i] == "index")
-				while (tokens[i+1] != ";" && tokens[i+1] != "\0" && tokens[i+1] != "}")
-					setIndex(tokens[++i]);
-			else if (tokens[i] == "client_max_body_size")
-				setBodysize(std::stoi(tokens[++i]));
-			else if (tokens[i] == "error_page" && !is_special_token(tokens[i+2]))
-			{
-				addErrorpage(std::stoi(tokens[i+1]), tokens[i+2]);
-				i += 2;
-			}
-		}
-		if (tokens[i] == "location" && !is_special_token(tokens[i+1]))
-		{
-			Location	*new_location = new Location;
-			if (addLocation(new_location) == 0)
-				new_location->configure(tokens, i);
-		}
-		i ++;
-	}
+	
 	print_status();
 }
 
@@ -204,13 +149,11 @@ void	Server::print_status()
 			<< "Host:\t\t" << getHost() << "\n"
 			<< "Name:\t\t" << getName() << "\n"
 			<< "Root:\t\t" << getRoot() << "\n"
-			<< "Index:\t\t" << getIndex() << "\n"
-			<< "Autoindex:\t" << getAutoindex() << "\n"
-			<< "Body size:\t" << getBodysize() << std::endl;
+			<< "Index:\t\t" << getIndex() << "\n" << std::endl;
 	
 	
 		for (size_t i = 0; i < locations.size(); i++)
 			std::cout << "Locations:\t" << getLocation(i) << std::endl;
-		for (std::map<size_t, std::string>::iterator it = error_pages.begin(); it != error_pages.end(); it++)
+		for (std::map<size_t, std::string>::iterator it = error_page.begin(); it != error_page.end(); it++)
 			std::cout << "Error Code:\t" << it->first  << "\t-> Page:\t" << it->second << std::endl;
 }

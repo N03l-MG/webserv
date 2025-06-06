@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/04 11:11:43 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/06 10:10:36 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ Location::Location()
 	this->index = "";
 	this->_return = "";
 	this->alias = "";
-	this->autoindex = false;
 }
 
 
@@ -59,11 +58,6 @@ void		Location::setAlias(std::string alias)
 		this->alias = alias;
 }
 
-void		Location::setAutoindex(bool autoindex)
-{
-	this->autoindex = autoindex;
-}
-
 void		Location::addMethod(std::string method)
 {
 	if (!is_special_token(method))
@@ -74,12 +68,6 @@ void		Location::addCgipath(std::string path)
 {
 	if (!is_special_token(path))
 		this->cgi_path.push_back(path);
-}
-
-void		Location::addCgiext(std::string ext)
-{
-	if (!is_special_token(ext))
-		this->cgi_ext.push_back(ext);
 }
 
 
@@ -109,11 +97,6 @@ std::string	Location::getAlias()
 	return (this->alias);
 }
 
-bool		Location::getAutoindex()
-{
-	return (this->autoindex);
-}
-
 std::string	Location::getMethod(size_t index)
 {
 	if (index < allow_methods.size())
@@ -138,24 +121,14 @@ t_vecstr	Location::getCgipath()
 	return (this->cgi_path);
 }
 
-std::string	Location::getCgiext(size_t index)
-{
-	if (index < cgi_ext.size())
-		return (cgi_ext[index]);
-	return ("");
-}
-
-t_vecstr	Location::getCgiext()
-{
-	return (this->cgi_ext);
-}
-
 
 //	Config
 void Location::configure(const t_vecstr &tokens, size_t &i)
 {
+	(void)tokens;
+	(void)i;
 	//move to start of location block and get path
-	setPath(tokens[++i]);
+	/*setPath(tokens[++i]);
 	if (tokens[++i] != "{")
 		throw ParseException();
 
@@ -179,7 +152,7 @@ void Location::configure(const t_vecstr &tokens, size_t &i)
 			configMap[tokens[i]]();
 		else
 			i ++;
-	}
+	}*/
 
 	//print debug statement
 	print_status();
@@ -194,14 +167,11 @@ void	Location::print_status()
 			<< "Root:\t\t" << getRoot() << "\n"
 			<< "Index:\t\t" << getIndex() << "\n"
 			<< "Return:\t\t" << getReturn() << "\n"
-			<< "Alias:\t\t" << getAlias() << "\n"
-			<< "Autoindex:\t" << getAutoindex() << "\n" << std::endl;
+			<< "Alias:\t\t" << getAlias() << std::endl;
 	
 	
 	for (size_t i = 0; i < allow_methods.size(); i++)
 		std::cout << "Methods:\t" << getMethod(i) << std::endl;
 	for (size_t i = 0; i < cgi_path.size(); i++)
 		std::cout << "CGI Path:\t" << getCgipath(i) << std::endl;
-	for (size_t i = 0; i < cgi_ext.size(); i++)
-		std::cout << "CGI Ext:\t" << getCgiext(i) << std::endl;
 }

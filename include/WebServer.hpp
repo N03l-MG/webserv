@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:32:39 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/03 11:18:34 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/06 10:16:32 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@
 #include "webserv.hpp"
 #include "Server.hpp"
 
-
+//	Class
 class	WebServer
 {
 	private:
-		std::string				config_path;
-		t_vecstr				tokens;
 		bool					is_running;
+		std::string				config_path;
+		std::vector<t_tokens>	tokens;
 		std::vector<Server*>	servers;
 
 		void	parseConfig();
@@ -32,10 +32,13 @@ class	WebServer
 		WebServer();
 		~WebServer();
 
+		void	setTokens(std::vector<t_tokens>);
 		int		addServer(Server *new_server);
+		t_tokens	*getToken(size_t index);
+		std::vector<t_tokens>	getTokens();
 		Server	*getServer(size_t index);
 		std::vector<Server*>	getServer();
 
-		void	start(t_vecstr &tokens);
+		void	start();
 		void	shutdown();
 };

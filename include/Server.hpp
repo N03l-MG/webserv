@@ -23,15 +23,14 @@
 class	Server
 {
 	private:
-		int								port;					//the port to listen to
-		std::string						host;					//the host to connect to
-		std::string						name;					//the servers name
-		std::string						root;					//the root repository
-		std::string						index;					//the default page
-		bool							autoindex;				//autoindex
-		size_t							client_max_body_size;	//max body size
-		std::map<size_t, std::string>	error_pages;			//List of error pages
-		std::vector<Location*>			locations;				//list of page locations
+		std::string						host;			//the host to connect to
+		int								port;			//the port to listen to
+		std::string						name;			//the servers name
+		std::string						root;			//the root repository
+		std::string						index;			//the default page
+		size_t							timeout;		//max response time for the server
+		std::map<size_t, std::string>	error_page;		//List of error pages
+		std::vector<Location*>			locations;		//list of page locations
 	
 	public:
 		Server();
@@ -42,8 +41,7 @@ class	Server
 		void		setName(std::string name);
 		void		setRoot(std::string root);
 		void		setIndex(std::string index);
-		void		setAutoindex(bool autoindex);
-		void		setBodysize(size_t size);
+		void		setTimeout(size_t time);
 		void		addErrorpage(size_t cide, std::string page);
 		int			addLocation(Location *new_location);
 		int			getPort();
@@ -51,8 +49,7 @@ class	Server
 		std::string	getName();
 		std::string	getRoot();
 		std::string	getIndex();
-		bool		getAutoindex();
-		size_t		getBodysize();
+		size_t		getTimeout();
 		std::string						getErrorpage(size_t code);
 		std::map<size_t, std::string>	getErrorpage();
 		Location				*getLocation(size_t index);

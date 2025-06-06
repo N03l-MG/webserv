@@ -6,7 +6,7 @@
 #    By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/13 16:17:26 by nmonzon           #+#    #+#              #
-#    Updated: 2025/06/04 09:44:23 by jgraf            ###   ########.fr        #
+#    Updated: 2025/06/06 10:28:33 by jgraf            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,8 @@ NAME = webserv
 CMP = c++
 FLAGS = -Wall -Wextra -Werror -std=c++17 -Iinclude
 
-SRC = src/main.cpp src/WebServer.cpp src/Server.cpp src/Location.cpp src/parse/read_config.cpp src/parse/parse_utils.cpp
+SCR_PARSE = $(addprefix parse/, read_config.cpp tokenize.cpp parse_utils.cpp)
+SRC = $(addprefix src/, main.cpp WebServer.cpp Server.cpp Location.cpp $(SCR_PARSE))
 OBJ_DIR = _obj
 OBJ = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 
