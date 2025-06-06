@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 09:30:28 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/06 15:00:25 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/06 15:07:12 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,14 +63,14 @@ void	tokenize(const std::string &line, t_vectok &tokens)
 //	Assign types to the individual tokens
 void	assign_token_type(t_vectok &tokens)
 {
-	std::vector<std::string>	TOK_DIRECTIVEs = {"server", "location"};
-	std::vector<std::string>	TOK_KEYs = {"listen", "host", "server_name", "error_page", "timeout", "path", "root", "index", "return", "alias", "methods", "cgi_path"};
+	std::vector<std::string>	directives = {"server", "location"};
+	std::vector<std::string>	keys = {"listen", "host", "server_name", "error_page", "timeout", "path", "root", "index", "return", "alias", "methods", "cgi_path"};
 
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
-		if (std::find(TOK_DIRECTIVEs.begin(), TOK_DIRECTIVEs.end(), tokens[i].token) != TOK_DIRECTIVEs.end())
+		if (std::find(directives.begin(), directives.end(), tokens[i].token) != directives.end())
 			tokens[i].type = TOK_DIRECTIVE;
-		else if (std::find(TOK_KEYs.begin(), TOK_KEYs.end(), tokens[i].token) != TOK_KEYs.end())
+		else if (std::find(keys.begin(), keys.end(), tokens[i].token) != keys.end())
 			tokens[i].type = TOK_KEY;
 		else if (tokens[i].token == "{")
 			tokens[i].type = TOK_OPEN_BRACE;
