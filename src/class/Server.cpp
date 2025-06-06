@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/05 16:14:40 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/06 11:39:51 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,18 +142,6 @@ void	Server::configure(const t_vecstr &tokens, size_t &i)
 	}
 }
 
-void	Server::respond(int client_fd)
-{
-	const std::string http_response =
-			"HTTP/1.1 200 OK\r\n"
-			"Content-Type: text/plain\r\n"
-			"Content-Length: 13\r\n"
-			"Connection: close\r\n"
-			"\r\n"
-			"Hello, world!\r\n";
-	send(client_fd, http_response.c_str(), http_response.size(), 0);
-}
-
 void	Server::run(int server_fd)
 {
 	while (true) {
@@ -185,4 +173,47 @@ void	Server::run(int server_fd)
 		fclose(client_stream);
 	}
 	close(server_fd);
+}
+
+void	Server::respond(int client_fd)
+{
+	// Construct the full path to index.html
+	std::string filepath = this->root + this->index;
+	std::ifstream file(filepath, std::ios::binary | std::ios::ate);
+	
+	if (!file.is_open()) {
+		// If file cannot be opened, send 404
+		const std::string error_response =
+			"HTTP/1.1 404 Not Found\r\n"
+			"Content-Type: text/plain\r\n"
+			"Content-Length: 13\r\n"
+			"\r\n"
+			"404 Not Found\r\n";
+		send(client_fd, error_response.c_str(), error_response.size(), 0);
+		return;
+	}
+
+	// Get file size
+	std::streamsize size = file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	// Read the entire file into a buffer
+	std::vector<char> buffer(size);
+	if (file.read(buffer.data(), size))
+	{
+		// Construct and send HTTP response headers
+		std::string headers = 
+			"HTTP/1.1 200 OK\r\n"
+			"Content-Type: text/html\r\n"
+			"Content-Length: " + std::to_string(size) + "\r\n"
+			"Connection: close\r\n"
+			"\r\n";
+		
+		// Send headers
+		send(client_fd, headers.c_str(), headers.size(), 0);
+		
+		// Send file content
+		send(client_fd, buffer.data(), size, 0);
+	}
+	file.close();
 }

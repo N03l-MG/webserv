@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:34:44 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/05 16:05:30 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/06 11:33:35 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,8 +86,5 @@ void	WebServer::parseConfig()
 //	Shutdown
 void WebServer::shutdown()
 {
-	for (Server *serv : servers)
-		delete serv;
-	servers.clear();
 	delete socketManager;
 }

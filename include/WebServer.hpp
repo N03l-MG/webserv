@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:32:39 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/05 16:05:00 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/06 12:01:39 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include "SocketManager.hpp"
 
 
-class	WebServer
+class	WebServ
 {
 	private:
 		std::string				config_path;
@@ -31,8 +31,8 @@ class	WebServer
 		void	parseConfig();
 
 	public:
-		WebServer();
-		~WebServer();
+		WebServ();
+		~WebServ();
 
 		int		addServer(Server *new_server);
 		Server	*getServer(size_t index);
