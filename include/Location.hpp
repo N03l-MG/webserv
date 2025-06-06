@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:49:46 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/05 15:07:52 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/06 13:10:07 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include "webserv.hpp"
+#include "include.hpp"
 
 //	Class
 class	Location
@@ -52,6 +52,6 @@ class	Location
 		std::string	getCgipath(size_t index);
 		t_vecstr	getCgipath();
 
-		void	configure(const t_vecstr &tokens, size_t &i);
+		void	configure(t_vectok &tokens, size_t &i);
 		void	print_status();
 };

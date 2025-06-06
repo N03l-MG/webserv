@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/13 16:28:13 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/06 10:23:16 by jgraf            ###   ########.fr       */
+/*   Created: 2025/05/28 08:32:39 by jgraf             #+#    #+#             */
+/*   Updated: 2025/06/06 12:26:02 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,44 +14,31 @@
 #pragma once
 
 //	Include
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <exception>
-#include <vector>
-#include <map>
-#include "exceptions.hpp"
+#include "include.hpp"
+#include "Server.hpp"
 
-
-//	Definitions
-typedef std::vector<std::string> t_vecstr;
-
-
-//	Enums
-typedef enum	e_toktype
+//	Class
+class	WebServ
 {
-	DIRECTIVE = 0,
-	KEY = 1,
-	OPEN_BRACE = 2,
-	CLOSE_BRACE = 3,
-	SEMICOLON = 4,
-	VALUE = 5,
-	END = 6
-}	t_toktype;
+	private:
+		bool					is_running;
+		std::string				config_path;
+		t_vectok	tokens;
+		std::vector<Server*>	servers;
 
+		void	parseConfig();
 
-//	Tokens
-typedef struct s_tokens
-{
-	std::string	token;
-	t_toktype	type;
-}	t_tokens;
+	public:
+		WebServ();
+		~WebServ();
 
+		void	setTokens(t_vectok);
+		int		addServer(Server *new_server);
+		t_tokens	*getToken(size_t index);
+		t_vectok	getTokens();
+		Server	*getServer(size_t index);
+		std::vector<Server*>	getServer();
 
-//	Parsing
-std::vector<t_tokens>	read_config_file(std::string const &in_file);
-void					tokenize(const std::string &line, std::vector<t_tokens> &tokens);
-void					assign_token_type(std::vector<t_tokens> &tokens);
-bool					brace_check(const t_vecstr tokens);
-bool					is_special_token(const std::string token);
-bool					has_semicolon(const t_vecstr tokens, size_t i);
+		void	start();
+		void	shutdown();
+};

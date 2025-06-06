@@ -1,26 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   WebServer.cpp                                      :+:      :+:    :+:   */
+/*   WebServ.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:34:44 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/06 10:18:46 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/06 12:54:26 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "WebServer.hpp"
+#include "WebServ.hpp"
 
 //	Constructor
-WebServer::WebServer()
+WebServ::WebServ()
 {
 	is_running = false;
 }
 
 
 //	Destructor
-WebServer::~WebServer()
+WebServ::~WebServ()
 {
 	//delete all servers to avoid leaking
 	for (Server* serv : servers)
@@ -32,12 +32,12 @@ WebServer::~WebServer()
 }
 
 //	Setters
-void	WebServer::setTokens(std::vector<t_tokens> tokens)
+void	WebServ::setTokens(t_vectok tokens)
 {
 	this->tokens = tokens;
 }
 
-int	WebServer::addServer(Server *new_server)
+int	WebServ::addServer(Server *new_server)
 {
 	if (!new_server)
 		return (1);
@@ -47,33 +47,33 @@ int	WebServer::addServer(Server *new_server)
 
 
 //	Getters
-t_tokens	*WebServer::getToken(size_t index)
+t_tokens	*WebServ::getToken(size_t index)
 {
 	if (index < tokens.size())
 		return (&tokens[index]);
 	return (NULL);
 }
 
-std::vector<t_tokens>	WebServer::getTokens()
+t_vectok	WebServ::getTokens()
 {
 	return (this->tokens);
 }
 
-Server	*WebServer::getServer(size_t index)
+Server	*WebServ::getServer(size_t index)
 {
 	if (index < servers.size())
 		return (servers[index]);
 	return (NULL);
 }
 
-std::vector<Server*>	WebServer::getServer()
+std::vector<Server*>	WebServ::getServer()
 {
 	return (servers);
 }
 
 
 //	Start
-void	WebServer::start()
+void	WebServ::start()
 {
 	is_running = true;
 	parseConfig();
@@ -81,16 +81,15 @@ void	WebServer::start()
 
 
 //	Parse Input
-void	WebServer::parseConfig()
+void	WebServ::parseConfig()
 {
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
-		std::cout << tokens[i].type << "\t" << tokens[i].token << std::endl;
-		/*if (tokens[i] == "server")
+		if (tokens[i].type == TOK_DIRECTIVE && tokens[i].token == "server")
 		{
 			Server *new_server = new Server;
-			if (addServer(new_server) == 0)
-				new_server->configure(tokens, i);
-		}*/
+			new_server->configure(tokens, ++i);
+			servers.push_back(new_server);
+		}
 	}
 }

@@ -6,12 +6,12 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/06 09:57:17 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/06 12:54:52 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "webserv.hpp"
-#include "WebServer.hpp"
+#include "include.hpp"
+#include "WebServ.hpp"
 
 int main(int ac, char **av)
 {
@@ -22,10 +22,10 @@ int main(int ac, char **av)
 		return (1);
 	}
 
-	//try to read input file
+	//try to read input file and execute program
 	try
 	{
-		WebServer	webserver;
+		WebServ	webserver;
 		webserver.setTokens(read_config_file(av[1]));
 		webserver.start();
 	}

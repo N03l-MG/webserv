@@ -6,16 +6,16 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:40:10 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/06 10:26:31 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/06 12:22:05 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "webserv.hpp"
+#include "include.hpp"
 
 //	Read individual lines and call the tokenisation function on each line.
-std::vector<t_tokens>	read_config_file(std::string const &in_file)
+t_vectok	read_config_file(std::string const &in_file)
 {
-	std::vector<t_tokens>	tokens;
+	t_vectok	tokens;
 	std::ifstream			file(in_file);
 	std::string				line;
 

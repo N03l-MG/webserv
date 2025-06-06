@@ -16,7 +16,7 @@
 //	Include
 #include <iostream>
 #include <string>
-#include "webserv.hpp"
+#include "include.hpp"
 #include "Location.hpp"
 
 //	Class
@@ -55,6 +55,6 @@ class	Server
 		Location				*getLocation(size_t index);
 		std::vector<Location*>	getLocation();
 
-		void	configure(const t_vecstr &tokens, size_t &i);
+		void	configure(t_vectok &tokens, size_t &i);
 		void	print_status();
 };
