@@ -6,11 +6,11 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:40:10 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/03 12:29:32 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/06 12:33:52 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "webserv.hpp"
+#include "include.hpp"
 
 static bool	is_separate_char(char chr)
 {

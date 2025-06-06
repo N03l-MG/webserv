@@ -6,15 +6,15 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/05 16:08:09 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/06 12:33:23 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "webserv.hpp"
-#include "WebServer.hpp"
+#include "include.hpp"
+#include "WebServ.hpp"
 #include <csignal>
 
-WebServer *g_webserver = nullptr; // Global pointer to the webserver
+WebServ *g_webserver = nullptr; // Global pointer to the webserver
 
 void signalHandler(int signum) {
 	if (signum == SIGINT) {
@@ -33,7 +33,7 @@ int main(int ac, char **av) {
 	}
 
 	try {
-		WebServer webserver;
+		WebServ webserver;
 		g_webserver = &webserver; // Set the global pointer
 		signal(SIGINT, signalHandler); // Register the signal handler
 

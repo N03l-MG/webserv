@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   WebServer.cpp                                      :+:      :+:    :+:   */
+/*   WebServ.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,17 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "WebServer.hpp"
+#include "WebServ.hpp"
 
 //	Constructor
-WebServer::WebServer()
+WebServ::WebServ()
 {
 	is_running = false;
 }
 
-
 //	Destructor
-WebServer::~WebServer()
+WebServ::~WebServ()
 {
 	//delete all servers to avoid leaking
 	for (Server* serv : servers)
@@ -32,7 +31,7 @@ WebServer::~WebServer()
 
 
 //	Getters
-Server	*WebServer::getServer(size_t index)
+Server	*WebServ::getServer(size_t index)
 {
 	if (index < servers.size())
 		return (servers[index]);
@@ -40,14 +39,14 @@ Server	*WebServer::getServer(size_t index)
 }
 
 
-std::vector<Server*>	WebServer::getServer()
+std::vector<Server*>	WebServ::getServer()
 {
 	return (servers);
 }
 
 
 //	Add new server
-int	WebServer::addServer(Server *new_server)
+int	WebServ::addServer(Server *new_server)
 {
 	if (!new_server)
 		return (1);
@@ -57,7 +56,7 @@ int	WebServer::addServer(Server *new_server)
 
 
 //	Start
-void	WebServer::start(t_vecstr &tokens)
+void	WebServ::start(t_vecstr &tokens)
 {
 	this->tokens = tokens;
 	parseConfig();
@@ -70,7 +69,7 @@ void	WebServer::start(t_vecstr &tokens)
 
 
 //	Parse Input
-void	WebServer::parseConfig()
+void	WebServ::parseConfig()
 {
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
@@ -84,7 +83,7 @@ void	WebServer::parseConfig()
 }
 
 //	Shutdown
-void WebServer::shutdown()
+void WebServ::shutdown()
 {
 	delete socketManager;
 }

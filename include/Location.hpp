@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:49:46 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/03 12:29:13 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/06 12:32:04 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 //	Include
 #include <iostream>
 #include <string>
-#include "webserv.hpp"
+#include "include.hpp"
 
 //	Class
 class	Location

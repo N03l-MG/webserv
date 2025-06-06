@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/06 11:39:51 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/06 12:31:10 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ Server::Server()
 	this->autoindex = false;
 }
 
-
 //	Destructor
 Server::~Server()
 {
@@ -32,7 +31,6 @@ Server::~Server()
 		delete loc;
 	locations.clear();
 }
-
 
 //	Setter
 void	Server::setPort(int port)
@@ -108,7 +106,6 @@ std::vector<Location*>	Server::getLocation()
 {
 	return (locations);
 }
-
 
 //	Add new location
 int	Server::addLocation(Location *new_location)
