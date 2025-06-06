@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "include.hpp"
+#include <filesystem>
 
 static bool	is_separate_char(char chr)
 {
