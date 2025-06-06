@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 14:14:48 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/06 13:00:22 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/06 16:20:02 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,25 @@ Socket::Socket(Server *serv) : server(serv)
 {
 	host = serv->getHost().c_str();
 	port = serv->getPort();
+	
+	// Create socket
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
-
 	if (server_fd == -1) {
-		std::cerr << "Failed to create socket\n";
-		return;
+		throw std::runtime_error("Failed to create socket");
 	}
-	if (setupSocket() != 0)
-		exit(1); // FIXME: bullshit way to handle this
+
+	// Set socket options
+	int opt = 1;
+	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+		close(server_fd);
+		throw std::runtime_error("Failed to set socket options");
+	}
+
+	// Setup the socket
+	if (setupSocket() != 0) {
+		close(server_fd);
+		throw std::runtime_error("Failed to setup socket");
+	}
 }
 
 Socket::~Socket() {}
