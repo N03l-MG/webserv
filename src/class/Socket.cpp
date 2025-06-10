@@ -19,9 +19,8 @@ Socket::Socket(Server *serv) : server(serv)
 	
 	// Create socket
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (server_fd == -1) {
+	if (server_fd == -1)
 		throw std::runtime_error("Failed to create socket");
-	}
 
 	// Set socket options
 	int opt = 1;
