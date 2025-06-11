@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/11 14:10:13 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/11 15:52:40 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,7 +189,7 @@ void Server::handleUpload(int client_fd, const std::string& request)
 	// Find the start of the body
 	size_t header_end = request.find("\r\n\r\n");
 	if (header_end == std::string::npos) {
-		// Malformed request
+		std::cerr << "Malformed request: No header end found" << std::endl;
 		return;
 	}
 	std::string headers = request.substr(0, header_end);
@@ -203,31 +203,61 @@ void Server::handleUpload(int client_fd, const std::string& request)
 		size_t end = boundary.find("\r");
 		if (end != std::string::npos)
 			boundary = boundary.substr(0, end);
+		std::cout << "Found boundary: '" << boundary << "'" << std::endl;
 	} else {
-		// No boundary found
+		std::cerr << "No boundary found in headers" << std::endl;
 		return;
 	}
 
 	// Find file content
 	size_t file_start = body.find("filename=\"");
-	if (file_start == std::string::npos) return;
+	if (file_start == std::string::npos) {
+		std::cerr << "No filename found" << std::endl;
+		return;
+	}
 	file_start += 10;
 	size_t file_end = body.find("\"", file_start);
 	std::string filename = body.substr(file_start, file_end - file_start);
+	std::cout << "Found filename: '" << filename << "'" << std::endl;
 
 	// Find start of file data
 	size_t data_start = body.find("\r\n\r\n", file_end);
-	if (data_start == std::string::npos) return;
+	if (data_start == std::string::npos) {
+		std::cerr << "No data start marker found" << std::endl;
+		return;
+	}
 	data_start += 4;
-	size_t data_end = body.find(boundary, data_start) - 4; // -4 to remove trailing \r\n--
-	if (data_end == std::string::npos) return;
 
+	// Find the end boundary by looking for \r\n + boundary
+	std::string boundary_marker = "\r\n" + boundary;
+	size_t boundary_start = body.find(boundary_marker, data_start);
+	if (boundary_start == std::string::npos) {
+		// Try alternative boundary format
+		boundary_marker = "\n" + boundary;
+		boundary_start = body.find(boundary_marker, data_start);
+		if (boundary_start == std::string::npos) {
+			std::cerr << "No boundary found after data" << std::endl;
+			return;
+		}
+	}
+
+	// Calculate actual data size (excluding the \r\n before boundary)
+	size_t data_end = boundary_start;
+	std::cout << "Data size: " << (data_end - data_start) << " bytes" << std::endl;
+
+	// Extract file data
 	std::string filedata = body.substr(data_start, data_end - data_start);
 
 	// Save file
 	std::ofstream outfile("www/uploads/" + filename, std::ios::binary);
+	if (!outfile.is_open()) {
+		std::cerr << "Failed to open output file" << std::endl;
+		return;
+	}
 	outfile.write(filedata.c_str(), filedata.size());
 	outfile.close();
+
+	std::cout << "File saved successfully" << std::endl;
 
 	// Respond
 	std::string response =
@@ -251,6 +281,7 @@ std::string Server::getContentTypeFromExtension(const std::string &filepath)
 		if (ext == ".png") return "image/png";
 		if (ext == ".jpg" || ext == ".jpeg") return "image/jpeg";
 		if (ext == ".gif") return "image/gif";
+		if (ext == ".md") return "text/markdown";
 	}
 	return "text/plain";
 }

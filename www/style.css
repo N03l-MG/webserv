@@ -16,6 +16,8 @@ body {
 	background-color: #252525;
 	border-radius: 15px;
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+	width: 45%;
+	max-width: 1000;
 }
 
 h1 {
@@ -27,7 +29,7 @@ h1 {
 }
 
 h2 {
-	color: #808080;
+	color: #9803fc;
 	font-size: 2rem;
 	margin-top: 1rem;
 	font-weight: 300;
@@ -85,11 +87,42 @@ nav {
 }
 
 .markdown-content {
-	color: #d4d4d4;
-	text-align: left;
 	max-width: 800px;
-	margin: 2rem auto;
+	margin: 0 auto;
+	padding: 20px;
 	line-height: 1.6;
+	color: #ffffff;
+	text-align: left;
+}
+
+.markdown-content div[align="center"] {
+	text-align: center;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+	color: #9803fc;
+	margin-top: 24px;
+	margin-bottom: 16px;
+}
+
+.markdown-content code {
+	background-color: #f6f8fa;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+}
+
+.markdown-content pre {
+    background-color: #f6f8fa;
+    padding: 16px;
+    border-radius: 6px;
+    overflow: auto;
+}
+
+.markdown-content img {
+    max-width: 100%;
+    height: auto;
 }
 
 .terminal {
@@ -98,7 +131,6 @@ nav {
 	border-radius: 5px;
 	margin: 2rem 0;
 	width: 100%;
-	max-width: 800px;
 	min-height: 400px;
 	font-family: monospace;
 	color: #0f0;
