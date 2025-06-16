@@ -33,7 +33,10 @@ class	Server
 		bool					autoindex;	//autoindex
 		std::vector<Location*>	locations;	//list of page locations
 
-		void handleUpload(int client_fd, const std::string& request);
+		std::string createResponse(int status_code, const std::string &content_type, const std::string &body);
+		void handleGet(int client_fd, std::string &path);
+		void handleUpload(int client_fd, const std::string &request);
+		void handleDelete(int client_fd, const std::string &filepath);
 		std::string getContentTypeFromExtension(const std::string &filepath);
 
 	public:

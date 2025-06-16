@@ -7,8 +7,6 @@
   </p>
 </div>
 
-_This project was made in collaboration with [Cimex](https://github.com/Cimex404). He has uploaded it as his own repository as well!_
-
 ## About
 A bunch of text about the project.
 
