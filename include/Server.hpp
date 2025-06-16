@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                   :+:      :+:    :+:   */
+/*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:18:11 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/03 09:07:20 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/16 16:01:14 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,13 @@ class	Server
 
 		std::string createResponse(int status_code, const std::string &content_type, const std::string &body);
 		void handleGet(int client_fd, std::string &path);
-		void handleUpload(int client_fd, const std::string &request);
+		void handlePost(int client_fd, const std::string &request);
 		void handleDelete(int client_fd, const std::string &filepath);
 		std::string getContentTypeFromExtension(const std::string &filepath);
+		void handleCgi(int client_fd, const std::string &path, const std::string &method, const std::string &request);
+		bool isCgiRequest(const std::string &path);
+		std::string executeCgi(const std::string &script_path, const std::string &query_string, 
+							const std::string &method, const std::string &body);
 
 	public:
 		Server();
