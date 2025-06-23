@@ -1,23 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
+<<<<<<< HEAD:include/WebServ.hpp
 /*   webserv.hpp                                        :+:      :+:    :+:   */
+=======
+/*   Socket.hpp                                         :+:      :+:    :+:   */
+>>>>>>> master:include/Socket.hpp
 /*                                                    +:+ +:+         +:+     */
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
+<<<<<<< HEAD:include/WebServ.hpp
 /*   Created: 2025/05/28 08:32:39 by jgraf             #+#    #+#             */
 /*   Updated: 2025/06/06 12:22:42 by nmonzon          ###   ########.fr       */
+=======
+/*   Created: 2025/06/05 14:15:14 by nmonzon           #+#    #+#             */
+/*   Updated: 2025/06/23 11:03:05 by jgraf            ###   ########.fr       */
+>>>>>>> master:include/Socket.hpp
 /*                                                                            */
 /* ************************************************************************** */
 
-//	Guard
 #pragma once
 
+<<<<<<< HEAD:include/WebServ.hpp
 //	Include
 #include "include.hpp"
+=======
+#include <sys/select.h>
+#include <fcntl.h>
+#include <map>
+#include <errno.h>
+>>>>>>> master:include/Socket.hpp
 #include "Server.hpp"
 #include "SocketManager.hpp"
 
+<<<<<<< HEAD:include/WebServ.hpp
 class	WebServ
 {
 	private:
@@ -40,4 +56,19 @@ class	WebServ
 		void	start(t_vecstr &tokens);
 		void	shutdown();
 		bool	isRunning() const { return is_running; }
+=======
+class Socket
+{
+	private:
+		int			port;
+		const char	*host;
+	
+	public:
+		int server_fd;
+		Server *server;
+		Socket(Server *serv);
+		~Socket();
+
+		int setupSocket();
+>>>>>>> master:include/Socket.hpp
 };

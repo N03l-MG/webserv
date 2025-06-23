@@ -25,7 +25,11 @@ h1 {
 	font-size: 5rem;
 	margin: 0;
 	letter-spacing: 2px;
+<<<<<<< HEAD
 	text-transform: lowercase;
+=======
+	text-transform: uppercase;
+>>>>>>> master
 }
 
 h2 {
@@ -51,14 +55,22 @@ nav {
 }
 
 .nav-links a {
+<<<<<<< HEAD
 	color: #808080;
+=======
+	color: #fcba03;
+>>>>>>> master
 	text-decoration: none;
 	font-size: 1.2rem;
 	transition: color 0.3s;
 }
 
 .nav-links a:hover {
+<<<<<<< HEAD
 	color: #fcba03;
+=======
+	color: #9803fc;
+>>>>>>> master
 }
 
 .upload-form {

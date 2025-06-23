@@ -6,11 +6,16 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:40:10 by jgraf             #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/06/06 12:33:52 by nmonzon          ###   ########.fr       */
+=======
+/*   Updated: 2025/06/23 09:13:02 by jgraf            ###   ########.fr       */
+>>>>>>> master
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "include.hpp"
+<<<<<<< HEAD
 #include <filesystem>
 
 static bool	is_separate_char(char chr)
@@ -56,13 +61,15 @@ static void	tokenize(const std::string &line, t_vecstr &tokens)
 	}
 	tokens.push_back("\n");
 }
+=======
+>>>>>>> master
 
 //	Read individual lines and call the tokenisation function on each line.
-t_vecstr	read_config_file(std::string const &in_file)
+t_vectok	read_config_file(std::string const &in_file)
 {
-	t_vecstr		output;
-	std::ifstream	file(in_file);
-	std::string		line;
+	t_vectok	tokens;
+	std::ifstream			file(in_file);
+	std::string				line;
 
 	//safely open file
 	if (!file.is_open() || file.fail() || std::filesystem::is_directory(in_file))
@@ -74,9 +81,17 @@ t_vecstr	read_config_file(std::string const &in_file)
 
 	//loop through input file
 	while (std::getline(file, line))
-		tokenize(line, output);
+		tokenize(line, tokens);
 
 	//close file to avoid leaking
 	file.close();
+<<<<<<< HEAD
 	return (output);
 }
+=======
+
+	//assign token type
+	assign_token_type(tokens);
+	return(tokens);
+}
+>>>>>>> master
