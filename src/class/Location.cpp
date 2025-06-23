@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/06 15:00:57 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 09:18:58 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,90 +28,34 @@ Location::~Location() {}
 
 
 //	Setters
-void		Location::setPath(std::string path)
-{
-	this->path = path;
-}
-
-void		Location::setRoot(std::string root)
-{
-	this->root = root;
-}
-
-void		Location::setIndex(std::string index)
-{
-	this->index = index;
-}
-
-void		Location::setReturn(std::string _return)
-{
-	this->_return = _return;
-}
-
-void		Location::setAlias(std::string alias)
-{
-	this->alias = alias;
-}
-
-void		Location::addMethod(std::string method)
-{
-	this->allow_methods.push_back(method);
-}
-
-void		Location::addCgipath(std::string path)
-{
-	this->cgi_path.push_back(path);
-}
+void		Location::setPath(std::string path) { this->path = path; }
+void		Location::setRoot(std::string root) { this->root = root; }
+void		Location::setIndex(std::string index) { this->index = index; }
+void		Location::setReturn(std::string _return) { this->_return = _return; }
+void		Location::setAlias(std::string alias) { this->alias = alias; }
+void		Location::addMethod(std::string method) { this->allow_methods.push_back(method); }
+void		Location::addCgipath(std::string path) { this->cgi_path.push_back(path); }
 
 
 //	Getters
-std::string	Location::getPath()
-{
-	return (this->path);
-}
-
-std::string	Location::getRoot()
-{
-	return (this->root);
-}
-
-std::string	Location::getIndex()
-{
-	return (this->index);
-}
-
-std::string	Location::getReturn()
-{
-	return (this->_return);
-}
-
-std::string	Location::getAlias()
-{
-	return (this->alias);
-}
-
+std::string	Location::getPath() { return (this->path); }
+std::string	Location::getRoot() { return (this->root); }
+std::string	Location::getIndex() { return (this->index); }
+std::string	Location::getReturn() { return (this->_return); }
+std::string	Location::getAlias() { return (this->alias); }
+t_vecstr	Location::getMethod() { return (this->allow_methods); }
+t_vecstr	Location::getCgipath() { return (this->cgi_path); }
 std::string	Location::getMethod(size_t index)
 {
 	if (index < allow_methods.size())
 		return (allow_methods[index]);
 	return ("");
 }
-
-t_vecstr	Location::getMethod()
-{
-	return (this->allow_methods);
-}
-
 std::string	Location::getCgipath(size_t index)
 {
 	if (index < cgi_path.size())
 		return (cgi_path[index]);
 	return ("");
-}
-
-t_vecstr	Location::getCgipath()
-{
-	return (this->cgi_path);
 }
 
 

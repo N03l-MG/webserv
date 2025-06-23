@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:49:46 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/06 13:10:07 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 09:19:08 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 //	Include
 #include <iostream>
 #include <string>
-#include <map>
 #include "include.hpp"
 
 //	Class

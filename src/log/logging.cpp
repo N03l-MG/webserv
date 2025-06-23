@@ -1,36 +1,13 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exceptions.hpp                                     :+:      :+:    :+:   */
+/*   logging.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/28 11:35:06 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/06 12:05:54 by nmonzon          ###   ########.fr       */
+/*   Created: 2025/06/16 15:57:45 by nmonzon           #+#    #+#             */
+/*   Updated: 2025/06/16 15:58:07 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//	Guard
-#pragma once
-
-//	Include
-#include <exception>
-
-//	Exception
-class WrongFileException : public std::exception
-{
-	public:
-		const char	*what()	const throw()
-		{
-			return ("ERROR!\tFailed to open or read file!");
-		}
-};
-
-class ParseException : public std::exception
-{
-	public:
-		const char	*what() const throw()
-		{
-			return ("ERROR!\tConfiguration file is invalid!");
-		}
-};
+// TODO: add a bunch of server logging and all that jazz

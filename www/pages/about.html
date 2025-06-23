@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>About - webserv</title>
+	<link rel="stylesheet" href="../style.css">
+	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+	<div class="container">
+		<h1>About</h1>
+		<div class="markdown-content" id="readme-content"></div>
+		<nav>
+			<ul class="nav-links">
+				<li><a href="/">Back</a></li>
+			</ul>
+		</nav>
+	</div>
+
+	<script>
+		// Fetch and render README.md
+		fetch('../README.md')
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.text();
+			})
+			.then(text => {
+				const readmeHtml = marked.parse(text);
+				document.getElementById('readme-content').innerHTML = readmeHtml;
+			})
+			.catch(error => {
+				console.error('Error loading README:', error);
+				document.getElementById('readme-content').innerHTML = 
+					'<p>Error loading README content.</p>';
+			});
+	</script>
+</body>
+</html>
