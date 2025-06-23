@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/23 14:19:31 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 16:45:13 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,7 +228,7 @@ void Server::handleGet(int client_fd, std::string &path)
     send(client_fd, response.c_str(), response.size(), 0);
 }
 
-void Server::handlePost(int client_fd, const std::string &request)
+void Server::handlePost(int client_fd, const std::string &request) //TODO: Make new folder if uploads doesn't exist. Handle posting more than just text files.
 {
 	// Find the start of the body
 	size_t header_end = request.find("\r\n\r\n");
@@ -320,7 +320,7 @@ void Server::handlePost(int client_fd, const std::string &request)
 	send(client_fd, response.c_str(), response.size(), 0);
 }
 
-void Server::handleDelete(int client_fd, const std::string &filepath)
+void Server::handleDelete(int client_fd, const std::string &filepath) // TODO: Fix massive security issues.
 {
 	if (filepath.substr(0, 8) != "/uploads/") {
 		std::string response = createResponse(405, "text/plain", "Method Not Allowed\r\n");
