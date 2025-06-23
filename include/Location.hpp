@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:49:46 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/23 14:20:01 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 16:24:44 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,9 @@
 #include <iostream>
 #include <string>
 #include "include.hpp"
+#include "Server.hpp"
+
+class	Server;
 
 //	Class
 class	Location
@@ -28,11 +31,12 @@ class	Location
 		std::string	_return;
 		std::string	alias;
 		std::string	store;
+		size_t		max_body;
 		t_vecstr	allow_methods;
 		t_vecstr	cgi_path;
 	
 	public:
-		Location();
+		Location(Server *parent_server);
 		~Location();
 
 		void		setPath(std::string path);
@@ -41,6 +45,7 @@ class	Location
 		void		setReturn(std::string _return);
 		void		setAlias(std::string alias);
 		void		setStore(std::string store);
+		void		setMaxBody(size_t max_body);
 		void		addMethod(std::string method);
 		void		addCgipath(std::string path);
 		std::string	getPath();
@@ -49,6 +54,7 @@ class	Location
 		std::string	getReturn();
 		std::string	getAlias();
 		std::string	getStore();
+		size_t		getMaxBody();
 		std::string	getMethod(size_t index);
 		t_vecstr	getMethod();
 		std::string	getCgipath(size_t index);

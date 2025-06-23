@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/23 14:19:31 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 16:17:02 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ Server::Server()
 	this->name = "";
 	this->root = "";
 	this->index = "";
+	this->timeout = 10000;
+	this->max_body = 10000;
 }
 
 //	Destructor
@@ -41,6 +43,7 @@ void	Server::setName(std::string name) { this->name = name; }
 void	Server::setRoot(std::string root) { this->root = root; }
 void	Server::setIndex(std::string index) { this->index = index; }
 void	Server::setTimeout(size_t timeout) { this->timeout = timeout; }
+void	Server::setMaxBody(size_t max_body) { this->max_body = max_body; }
 void	Server::addErrorpage(size_t code, std::string page) { error_page[code] = page; }
 int		Server::addLocation(Location *new_location)
 {
@@ -57,6 +60,7 @@ std::string	Server::getName() { return (this->name); }
 std::string	Server::getRoot() { return (this->root); }
 std::string	Server::getIndex() { return (this->index); }
 size_t		Server::getTimeout() { return (this->timeout); }
+size_t		Server::getMaxBody() { return (this->max_body); }
 std::vector<Location*>	Server::getLocation() { return (locations); }
 std::map<size_t, std::string>	Server::getErrorpage() { return (error_page); }
 std::string	&Server::getErrorpage(size_t code) { return (this->error_page[code]); }
@@ -118,6 +122,8 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 				setIndex(value);
 			else if (key == "timeout")
 				setTimeout(std::stoi(value));
+			else if (key == "max_body")
+				setMaxBody(std::stoi(value));
 			else if (key == "error_page")
 			{
 				if (tokens[++i].type != TOK_VALUE) // Ensure the next token is a value
@@ -128,14 +134,14 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 		}
 		else if (tokens[i].type == TOK_DIRECTIVE && tokens[i].token == "location")
 		{
-			Location *new_location = new Location;
+			Location *new_location = new Location(this);
 			new_location->configure(tokens, ++i);
 			locations.push_back(new_location);
 		}
 	}
 
 	//print data
-	//print_status();
+	print_status();
 }
 
 
@@ -147,7 +153,8 @@ void	Server::print_status()
 			<< "Host:\t\t" << getHost() << "\n"
 			<< "Name:\t\t" << getName() << "\n"
 			<< "Root:\t\t" << getRoot() << "\n"
-			<< "Index:\t\t" << getIndex() << "\n" << std::endl;
+			<< "Index:\t\t" << getIndex() << "\n"
+			<< "Max Body:\t" << getMaxBody() << std::endl;
 	
 	for (size_t i = 0; i < locations.size(); i++)
 		std::cout << "Locations:\t" << getLocation(i) << std::endl;

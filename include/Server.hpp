@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:18:11 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/23 14:19:42 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 16:25:10 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 #include "include.hpp"
 #include "Location.hpp"
 
+class	Location;
+
 //	Class
 class	Server
 {
@@ -31,6 +33,7 @@ class	Server
 		std::string						root;			//the root repository
 		std::string						index;			//the default page
 		size_t							timeout;		//max response time for the server
+		size_t							max_body;		//max body size the client can recieve
 		std::map<size_t, std::string>	error_page;		//List of error pages
 		std::vector<Location*>			locations;		//list of page locations
 
@@ -54,6 +57,7 @@ class	Server
 		void		setRoot(std::string root);
 		void		setIndex(std::string index);
 		void		setTimeout(size_t time);
+		void		setMaxBody(size_t max_body);
 		void		addErrorpage(size_t code, std::string page);
 		int			addLocation(Location *new_location);
 		int			getPort();
@@ -62,6 +66,7 @@ class	Server
 		std::string	getRoot();
 		std::string	getIndex();
 		size_t		getTimeout();
+		size_t		getMaxBody();
 		std::string						&getErrorpage(size_t code);
 		std::map<size_t, std::string>	getErrorpage();
 		Location				*getLocation(size_t index);
