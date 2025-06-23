@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 14:15:14 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/06 12:59:39 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/23 11:03:05 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,9 @@
 class Socket
 {
 	private:
-		int port;
-		const char *host;
+		int			port;
+		const char	*host;
+	
 	public:
 		int server_fd;
 		Server *server;

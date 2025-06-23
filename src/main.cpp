@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/23 10:32:44 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 12:23:13 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void signalHandler(int signum)
 		if (g_webserver)
 		{
 			g_webserver->shutdown();
-			g_webserver->~WebServ();	//call destructor here because calling exit bypasses destructors
+			g_webserver->~WebServ();
 		}
 		exit(signum);
 	}

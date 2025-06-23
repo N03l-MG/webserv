@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/23 10:35:22 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 14:03:45 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ Location::Location()
 	this->index = "";
 	this->_return = "";
 	this->alias = "";
+	this->store = "";
 }
 
 
@@ -37,6 +38,7 @@ void	Location::setRoot(std::string root) { this->root = root; }
 void	Location::setIndex(std::string index) { this->index = index; }
 void	Location::setReturn(std::string _return) { this->_return = _return; }
 void	Location::setAlias(std::string alias) { this->alias = alias; }
+void	Location::setStore(std::string store) { this->store = store; }
 void	Location::addMethod(std::string method) { this->allow_methods.push_back(method); }
 void	Location::addCgipath(std::string path) { this->cgi_path.push_back(path); }
 
@@ -47,6 +49,7 @@ std::string	Location::getRoot() { return (this->root); }
 std::string	Location::getIndex() { return (this->index); }
 std::string	Location::getReturn() { return (this->_return); }
 std::string	Location::getAlias() { return (this->alias); }
+std::string	Location::getStore() { return (this->store); }
 t_vecstr	Location::getMethod() { return (this->allow_methods); }
 t_vecstr	Location::getCgipath() { return (this->cgi_path); }
 std::string	Location::getMethod(size_t index)
@@ -90,6 +93,8 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 					setReturn(value);
 				else if (key == "alias")
 					setAlias(value);
+				else if (key == "upload_store")
+					setStore(value);
 				else if (key == "methods")
 					addMethod(value);
 				else if (key == "cgi_path")
@@ -99,7 +104,7 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 	}
 
 	//print debug statement
-	//print_status();
+	print_status();
 }
 
 
@@ -111,7 +116,8 @@ void	Location::print_status()
 			<< "Root:\t\t" << getRoot() << "\n"
 			<< "Index:\t\t" << getIndex() << "\n"
 			<< "Return:\t\t" << getReturn() << "\n"
-			<< "Alias:\t\t" << getAlias() << std::endl;
+			<< "Alias:\t\t" << getAlias() << "\n"
+			<< "Upload Store:\t" << getStore() << std::endl;
 	
 	
 	for (size_t i = 0; i < allow_methods.size(); i++)
