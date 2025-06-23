@@ -3,14 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:18:11 by jgraf             #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2025/06/16 16:01:14 by nmonzon          ###   ########.fr       */
-=======
 /*   Updated: 2025/06/23 14:19:42 by jgraf            ###   ########.fr       */
->>>>>>> master
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +25,6 @@
 class	Server
 {
 	private:
-<<<<<<< HEAD
-		int						port;		//the port to listen to
-		std::string				host;		//the host to connect to
-		std::string				name;		//the servers name
-		std::string				root;		//the root repository
-		std::string				index;		//the default page
-		bool					autoindex;	//autoindex
-		std::vector<Location*>	locations;	//list of page locations
-=======
 		std::string						host;			//the host to connect to
 		int								port;			//the port to listen to
 		std::string						name;			//the servers name
@@ -46,7 +33,6 @@ class	Server
 		size_t							timeout;		//max response time for the server
 		std::map<size_t, std::string>	error_page;		//List of error pages
 		std::vector<Location*>			locations;		//list of page locations
->>>>>>> master
 
 		std::string createResponse(int status_code, const std::string &content_type, const std::string &body);
 		void handleGet(int client_fd, std::string &path);
@@ -81,11 +67,7 @@ class	Server
 		Location				*getLocation(size_t index);
 		std::vector<Location*>	getLocation();
 
-<<<<<<< HEAD
-		void	configure(const t_vecstr &tokens, size_t &i);
-=======
 		void	configure(t_vectok &tokens, size_t &i);
 		void	print_status();
->>>>>>> master
 		void	respond(int client_fd, const std::string& request);
 };

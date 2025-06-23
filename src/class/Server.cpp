@@ -3,17 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-<<<<<<< HEAD
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/16 16:10:17 by nmonzon          ###   ########.fr       */
-=======
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
 /*   Updated: 2025/06/23 14:19:31 by jgraf            ###   ########.fr       */
->>>>>>> master
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,36 +15,23 @@
 //	Constructor
 Server::Server()
 {
-<<<<<<< HEAD
-=======
 	log(LOG_LOG, "Server created!");
->>>>>>> master
 	this->port = 0;
 	this->host = "";
 	this->name = "";
 	this->root = "";
 	this->index = "";
-<<<<<<< HEAD
-	this->autoindex = false;
-=======
->>>>>>> master
 }
 
 //	Destructor
 Server::~Server()
 {
 	//delete all locations to avoid leaking
-<<<<<<< HEAD
-	for (Location* loc : locations)
-		delete loc;
-	locations.clear();
-=======
 	for (Location *loc : locations)
 		delete loc;
 	locations.clear();
 	error_page.clear();
 	log(LOG_LOG, "Server destroyed!");
->>>>>>> master
 }
 
 //	Setters
@@ -60,12 +40,6 @@ void	Server::setHost(std::string host) { this->host = host; }
 void	Server::setName(std::string name) { this->name = name; }
 void	Server::setRoot(std::string root) { this->root = root; }
 void	Server::setIndex(std::string index) { this->index = index; }
-<<<<<<< HEAD
-void	Server::setAutoindex(bool autoindex) { this->autoindex = autoindex; }
-
-//	Getters
-int		Server::getPort() { return (this->port); }
-=======
 void	Server::setTimeout(size_t timeout) { this->timeout = timeout; }
 void	Server::addErrorpage(size_t code, std::string page) { error_page[code] = page; }
 int		Server::addLocation(Location *new_location)
@@ -78,62 +52,20 @@ int		Server::addLocation(Location *new_location)
 
 //	Getters
 int			Server::getPort() { return (this->port); }
->>>>>>> master
 std::string	Server::getHost() { return (this->host); }
 std::string	Server::getName() { return (this->name); }
 std::string	Server::getRoot() { return (this->root); }
 std::string	Server::getIndex() { return (this->index); }
-<<<<<<< HEAD
-bool	Server::getAutoindex() { return (this->autoindex); }
-
-=======
 size_t		Server::getTimeout() { return (this->timeout); }
 std::vector<Location*>	Server::getLocation() { return (locations); }
 std::map<size_t, std::string>	Server::getErrorpage() { return (error_page); }
 std::string	&Server::getErrorpage(size_t code) { return (this->error_page[code]); }
->>>>>>> master
 Location	*Server::getLocation(size_t index)
 {
 	if (index < locations.size())
 		return (locations[index]);
 	return (NULL);
 }
-<<<<<<< HEAD
-std::vector<Location*>	Server::getLocation() { return (locations); }
-
-//	Add new location
-int	Server::addLocation(Location *new_location)
-{
-	if (!new_location)
-		return (1);
-	locations.push_back(new_location);
-	return (0);
-}
-
-//	Config
-void	Server::configure(const t_vecstr &tokens, size_t &i)
-{
-	while (tokens[i] != "\0" && tokens[i] != "}")
-	{
-		if (tokens[i] == "listen")
-			setPort(std::stoi(tokens[++i]));
-		else if (tokens[i] == "host")
-			setHost(tokens[++i]);
-		else if (tokens[i] == "root")
-			setRoot(tokens[++i]);
-		else if (tokens[i] == "index")
-			setIndex(tokens[++i]);
-		else if (tokens[i] == "location")
-		{
-			Location	*new_location = new Location;
-			if (addLocation(new_location) == 0)
-				new_location->configure(tokens, i);
-		}
-		i ++;
-	}
-}
-
-=======
 
 
 // ================================================= //
@@ -224,7 +156,6 @@ void	Server::print_status()
 }
 
 
->>>>>>> master
 // ================================================= //
 // ===========       HTTP RESPONSE       =========== //
 // ================================================= //

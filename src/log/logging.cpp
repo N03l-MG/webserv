@@ -3,16 +3,6 @@
 /*                                                        :::      ::::::::   */
 /*   logging.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-<<<<<<< HEAD
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/16 15:57:45 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/16 15:58:07 by nmonzon          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-// TODO: add a bunch of server logging and all that jazz
-=======
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/16 15:57:45 by nmonzon           #+#    #+#             */
@@ -35,4 +25,3 @@ void	log(t_logtype type, std::string msg)
 	}
 	std::cout << msg << "\033[0m" << std::endl;
 }
->>>>>>> master

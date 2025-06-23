@@ -19,6 +19,7 @@ WebServ::WebServ()
 	is_running = false;
 }
 
+
 //	Destructor
 WebServ::~WebServ()
 {
@@ -41,26 +42,16 @@ int		WebServ::addServer(Server *new_server)
 
 
 //	Getters
-<<<<<<< HEAD:src/class/WebServ.cpp
-Server	*WebServ::getServer(size_t index)
-=======
 bool		WebServ::isRunning() { return (this->is_running); }
 t_vectok	WebServ::getTokens() { return (this->tokens);}
 t_tokens	*WebServ::getToken(size_t index)
->>>>>>> master:src/WebServer.cpp
 {
 	if (index < tokens.size())
 		return (&tokens[index]);
 	return (NULL);
 }
-<<<<<<< HEAD:src/class/WebServ.cpp
-
-
-std::vector<Server*>	WebServ::getServer()
-=======
 std::vector<Server*>	WebServ::getServer() {return (servers);}
 Server	*WebServ::getServer(size_t index)
->>>>>>> master:src/WebServer.cpp
 {
 	if (index < servers.size())
 		return (servers[index]);
@@ -68,13 +59,8 @@ Server	*WebServ::getServer(size_t index)
 }
 
 
-<<<<<<< HEAD:src/class/WebServ.cpp
-//	Add new server
-int	WebServ::addServer(Server *new_server)
-=======
 //	Parse Input
 void	WebServ::parseConfig()
->>>>>>> master:src/WebServer.cpp
 {
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
@@ -89,14 +75,8 @@ void	WebServ::parseConfig()
 
 
 //	Start
-<<<<<<< HEAD:src/class/WebServ.cpp
-void	WebServ::start(t_vecstr &tokens)
-{
-	this->tokens = tokens;
-=======
 void	WebServ::start()
 {
->>>>>>> master:src/WebServer.cpp
 	parseConfig();
 
 	socketManager = new SocketManager(servers);
@@ -104,30 +84,8 @@ void	WebServ::start()
 }
 
 
-<<<<<<< HEAD:src/class/WebServ.cpp
-//	Parse Input
-void	WebServ::parseConfig()
-{
-	for (size_t i = 0; i < tokens.size(); i++)
-	{
-		if (tokens[i] == "server")
-		{
-			Server *new_server = new Server;
-			if (addServer(new_server) == 0)
-				new_server->configure(tokens, i);
-		}
-	}
-}
-
 //	Shutdown
 void WebServ::shutdown()
 {
 	delete socketManager;
 }
-=======
-//	Shutdown
-void WebServ::shutdown()
-{
-	delete socketManager;
-}
->>>>>>> master:src/WebServer.cpp

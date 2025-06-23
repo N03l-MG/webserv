@@ -3,14 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:49:46 by jgraf             #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2025/06/06 12:32:04 by nmonzon          ###   ########.fr       */
-=======
 /*   Updated: 2025/06/23 14:20:01 by jgraf            ###   ########.fr       */
->>>>>>> master
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,11 +54,6 @@ class	Location
 		std::string	getCgipath(size_t index);
 		t_vecstr	getCgipath();
 
-<<<<<<< HEAD
-		void	configure(const t_vecstr &tokens, size_t &i);
-};
-=======
 		void	configure(t_vectok &tokens, size_t &i);
 		void	print_status();
 };
->>>>>>> master
