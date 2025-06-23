@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/23 09:18:58 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 10:35:22 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 //	Constructor
 Location::Location()
 {
-	this->path = "";
+	log(LOG_LOG, "Location created!");
+	this->path = "/";
 	this->root = "";
 	this->index = "";
 	this->_return = "";
@@ -24,17 +25,20 @@ Location::Location()
 
 
 //	Destructor
-Location::~Location() {}
+Location::~Location()
+{
+	log(LOG_LOG, "Location destroyed!");
+}
 
 
 //	Setters
-void		Location::setPath(std::string path) { this->path = path; }
-void		Location::setRoot(std::string root) { this->root = root; }
-void		Location::setIndex(std::string index) { this->index = index; }
-void		Location::setReturn(std::string _return) { this->_return = _return; }
-void		Location::setAlias(std::string alias) { this->alias = alias; }
-void		Location::addMethod(std::string method) { this->allow_methods.push_back(method); }
-void		Location::addCgipath(std::string path) { this->cgi_path.push_back(path); }
+void	Location::setPath(std::string path) { this->path = path; }
+void	Location::setRoot(std::string root) { this->root = root; }
+void	Location::setIndex(std::string index) { this->index = index; }
+void	Location::setReturn(std::string _return) { this->_return = _return; }
+void	Location::setAlias(std::string alias) { this->alias = alias; }
+void	Location::addMethod(std::string method) { this->allow_methods.push_back(method); }
+void	Location::addCgipath(std::string path) { this->cgi_path.push_back(path); }
 
 
 //	Getters
@@ -62,6 +66,13 @@ std::string	Location::getCgipath(size_t index)
 //	Config
 void	Location::configure(t_vectok &tokens, size_t &i)
 {
+	//	Set path
+	while (tokens[i].type != TOK_OPEN_BRACE)
+	{
+		if (tokens[i].type == TOK_VALUE)
+			setPath(tokens[i++].token);
+	}
+	
 	//configure
 	while (i + 1 < tokens.size() && tokens[++i].type != TOK_CLOSE_BRACE)
 	{
@@ -71,9 +82,7 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 			while (i + 1 < tokens.size() && tokens[++i].type != TOK_SEMICOLON && tokens[i].type != TOK_CLOSE_BRACE)
 			{
 				std::string value = tokens[i].token;
-				if (key == "path")
-					setPath(value);
-				else if (key == "root")
+				if (key == "root")
 					setRoot(value);
 				else if (key == "index")
 					setIndex(value);
@@ -81,7 +90,7 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 					setReturn(value);
 				else if (key == "alias")
 					setAlias(value);
-				else if (key == "allow_methods")
+				else if (key == "methods")
 					addMethod(value);
 				else if (key == "cgi_path")
 					addCgipath(value);
@@ -90,7 +99,7 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 	}
 
 	//print debug statement
-	print_status();
+	//print_status();
 }
 
 

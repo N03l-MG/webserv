@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/23 09:34:39 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 10:32:44 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,11 @@ void signalHandler(int signum)
 {
 	if (signum == SIGINT)
 	{
-		std::cout << "Interrupt signal (" << signum << ") received.\n";
+		log(LOG_WARNING, "Interrupt signal (" + std::to_string(signum) + ") received.");
 		if (g_webserver)
 		{
 			g_webserver->shutdown();
-			g_webserver->~WebServ();	//probably doesn't trigger automatically because it's global
+			g_webserver->~WebServ();	//call destructor here because calling exit bypasses destructors
 		}
 		exit(signum);
 	}
@@ -49,17 +49,11 @@ int main(int ac, char **av)
 	{
 		std::cerr << e.what() << std::endl;
 		if (g_webserver)
-		{
 			g_webserver->shutdown();
-			g_webserver->~WebServ();
-		}
 		return (1);
 	}
 
 	if (g_webserver)
-	{
 		g_webserver->shutdown();
-		g_webserver->~WebServ();
-	}
 	return (0);
 }

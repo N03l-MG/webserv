@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/23 09:30:20 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 10:35:56 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 //	Constructor
 Server::Server()
 {
+	log(LOG_LOG, "Server created!");
 	this->port = 0;
 	this->host = "";
 	this->name = "";
@@ -26,13 +27,11 @@ Server::Server()
 Server::~Server()
 {
 	//delete all locations to avoid leaking
-	for (Location* loc : locations)
-	{
-		std::cout << "Delete Location:\t" << loc << std::endl;
+	for (Location *loc : locations)
 		delete loc;
-	}
 	locations.clear();
 	error_page.clear();
+	log(LOG_LOG, "Server destroyed!");
 }
 
 //	Setters
@@ -136,7 +135,7 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 	}
 
 	//print data
-	print_status();
+	//print_status();
 }
 
 

@@ -15,6 +15,7 @@
 //	Constructor
 WebServ::WebServ()
 {
+	log(LOG_LOG, "WebServ created!");
 	is_running = false;
 }
 
@@ -23,12 +24,10 @@ WebServ::WebServ()
 WebServ::~WebServ()
 {
 	//delete all servers to avoid leaking
-	for (Server* serv : servers)
-	{
-		std::cout << "Delete server:\t" << serv << std::endl;
+	for (Server *serv : servers)
 		delete serv;
-	}
 	servers.clear();
+	log(LOG_LOG, "WebServ destroyed!");
 }
 
 //	Setters

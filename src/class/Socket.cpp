@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 14:14:48 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/06 16:20:02 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/23 10:41:33 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 Socket::Socket(Server *serv) : server(serv)
 {
+	log(LOG_LOG, "Socket created!");
 	host = serv->getHost().c_str();
 	port = serv->getPort();
 	
@@ -36,7 +37,10 @@ Socket::Socket(Server *serv) : server(serv)
 	}
 }
 
-Socket::~Socket() {}
+Socket::~Socket()
+{
+	log(LOG_LOG, "Socket destroyed!");
+}
 
 int Socket::setupSocket()
 {
@@ -59,6 +63,6 @@ int Socket::setupSocket()
 		close(server_fd);
 		return 1;
 	}
-	std::cout << "Server listening on http://" << host << ":" << port << std::endl;
+	log(LOG_LOG, "Server listening on http://" + std::string(host) + ":" + std::to_string(port));
 	return 0;
 }
