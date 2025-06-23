@@ -1,36 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exceptions.hpp                                     :+:      :+:    :+:   */
+/*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/28 11:35:06 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/06 12:05:54 by nmonzon          ###   ########.fr       */
+/*   Created: 2025/06/05 14:15:14 by nmonzon           #+#    #+#             */
+/*   Updated: 2025/06/06 12:59:39 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//	Guard
 #pragma once
 
-//	Include
-#include <exception>
+#include <sys/select.h>
+#include <fcntl.h>
+#include <map>
+#include <errno.h>
+#include "Server.hpp"
 
-//	Exception
-class WrongFileException : public std::exception
+class Socket
 {
+	private:
+		int port;
+		const char *host;
 	public:
-		const char	*what()	const throw()
-		{
-			return ("ERROR!\tFailed to open or read file!");
-		}
-};
+		int server_fd;
+		Server *server;
+		Socket(Server *serv);
+		~Socket();
 
-class ParseException : public std::exception
-{
-	public:
-		const char	*what() const throw()
-		{
-			return ("ERROR!\tConfiguration file is invalid!");
-		}
+		int setupSocket();
 };

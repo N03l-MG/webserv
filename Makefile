@@ -6,7 +6,7 @@
 #    By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/13 16:17:26 by nmonzon           #+#    #+#              #
-#    Updated: 2025/06/06 15:04:24 by jgraf            ###   ########.fr        #
+#    Updated: 2025/06/23 09:15:12 by jgraf            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,8 @@ CMP = c++
 FLAGS = -Wall -Wextra -Werror -std=c++17 -Iinclude
 
 SCR_PARSE = $(addprefix parse/, read_config.cpp tokenize.cpp)
-SCR_CLASS = $(addprefix class/, WebServ.cpp Server.cpp Location.cpp)
+SCR_CLASS = $(addprefix class/, WebServ.cpp Server.cpp Location.cpp Socket.cpp SocketManager.cpp)
+SCR_LOG = $(addprefix log/, logging.cpp)
 SRC = $(addprefix src/, main.cpp $(SCR_PARSE) $(SCR_CLASS))
 OBJ_DIR = _obj
 OBJ = $(SRC:%.cpp=$(OBJ_DIR)/%.o)

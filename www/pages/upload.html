@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Upload - webserv</title>
+	<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+	<div class="container">
+		<h1>Upload Files</h1>
+		<form class="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
+			<input type="file" name="file" required>
+			<button type="submit">Upload</button>
+		</form>
+		<nav>
+			<ul class="nav-links">
+				<li><a href="/">Back</a></li>
+			</ul>
+		</nav>
+	</div>
+</body>
+</html>

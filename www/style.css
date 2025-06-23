@@ -1,0 +1,133 @@
+body {
+	margin: 0;
+	padding: 0;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background-color: #1a1a1a;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.container {
+	text-align: center;
+	padding: 4rem;
+	background-color: #252525;
+	border-radius: 15px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+	width: 45%;
+	max-width: 1000;
+}
+
+h1 {
+	color: #fcba03;
+	font-size: 5rem;
+	margin: 0;
+	letter-spacing: 2px;
+	text-transform: lowercase;
+}
+
+h2 {
+	color: #9803fc;
+	font-size: 2rem;
+	margin-top: 1rem;
+	font-weight: 300;
+}
+
+.highlight {
+	color: #9803fc;
+}
+
+nav {
+	margin-top: 2rem;
+}
+
+.nav-links {
+	list-style: none;
+	padding: 0;
+	display: flex;
+	gap: 1.5rem;
+}
+
+.nav-links a {
+	color: #808080;
+	text-decoration: none;
+	font-size: 1.2rem;
+	transition: color 0.3s;
+}
+
+.nav-links a:hover {
+	color: #fcba03;
+}
+
+.upload-form {
+	margin-top: 2rem;
+	color: #d4d4d4;
+}
+
+.upload-form input[type="file"] {
+	display: block;
+	margin: 1rem 0;
+	color: #d4d4d4;
+}
+
+.upload-form button {
+	background: #fcba03;
+	border: none;
+	padding: 0.8rem 1.5rem;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 1rem;
+	transition: background 0.3s;
+}
+
+.upload-form button:hover {
+	background: #d49f02;
+}
+
+.markdown-content {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 20px;
+	line-height: 1.6;
+	color: #ffffff;
+	text-align: left;
+}
+
+.markdown-content div[align="center"] {
+	text-align: center;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+	color: #9803fc;
+	margin-top: 24px;
+	margin-bottom: 16px;
+}
+
+.markdown-content pre {
+    background-color: #2d2d2d;  /* Darker background */
+    padding: 16px;
+    border-radius: 6px;
+    overflow: auto;
+    color: #d4d4d4;  /* Light gray text */
+    font-family: monospace;
+    line-height: 1.4;
+    margin: 1rem 0;
+    border: 1px solid #404040;  /* Subtle border */
+}
+
+.markdown-content code {
+    background-color: #2d2d2d;  /* Match pre background */
+    color: #d4d4d4;  /* Match pre text color */
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.markdown-content img {
+    max-width: 100%;
+    height: auto;
+}

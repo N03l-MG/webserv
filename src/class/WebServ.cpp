@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   WebServ.cpp                                        :+:      :+:    :+:   */
+/*   WebServ.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:34:44 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/06 12:54:26 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/06 11:33:35 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,19 +25,15 @@ WebServ::~WebServ()
 	//delete all servers to avoid leaking
 	for (Server* serv : servers)
 	{
-		std::cout << "Delete server" << std::endl;
+		std::cout << "Delete server:\t" << serv << std::endl;
 		delete serv;
 	}
 	servers.clear();
 }
 
 //	Setters
-void	WebServ::setTokens(t_vectok tokens)
-{
-	this->tokens = tokens;
-}
-
-int	WebServ::addServer(Server *new_server)
+void	WebServ::setTokens(t_vectok tokens) { this->tokens = tokens;}
+int		WebServ::addServer(Server *new_server)
 {
 	if (!new_server)
 		return (1);
@@ -47,36 +43,20 @@ int	WebServ::addServer(Server *new_server)
 
 
 //	Getters
+bool		WebServ::isRunning() { return (this->is_running); }
+t_vectok	WebServ::getTokens() { return (this->tokens);}
 t_tokens	*WebServ::getToken(size_t index)
 {
 	if (index < tokens.size())
 		return (&tokens[index]);
 	return (NULL);
 }
-
-t_vectok	WebServ::getTokens()
-{
-	return (this->tokens);
-}
-
+std::vector<Server*>	WebServ::getServer() {return (servers);}
 Server	*WebServ::getServer(size_t index)
 {
 	if (index < servers.size())
 		return (servers[index]);
 	return (NULL);
-}
-
-std::vector<Server*>	WebServ::getServer()
-{
-	return (servers);
-}
-
-
-//	Start
-void	WebServ::start()
-{
-	is_running = true;
-	parseConfig();
 }
 
 
@@ -92,4 +72,21 @@ void	WebServ::parseConfig()
 			servers.push_back(new_server);
 		}
 	}
+}
+
+
+//	Start
+void	WebServ::start()
+{
+	parseConfig();
+
+	socketManager = new SocketManager(servers);
+	socketManager->run();
+}
+
+
+//	Shutdown
+void WebServ::shutdown()
+{
+	delete socketManager;
 }

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   webserv.hpp                                        :+:      :+:    :+:   */
+/*   WebServ.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:32:39 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/06 12:26:02 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 09:10:57 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,16 @@
 //	Include
 #include "include.hpp"
 #include "Server.hpp"
+#include "SocketManager.hpp"
 
-//	Class
 class	WebServ
 {
 	private:
 		bool					is_running;
 		std::string				config_path;
-		t_vectok	tokens;
+		t_vectok				tokens;
 		std::vector<Server*>	servers;
+		SocketManager			*socketManager;
 
 		void	parseConfig();
 
@@ -32,13 +33,14 @@ class	WebServ
 		WebServ();
 		~WebServ();
 
-		void	setTokens(t_vectok);
-		int		addServer(Server *new_server);
+		void		setTokens(t_vectok tokens);
+		int			addServer(Server *new_server);
 		t_tokens	*getToken(size_t index);
 		t_vectok	getTokens();
-		Server	*getServer(size_t index);
+		Server		*getServer(size_t index);
 		std::vector<Server*>	getServer();
 
 		void	start();
 		void	shutdown();
+		bool	isRunning();
 };
