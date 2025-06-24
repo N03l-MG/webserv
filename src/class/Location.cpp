@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/23 16:26:36 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/23 16:31:29 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 	}
 
 	//print debug statement
-	print_status();
+	//print_status();
 }
 
 
