@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   SocketManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/25 15:34:07 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/25 16:52:37 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ std::vector<int> SocketManager::checkClient(fd_set &read_fds, t_client_socket &s
 		int client_fd = pair.first;
 		if (FD_ISSET(client_fd, &read_fds)) {
 			std::string request;
-			const size_t chunk_size = 4096;
+			const size_t chunk_size = 8192;
 			char chunk[chunk_size];
 			size_t total_bytes = 0;
 			bool headers_complete = false;
@@ -118,18 +118,21 @@ std::vector<int> SocketManager::checkClient(fd_set &read_fds, t_client_socket &s
 			while (true) {
 				ssize_t bytes_read = recv(client_fd, chunk, chunk_size - 1, 0);
 				if (bytes_read <= 0) {
-					if (bytes_read == 0 || errno != EAGAIN) {
-						close(client_fd);
-						to_remove.push_back(client_fd);
+					if (bytes_read == EAGAIN || errno == EWOULDBLOCK) {
+						continue;
 					}
+					close(client_fd);
+					to_remove.push_back(client_fd);
+					break;
+				} else if (bytes_read == 0) {
+					close(client_fd);
+					to_remove.push_back(client_fd);
 					break;
 				}
 
 				chunk[bytes_read] = '\0';
 				request.append(chunk, bytes_read);
 				total_bytes += bytes_read;
-
-				// Check if we've received all headers
 				if (!headers_complete) {
 					size_t header_end = request.find("\r\n\r\n");
 					if (header_end != std::string::npos) {
@@ -144,8 +147,6 @@ std::vector<int> SocketManager::checkClient(fd_set &read_fds, t_client_socket &s
 						}
 					}
 				}
-
-				// Check if we've received the complete request
 				if (headers_complete) {
 					size_t headers_size = request.find("\r\n\r\n") + 4;
 					if (content_length == 0 || total_bytes >= headers_size + content_length) {
@@ -158,8 +159,9 @@ std::vector<int> SocketManager::checkClient(fd_set &read_fds, t_client_socket &s
 				int server_fd = pair.second;
 				Socket* socket = sock_map[server_fd];
 				std::cout << "Received request of size: " << request.size() << " bytes, from client: " << client_fd << std::endl;
-				std::cout << "Full Request:\n" << request << std::endl;
-				socket->server->respond(client_fd, request);
+				//std::cout << "Full Request:\n" << request << std::endl;
+				if (headers_complete && total_bytes >= content_length)
+					socket->server->respond(client_fd, request);
 				close(client_fd);
 				to_remove.push_back(client_fd);
 			}
