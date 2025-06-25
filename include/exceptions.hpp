@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 11:35:06 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/06 12:05:54 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/25 14:51:13 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ class WrongFileException : public std::exception
 	public:
 		const char	*what()	const throw()
 		{
-			return ("ERROR!\tFailed to open or read file!");
+			return ("ERROR!\tFailed to open or read file! Default config may be missing or corrupt.");
 		}
 };
 
