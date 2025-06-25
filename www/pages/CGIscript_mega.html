@@ -28,22 +28,29 @@
 			const input = document.getElementById('input').value;
 			const output = document.getElementById('cgi-output');
 			output.innerHTML = 'Running megaphone...';
-			
-			fetch('/cgi-bin/megaphone.cgi?input=' + encodeURIComponent(input))
-				.then(response => {
-					if (!response.ok) {
-						throw new Error('Network response was not ok');
-					}
-					return response.text();
-				})
-				.then(html => {
-					document.getElementById('cgi-output').innerHTML = html;
-				})
-				.catch(error => {
-					console.error('Error:', error);
-					document.getElementById('cgi-output').innerHTML = 
-						'<p class="error">Error running megaphone: ' + error.message + '</p>';
-				});
+	
+			// Send input using POST
+			fetch('/cgi-bin/megaphone.cgi', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: 'input=' + input // Send raw input directly
+			})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.text();
+			})
+			.then(html => {
+				document.getElementById('cgi-output').innerHTML = html;
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				document.getElementById('cgi-output').innerHTML = 
+					'<p class="error">Error running megaphone: ' + error.message + '</p>';
+			});
 		}
 	</script>
 </body>
