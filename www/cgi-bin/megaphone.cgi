@@ -3,23 +3,24 @@
 echo "Content-type: text/html"
 echo ""
 
-# Read POST data
-read POST_DATA
+# Get query string from environment variable
+QUERY_STRING=${QUERY_STRING:-"voice="}
+VOICE=${QUERY_STRING#voice=}
 
-# Extract the 'input' parameter from POST data
-MEGA_INPUT=$(echo "$POST_DATA" | sed 's/^input=//')
+# URL decode the numbers
+VOICE=$(echo "$VOICE" | sed 's/+/ /g' | sed 's/%20/ /g')
 
 echo "<html>"
-echo "<head><title>Megaphone Result</title></head>"
+echo "<head><title>Push Swap Result</title></head>"
 echo "<body>"
 echo "<div class='output-container'>"
 
 echo "<h3>Input:</h3>"
-echo "<pre>$MEGA_INPUT</pre>"
+echo "<pre>$VOICE</pre>"
 echo "<h3>Output:</h3>"
 echo "<pre>"
-# Execute megaphone with the provided input
-./www/cgi-bin/megaphone "$MEGA_INPUT" 2>&1
+# Execute push_swap with the provided numbers
+./www/cgi-bin/megaphone "$VOICE" 2>&1
 echo "</pre>"
 
 echo "</div>"
