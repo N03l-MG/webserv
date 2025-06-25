@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:18:11 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/23 16:25:10 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/25 11:53:47 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <string>
 #include <sstream>
 #include <filesystem>
+#include <map>
 #include "include.hpp"
 #include "Location.hpp"
 
@@ -36,13 +37,24 @@ class	Server
 		size_t							max_body;		//max body size the client can recieve
 		std::map<size_t, std::string>	error_page;		//List of error pages
 		std::vector<Location*>			locations;		//list of page locations
+		std::map<std::string, std::string> mimeTypes;
+		struct HttpRequest
+		{
+			std::string method;
+			std::string path;
+			std::string version;
+			std::map<std::string, std::string> headers;
+			std::string body;
+			std::string boundary;
+		};
 
+		HttpRequest parseRequest(const std::string& raw_request);
 		std::string createResponse(int status_code, const std::string &content_type, const std::string &body);
-		void handleGet(int client_fd, std::string &path);
-		void handlePost(int client_fd, const std::string &request);
-		void handleDelete(int client_fd, const std::string &filepath);
-		std::string getContentTypeFromExtension(const std::string &filepath);
-		void handleCgi(int client_fd, const std::string &path, const std::string &method, const std::string &request);
+		void handleGet(int client_fd, const HttpRequest& request);
+		void handlePost(int client_fd, const HttpRequest& request);
+		void handleDelete(int client_fd, const HttpRequest& request);
+		void handleCgi(int client_fd, const HttpRequest& request);
+		std::string getMimeType(const std::string &filepath);
 		bool isCgiRequest(const std::string &path);
 		std::string executeCgi(const std::string &script_path, const std::string &query_string, 
 							const std::string &method, const std::string &body);

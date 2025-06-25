@@ -3,14 +3,18 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>CGI Script</title>
+	<title>Push Swap CGI</title>
 	<link rel="stylesheet" href="../style.css">
 </head>
 <body>
 	<div class="container">
-		<h1>CGI Test</h1>
+		<h1>Push Swap</h1>
+		<div class="push-swap-form">
+			<input type="text" id="numbers" placeholder="Enter numbers separated by spaces">
+			<button onclick="runPushSwap()">Run Push Swap</button>
+		</div>
 		<div id="cgi-output" class="markdown-content">
-			Loading CGI output...
+			Output will appear here...
 		</div>
 		<nav>
 			<ul class="nav-links">
@@ -20,17 +24,27 @@
 	</div>
 
 	<script>
-		// Fetch CGI script output
-		fetch('/cgi-bin/script.cgi')
-			.then(response => response.text())
-			.then(html => {
-				document.getElementById('cgi-output').innerHTML = html;
-			})
-			.catch(error => {
-				console.error('Error:', error);
-				document.getElementById('cgi-output').innerHTML = 
-					'<p>Error loading CGI script output.</p>';
-			});
+		function runPushSwap() {
+			const numbers = document.getElementById('numbers').value;
+			const output = document.getElementById('cgi-output');
+			output.innerHTML = 'Running push_swap...';
+			
+			fetch('/cgi-bin/script.cgi?numbers=' + encodeURIComponent(numbers))
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('Network response was not ok');
+					}
+					return response.text();
+				})
+				.then(html => {
+					document.getElementById('cgi-output').innerHTML = html;
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					document.getElementById('cgi-output').innerHTML = 
+						'<p class="error">Error running push_swap: ' + error.message + '</p>';
+				});
+		}
 	</script>
 </body>
 </html>

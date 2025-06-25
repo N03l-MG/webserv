@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/24 16:36:18 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/25 11:52:32 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,32 @@ Server::Server()
 	this->index = "";
 	this->timeout = 10000;
 	this->max_body = 10000;
+
+	// MIME types
+	mimeTypes[".html"] = "text/html";
+	mimeTypes[".htm"] = "text/html";
+	mimeTypes[".css"] = "text/css";
+	mimeTypes[".js"] = "application/javascript";
+	mimeTypes[".json"] = "application/json";
+	mimeTypes[".xml"] = "application/xml";
+	mimeTypes[".txt"] = "text/plain";
+	mimeTypes[".md"] = "text/markdown";
+	mimeTypes[".jpg"] = "image/jpeg";
+	mimeTypes[".jpeg"] = "image/jpeg";
+	mimeTypes[".png"] = "image/png";
+	mimeTypes[".gif"] = "image/gif";
+	mimeTypes[".svg"] = "image/svg+xml";
+	mimeTypes[".ico"] = "image/x-icon";
+	mimeTypes[".mp3"] = "audio/mpeg";
+	mimeTypes[".wav"] = "audio/wav";
+	mimeTypes[".mp4"] = "video/mp4";
+	mimeTypes[".webm"] = "video/webm";
+	mimeTypes[".pdf"] = "application/pdf";
+	mimeTypes[".doc"] = "application/msword";
+	mimeTypes[".docx"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+	mimeTypes[".zip"] = "application/zip";
+	mimeTypes[".gz"] = "application/gzip";
+	mimeTypes[".tar"] = "application/x-tar";
 }
 
 //	Destructor
@@ -71,10 +97,10 @@ Location	*Server::getLocation(size_t index)
 	return (NULL);
 }
 
-
 // ================================================= //
 // ===========         CONFIGURE         =========== //
 // ================================================= //
+
 static bool	brace_check(t_vectok tokens)
 {
 	int	cnt = 0;
@@ -144,7 +170,6 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 	//print_status();
 }
 
-
 //	Debug
 void	Server::print_status()
 {
@@ -162,26 +187,62 @@ void	Server::print_status()
 		std::cout << "Error Code:\t" << it->first  << "\t-> Page:\t" << it->second << std::endl;
 }
 
-
 // ================================================= //
 // ===========       HTTP RESPONSE       =========== //
 // ================================================= //
 
-void Server::respond(int client_fd, const std::string &request)
+Server::HttpRequest Server::parseRequest(const std::string& raw_request) 
 {
-	// Parse the path from the request line
-	std::istringstream req_stream(request);
-	std::string method, path, version;
-	req_stream >> method >> path >> version;
+	HttpRequest request;
+	std::istringstream request_stream(raw_request);
 
-	if (isCgiRequest(path))
-        handleCgi(client_fd, path, method, request);
-	else if (method == "POST" && path == "/upload")
+	std::string request_line;
+	std::getline(request_stream, request_line);
+	std::istringstream request_line_stream(request_line);
+	request_line_stream >> request.method >> request.path >> request.version;
+
+	std::string header_line;
+	while (std::getline(request_stream, header_line) && header_line != "\r") {
+		size_t colon_pos = header_line.find(':');
+		if (colon_pos != std::string::npos) {
+			std::string key = header_line.substr(0, colon_pos);
+			std::string value = header_line.substr(colon_pos + 2); // Skip ": "
+			if (!value.empty() && value[value.length()-1] == '\r') {
+				value = value.substr(0, value.length()-1);
+			}
+			request.headers[key] = value;
+		}
+	}
+
+	auto content_type_it = request.headers.find("Content-Type");
+	if (content_type_it != request.headers.end()) {
+		size_t boundary_pos = content_type_it->second.find("boundary=");
+		if (boundary_pos != std::string::npos) {
+			request.boundary = content_type_it->second.substr(boundary_pos + 9);
+		}
+	}
+
+	size_t header_end = raw_request.find("\r\n\r\n");
+	if (header_end != std::string::npos) {
+		request.body = raw_request.substr(header_end + 4);
+	}
+	
+	return request;
+}
+
+// Modify your respond method to use the parser:
+void Server::respond(int client_fd, const std::string& raw_request)
+{
+	HttpRequest request = parseRequest(raw_request);
+	
+	if (isCgiRequest(request.path))
+		handleCgi(client_fd, request);
+	else if (request.method == "POST" && request.path == "/upload")
 		handlePost(client_fd, request);
-	else if (method == "DELETE")
-		handleDelete(client_fd, path);
+	else if (request.method == "DELETE")
+		handleDelete(client_fd, request);
 	else
-		handleGet(client_fd, path);
+		handleGet(client_fd, request);
 }
 
 std::string Server::createResponse(int status_code, const std::string &content_type, const std::string &body)
@@ -209,12 +270,13 @@ std::string Server::createResponse(int status_code, const std::string &content_t
 // ===========      METHOD HANDLING      =========== //
 // ================================================= //
 
-void Server::handleGet(int client_fd, std::string &path)
+void Server::handleGet(int client_fd, const HttpRequest& request)
 {
-	if (path.empty() || path == "/")
-		path = "/" + this->index;
+	std::string path = request.path;
+    if (path.empty() || path == "/")
+        path = "/" + this->index;
 
-	std::string filepath = this->root + path;
+    std::string filepath = this->root + path;
 	std::ifstream file(filepath, std::ios::binary | std::ios::ate);
 	
 	if (!file.is_open()) {
@@ -229,127 +291,82 @@ void Server::handleGet(int client_fd, std::string &path)
 	file.read(file_buffer.data(), size);
 	file.close();
 
-	std::string content_type = getContentTypeFromExtension(filepath);
+	std::string content_type = getMimeType(filepath);
 
 	std::string response = createResponse(200, content_type, std::string(file_buffer.data(), file_buffer.size()));
     send(client_fd, response.c_str(), response.size(), 0);
 }
 
-void Server::handlePost(int client_fd, const std::string &request)
+void Server::handlePost(int client_fd, const HttpRequest& request)
 {
-	std::ofstream debug_file("debug_request_body.txt", std::ios::binary);
-	debug_file.write(request.data(), request.size());
-	debug_file.close();
-	// Find the start of the body
-	size_t header_end = request.find("\r\n\r\n");
-	if (header_end == std::string::npos) {
-		std::string response = createResponse(400, "text/plain", "Malformed request\r\n");
+	if (request.boundary.empty()) {
+		std::string response = createResponse(400, "text/plain", "Bad Request: No boundary found\n");
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
-
-	std::string headers = request.substr(0, header_end);
-	const char* body_start = request.data() + header_end + 4;
-	size_t body_length = request.size() - (header_end + 4);
-
-	// Find boundary first
-	std::string boundary;
-	size_t boundary_pos = headers.find("boundary=");
-	if (boundary_pos == std::string::npos) {
-		std::string response = createResponse(400, "text/plain", "No boundary found\r\n");
+	
+	// Find filename in the body
+	size_t filename_pos = request.body.find("filename=\"");
+	if (filename_pos == std::string::npos) {
+		std::string response = createResponse(400, "text/plain", "Bad Request: No filename found\n");
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
-
-	// Check Content length
-	if (body_length != static_cast<size_t>(std::stol(headers.substr(headers.find("Content-Length:") + 15)))) {
-		std::cerr << "Incomplete request body received" << std::endl;
-		std::string response = createResponse(400, "text/plain", "Incomplete request body\r\n");
+	
+	// Extract filename
+	filename_pos += 10;
+	size_t filename_end = request.body.find("\"", filename_pos);
+	std::string filename = request.body.substr(filename_pos, filename_end - filename_pos);
+	
+	// Find file content
+	size_t content_start = request.body.find("\r\n\r\n", filename_end) + 4;
+	size_t content_end = request.body.find("--" + request.boundary + "--") - 2;
+	
+	if (content_start == std::string::npos || content_end == std::string::npos) {
+		std::string response = createResponse(400, "text/plain", "Bad Request: Invalid file content\n");
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
-
-	// Get the boundary value
-	boundary = headers.substr(boundary_pos + 9);
-	size_t end = boundary.find("\r");
-	if (end != std::string::npos)
-		boundary = boundary.substr(0, end);
-
-	// Create full boundary pattern with markers
-	std::string full_boundary = "--" + boundary;  // Remove \r\n prefix
-	std::cout << "Found boundary: '" << boundary << "'" << std::endl;
-
-	// Find filename
-	const char* filename_pattern = "filename=\"";
-	const char* file_content = std::search(body_start, body_start + body_length,
-		filename_pattern, filename_pattern + strlen(filename_pattern));
-	if (file_content == body_start + body_length) {
-		std::cerr << "No filename found" << std::endl;
-		return;
+	
+	// Extract file content
+	std::string file_content = request.body.substr(content_start, content_end - content_start);
+	
+	// Create directory and save file
+	std::string upload_dir = "www/uploads";
+	if (!std::filesystem::exists(upload_dir)) {
+		if (!std::filesystem::create_directory(upload_dir)) {
+			std::string response = createResponse(500, "text/plain", "Server Error: Failed to create upload directory\n");
+			send(client_fd, response.c_str(), response.size(), 0);
+			return;
+		}
 	}
-	file_content += strlen(filename_pattern);
-
-	// Get filename
-	const char* quote = "\"";
-	const char* filename_end = std::search(file_content, body_start + body_length,
-		quote, quote + strlen(quote));
-	if (filename_end == body_start + body_length) {
-		std::cerr << "Malformed filename" << std::endl;
-		return;
-	}
-	std::string filename(file_content, filename_end - file_content);
-	std::cout << "Found filename: '" << filename << "'" << std::endl;
-
-	// Find start of actual file data
-	const char* separator = "\r\n\r\n";
-	const char* data_start = std::search(filename_end, body_start + body_length,
-		separator, separator + strlen(separator));
-	if (data_start == body_start + body_length) {
-		std::cerr << "No data start marker found" << std::endl;
-		return;
-	}
-	data_start += strlen(separator);
-
-	// Find end of file data using full boundary
-	std::string boundary_pattern = "\r\n" + full_boundary;
-	const char *data_end = std::search(data_start, body_start + body_length,
-		boundary_pattern.c_str(), boundary_pattern.c_str() + boundary_pattern.length());
-	if (data_end == body_start + body_length) {
-		std::string response = createResponse(500, "text/plain", "No boundary found after data\r\n");
-		send(client_fd, response.c_str(), response.size(), 0);
-		std::cerr << "No boundary found after data" << std::endl;
-		return;
-	}
-
-	// Calculate final data size
-	size_t data_size = data_end - data_start;
-	std::cout << "Data size: " << data_size << " bytes" << std::endl;
-
-	// Save the file
-	std::ofstream outfile("www/uploads/" + filename, std::ios::binary);
+	
+	std::string filepath = upload_dir + "/" + filename;
+	std::ofstream outfile(filepath, std::ios::binary);
 	if (!outfile.is_open()) {
-		std::string response = createResponse(500, "text/plain", "Failed to create output file\r\n");
+		std::string response = createResponse(500, "text/plain", "Server Error: Failed to create file\n");
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
-
-	outfile.write(data_start, data_size);
+	
+	outfile.write(file_content.c_str(), file_content.length());
 	outfile.close();
-
-	std::string response = createResponse(200, getContentTypeFromExtension(filename), "<h1>Upload successful!</h1>\n");
+	std::string response = createResponse(200, "text/html", 
+		"<h1>Upload successful!</h1>\n"
+		"<p>File '" + filename + "' has been uploaded.</p>\n");
 	send(client_fd, response.c_str(), response.size(), 0);
 }
 
-void Server::handleDelete(int client_fd, const std::string &filepath)
+void Server::handleDelete(int client_fd, const HttpRequest& request) // TODO: Fix massive security issues.
 {
-	if (filepath.substr(0, 8) != "/uploads/") {
-		std::string response = createResponse(405, "text/plain", "Method Not Allowed\r\n");
-		send(client_fd, response.c_str(), response.size(), 0);
-		return;
-	}
+	if (request.path.substr(0, 8) != "/uploads/") {
+        std::string response = createResponse(405, "text/plain", "Method Not Allowed\r\n");
+        send(client_fd, response.c_str(), response.size(), 0);
+        return;
+    }
 
 	// Remove www/ from filepath if it exists
-	std::string actual_path = filepath;
+	std::string actual_path = request.path;
 	if (actual_path.substr(0, 4) == "www/") {
 		actual_path = actual_path.substr(4);
 	}
@@ -371,20 +388,17 @@ void Server::handleDelete(int client_fd, const std::string &filepath)
 	}
 }
 
-std::string Server::getContentTypeFromExtension(const std::string &filepath)
+std::string Server::getMimeType(const std::string &filepath)
 {
 	size_t dot_pos = filepath.find_last_of(".");
 	if (dot_pos != std::string::npos) {
 		std::string ext = filepath.substr(dot_pos);
-		if (ext == ".html") return "text/html";
-		if (ext == ".css") return "text/css";
-		if (ext == ".js") return "application/javascript";
-		if (ext == ".png") return "image/png";
-		if (ext == ".jpg" || ext == ".jpeg") return "image/jpeg";
-		if (ext == ".gif") return "image/gif";
-		if (ext == ".md") return "text/markdown";
+		auto it = mimeTypes.find(ext);
+		if (it != mimeTypes.end()) {
+			return it->second;
+		}
 	}
-	return "text/plain";
+	return "application/octet-stream"; // Unknown file default
 }
 
 // ================================================= //
@@ -397,26 +411,13 @@ bool Server::isCgiRequest(const std::string &path)
 	return path.substr(0, 9) == "/cgi-bin/";
 }
 
-void Server::handleCgi(int client_fd, const std::string &path, const std::string &method, 
-					const std::string &request)
+void Server::handleCgi(int client_fd, const HttpRequest& request)
 {
-	// Extract query string if present
-	std::string script_path = this->root + path;
+	std::string script_path = this->root + request.path;
 	std::string query_string;
 	
-	// Get request body for POST requests
-	std::string body;
-	if (method == "POST") {
-		size_t header_end = request.find("\r\n\r\n");
-		if (header_end != std::string::npos) {
-			body = request.substr(header_end + 4);
-		}
-	}
-
-	// Execute CGI script
-	std::string output;
 	try {
-		output = executeCgi(script_path, query_string, method, body);
+		std::string output = executeCgi(script_path, query_string, request.method, request.body);
 		std::string response = createResponse(200, "text/html", output);
 		send(client_fd, response.c_str(), response.size(), 0);
 	} catch (const std::exception &e) {
