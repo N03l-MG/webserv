@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/23 16:31:33 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/24 16:36:18 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	Server::setRoot(std::string root) { this->root = root; }
 void	Server::setIndex(std::string index) { this->index = index; }
 void	Server::setTimeout(size_t timeout) { this->timeout = timeout; }
 void	Server::setMaxBody(size_t max_body) { this->max_body = max_body; }
-void	Server::addErrorpage(size_t code, std::string page) { error_page[code] = page; }
+void	Server::addErrorpage(size_t code, std::string page) { this->error_page[code] = page; }
 int		Server::addLocation(Location *new_location)
 {
 	if (!new_location)
@@ -61,8 +61,8 @@ std::string	Server::getRoot() { return (this->root); }
 std::string	Server::getIndex() { return (this->index); }
 size_t		Server::getTimeout() { return (this->timeout); }
 size_t		Server::getMaxBody() { return (this->max_body); }
-std::vector<Location*>	Server::getLocation() { return (locations); }
-std::map<size_t, std::string>	Server::getErrorpage() { return (error_page); }
+std::vector<Location*>	Server::getLocation() { return (this->locations); }
+std::map<size_t, std::string>	Server::getErrorpage() { return (this->error_page); }
 std::string	&Server::getErrorpage(size_t code) { return (this->error_page[code]); }
 Location	*Server::getLocation(size_t index)
 {
@@ -237,6 +237,9 @@ void Server::handleGet(int client_fd, std::string &path)
 
 void Server::handlePost(int client_fd, const std::string &request)
 {
+	std::ofstream debug_file("debug_request_body.txt", std::ios::binary);
+	debug_file.write(request.data(), request.size());
+	debug_file.close();
 	// Find the start of the body
 	size_t header_end = request.find("\r\n\r\n");
 	if (header_end == std::string::npos) {
@@ -254,6 +257,14 @@ void Server::handlePost(int client_fd, const std::string &request)
 	size_t boundary_pos = headers.find("boundary=");
 	if (boundary_pos == std::string::npos) {
 		std::string response = createResponse(400, "text/plain", "No boundary found\r\n");
+		send(client_fd, response.c_str(), response.size(), 0);
+		return;
+	}
+
+	// Check Content length
+	if (body_length != static_cast<size_t>(std::stol(headers.substr(headers.find("Content-Length:") + 15)))) {
+		std::cerr << "Incomplete request body received" << std::endl;
+		std::string response = createResponse(400, "text/plain", "Incomplete request body\r\n");
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -304,6 +315,8 @@ void Server::handlePost(int client_fd, const std::string &request)
 	const char *data_end = std::search(data_start, body_start + body_length,
 		boundary_pattern.c_str(), boundary_pattern.c_str() + boundary_pattern.length());
 	if (data_end == body_start + body_length) {
+		std::string response = createResponse(500, "text/plain", "No boundary found after data\r\n");
+		send(client_fd, response.c_str(), response.size(), 0);
 		std::cerr << "No boundary found after data" << std::endl;
 		return;
 	}
@@ -323,7 +336,7 @@ void Server::handlePost(int client_fd, const std::string &request)
 	outfile.write(data_start, data_size);
 	outfile.close();
 
-	std::string response = createResponse(200, "text/html", "<h1>Upload successful!</h1>\n");
+	std::string response = createResponse(200, getContentTypeFromExtension(filename), "<h1>Upload successful!</h1>\n");
 	send(client_fd, response.c_str(), response.size(), 0);
 }
 

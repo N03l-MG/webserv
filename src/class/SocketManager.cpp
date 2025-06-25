@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   SocketManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/11 14:08:46 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/25 08:43:32 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ std::vector<int> SocketManager::checkClient(fd_set &read_fds, t_client_socket &s
 	for (const auto& pair : client_server_map) {
 		int client_fd = pair.first;
 		if (FD_ISSET(client_fd, &read_fds)) {
-			char buffer[4096];
+			char buffer[1048576];
 			ssize_t bytes_read = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
 			if (bytes_read <= 0) {
 				close(client_fd);
@@ -119,7 +119,7 @@ std::vector<int> SocketManager::checkClient(fd_set &read_fds, t_client_socket &s
 			buffer[bytes_read] = '\0';
 			int server_fd = pair.second;
 			Socket* socket = sock_map[server_fd];
-			socket->server->respond(client_fd, std::string(buffer));
+			socket->server->respond(client_fd, buffer);
 			close(client_fd);
 			to_remove.push_back(client_fd);
 		}
