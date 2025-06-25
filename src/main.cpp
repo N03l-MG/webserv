@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/23 12:23:13 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/25 14:49:46 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ void signalHandler(int signum)
 
 int main(int ac, char **av)
 {
-	if (ac != 2) {
-		std::cerr << "Invalid number of arguments! (Expected 1)" << std::endl;
+	if (ac > 2) {
+		log(LOG_ERROR, "Too many arguments! (Expected 1 at most)");
 		return (1);
 	}
 
@@ -42,7 +42,10 @@ int main(int ac, char **av)
 		g_webserver = &webserver; // Set the global pointer
 		signal(SIGINT, signalHandler); // Register the signal handler
 
-		webserver.setTokens(read_config_file(av[1]));
+		if (ac == 2)
+			webserver.setTokens(read_config_file(av[1]));
+		else
+			webserver.setTokens(read_config_file("./config/default.conf"));
 		webserver.start();
 	}
 	catch (std::exception &e)

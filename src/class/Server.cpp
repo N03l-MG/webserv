@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/24 16:25:26 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/25 15:20:18 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -350,13 +350,14 @@ void Server::handlePost(int client_fd, const HttpRequest& request)
 	send(client_fd, response.c_str(), response.size(), 0);
 }
 
-void Server::handleDelete(int client_fd, const HttpRequest& request) // TODO: Fix massive security issues.
+void Server::handleDelete(int client_fd, const HttpRequest& request)
 {
-	if (request.path.substr(0, 8) != "/uploads/") {
-        std::string response = createResponse(405, "text/plain", "Method Not Allowed\r\n");
-        send(client_fd, response.c_str(), response.size(), 0);
-        return;
-    }
+	if (request.path.substr(0, 9) != "/uploads/") {
+		std::cout << request.path.substr(0, 9) << std::endl;
+		std::string response = createResponse(405, "text/plain", "Method Not Allowed\r\n");
+		send(client_fd, response.c_str(), response.size(), 0);
+		return;
+	}
 
 	// Remove www/ from filepath if it exists
 	std::string actual_path = request.path;

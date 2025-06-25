@@ -2,3 +2,5 @@
 _obj/
 testing/
 .vscode/
+.DS_Store
+webserv

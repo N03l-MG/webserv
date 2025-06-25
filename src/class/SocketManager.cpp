@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/24 16:50:14 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/25 14:59:10 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,8 @@ std::vector<int> SocketManager::checkClient(fd_set &read_fds, t_client_socket &s
 			if (!request.empty()) {
 				int server_fd = pair.second;
 				Socket* socket = sock_map[server_fd];
-				std::cout << "Received request of size: " << request.size() << " bytes" << std::endl;
+				std::cout << "Received request of size: " << request.size() << " bytes, from client: " << client_fd << std::endl;
+				std::cout << "Full Request:\n" << request << std::endl;
 				socket->server->respond(client_fd, request);
 				close(client_fd);
 				to_remove.push_back(client_fd);
