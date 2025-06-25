@@ -23,7 +23,7 @@ else
     echo "<h3>Output:</h3>"
     echo "<pre>"
     # Execute push_swap with the provided numbers
-    ./push_swap $NUMBERS 2>&1
+    ./www/cgi-bin/push_swap $NUMBERS 2>&1
     echo "</pre>"
 fi
 

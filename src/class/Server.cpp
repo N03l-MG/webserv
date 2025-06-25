@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/25 11:52:32 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/25 12:45:29 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Server::Server()
 	this->name = "";
 	this->root = "";
 	this->index = "";
-	this->timeout = 10000;
+	this->timeout = 15;
 	this->max_body = 10000;
 
 	// MIME types
@@ -413,9 +413,16 @@ bool Server::isCgiRequest(const std::string &path)
 
 void Server::handleCgi(int client_fd, const HttpRequest& request)
 {
-	std::string script_path = this->root + request.path;
-	std::string query_string;
-	
+	std::cout << "Request: " << request.path << std::endl;
+
+	// Extract script path and query string
+	size_t query_pos = request.path.find('?');
+	std::string script_path = this->root + request.path.substr(0, query_pos);
+	std::string query_string = (query_pos != std::string::npos) ? request.path.substr(query_pos + 1) : "";
+
+	std::cout << "Script Path: " << script_path << std::endl;
+	std::cout << "Query String: " << query_string << std::endl;
+
 	try {
 		std::string output = executeCgi(script_path, query_string, request.method, request.body);
 		std::string response = createResponse(200, "text/html", output);
