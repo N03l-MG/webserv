@@ -19,9 +19,12 @@ echo "<h3>Input:</h3>"
 echo "<pre>$VOICE</pre>"
 echo "<h3>Output:</h3>"
 echo "<pre>"
-# Execute push_swap with the provided numbers
-./www/cgi-bin/megaphone "$VOICE" 2>&1
-echo "</pre>"
+
+if [ -z "$VOICE" ]; then
+    ./www/cgi-bin/megaphone $VOICE 2>&1
+else
+    ./www/cgi-bin/megaphone "$VOICE" 2>&1
+fi
 
 echo "</div>"
 echo "</body></html>"
