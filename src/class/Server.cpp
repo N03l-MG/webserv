@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include <sys/wait.h>
 
 //	Constructor
 Server::Server()

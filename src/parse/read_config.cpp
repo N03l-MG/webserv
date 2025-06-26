@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "include.hpp"
+#include <filesystem>
 
 //	Read individual lines and call the tokenisation function on each line.
 t_vectok	read_config_file(std::string const &in_file)

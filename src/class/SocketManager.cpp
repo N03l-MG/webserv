@@ -43,19 +43,27 @@ void SocketManager::initializeServerSockets()
 void SocketManager::handleNewConnection(pollfd &pfd, time_t now)
 {
 	sockaddr_in client_addr{};
-	socklen_t client_len = sizeof(client_addr);
-	int client_fd = accept(pfd.fd, (sockaddr*)&client_addr, &client_len);
-	
-	if (client_fd < 0) {
-		std::cerr << "Accept failed: " << strerror(errno) << "\n";
-		return;
-	}
-	
-	fcntl(client_fd, F_SETFL, fcntl(client_fd, F_GETFL, 0) | O_NONBLOCK);
-	poll_fds.push_back({client_fd, POLLIN, 0});
-	client_to_server[client_fd] = fd_to_socket[pfd.fd]->server;
-	client_last_active[client_fd] = now;
-	client_buffers[client_fd] = "";
+    socklen_t client_len = sizeof(client_addr);
+    int client_fd = accept(pfd.fd, (sockaddr*)&client_addr, &client_len);
+
+    if (client_fd < 0) {
+        std::cerr << "Accept failed: " << strerror(errno) << "\n";
+        return;
+    }
+
+    fcntl(client_fd, F_SETFL, fcntl(client_fd, F_GETFL, 0) | O_NONBLOCK);
+    poll_fds.push_back({client_fd, POLLIN, 0});
+
+    // Defensive: check fd_to_socket
+    if (fd_to_socket.count(pfd.fd) == 0 || fd_to_socket[pfd.fd] == nullptr) {
+        std::cerr << "Error: fd_to_socket missing or null for fd " << pfd.fd << "\n";
+        close(client_fd);
+        return;
+    }
+
+    client_to_server[client_fd] = fd_to_socket[pfd.fd]->server;
+    client_last_active[client_fd] = now;
+    client_buffers[client_fd] = "";
 }
 
 bool SocketManager::processRequest(int fd, std::string &request)
