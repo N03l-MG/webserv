@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/27 11:50:20 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 14:32:20 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	Location::setReturn(std::string _return)	{ this->_return = _return; }
 void	Location::setAlias(std::string alias)		{ this->alias = alias; }
 void	Location::setStore(std::string store)		{ this->store = store; }
 void	Location::setMaxBody(size_t max_body)		{ this->max_body = max_body; }
-void	Location::addMethod(std::string method)		{ this->allow_methods.push_back(method); }
+void	Location::addMethod(t_methods method)		{ this->allow_methods.push_back(method); }
 void	Location::addCgipath(std::string path)		{ this->cgi_path.push_back(path); }
 
 
@@ -53,13 +53,13 @@ std::string	Location::getReturn()	{ return (this->_return); }
 std::string	Location::getAlias()	{ return (this->alias); }
 std::string	Location::getStore()	{ return (this->store); }
 size_t		Location::getMaxBody()	{ return (this->max_body); }
-t_vecstr	Location::getMethod()	{ return (this->allow_methods); }
+std::vector<t_methods>	Location::getMethod()	{ return (this->allow_methods); }
 t_vecstr	Location::getCgipath()	{ return (this->cgi_path); }
-std::string	Location::getMethod(size_t index)
+t_methods	Location::getMethod(size_t index)
 {
 	if (index < allow_methods.size())
 		return (allow_methods[index]);
-	return ("");
+	return (METHOD_INVALID);
 }
 std::string	Location::getCgipath(size_t index)
 {
@@ -70,6 +70,18 @@ std::string	Location::getCgipath(size_t index)
 
 
 //	Config
+t_methods	Location::strToMeth(std::string method)
+{
+	if (method == "GET")
+		return (METHOD_GET);
+	if (method == "POST")
+		return (METHOD_POST);
+	if (method == "DELETE")
+		return (METHOD_DELETE);
+	else
+		return (METHOD_INVALID);
+}
+
 void	Location::configure(t_vectok &tokens, size_t &i)
 {
 	//	Set path
@@ -101,7 +113,7 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 				else if (key == "max_body")
 					setMaxBody(std::stoi(value));
 				else if (key == "methods")
-					addMethod(value);
+					addMethod(strToMeth(value));
 				else if (key == "cgi_path")
 					addCgipath(value);
 			}

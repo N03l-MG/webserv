@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:13 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/27 11:10:27 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 14:28:30 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,15 @@ typedef enum	e_logtype
 	LOG_WARN,
 	LOG_ERR
 }	t_logtype;
+
+
+typedef enum	e_methods
+{
+	METHOD_GET,
+	METHOD_POST,
+	METHOD_DELETE,
+	METHOD_INVALID
+}	t_methods;
 
 
 //	Tokens

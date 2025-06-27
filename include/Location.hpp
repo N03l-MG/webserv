@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:49:46 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/23 16:24:44 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 14:30:25 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ class	Location
 		std::string	alias;
 		std::string	store;
 		size_t		max_body;
-		t_vecstr	allow_methods;
 		t_vecstr	cgi_path;
+		std::vector<t_methods>	allow_methods;
 	
 	public:
 		Location(Server *parent_server);
@@ -46,7 +46,7 @@ class	Location
 		void		setAlias(std::string alias);
 		void		setStore(std::string store);
 		void		setMaxBody(size_t max_body);
-		void		addMethod(std::string method);
+		void		addMethod(t_methods method);
 		void		addCgipath(std::string path);
 		std::string	getPath();
 		std::string	getRoot();
@@ -55,11 +55,12 @@ class	Location
 		std::string	getAlias();
 		std::string	getStore();
 		size_t		getMaxBody();
-		std::string	getMethod(size_t index);
-		t_vecstr	getMethod();
+		t_methods	getMethod(size_t index);
+		std::vector<t_methods>	getMethod();
 		std::string	getCgipath(size_t index);
 		t_vecstr	getCgipath();
 
-		void	configure(t_vectok &tokens, size_t &i);
-		void	print_status();
+		void		configure(t_vectok &tokens, size_t &i);
+		t_methods	strToMeth(std::string method);
+		void		print_status();
 };
