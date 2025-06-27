@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:18:11 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/26 16:23:27 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/25 11:53:47 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ class	Server
 		std::string						name;			//the servers name
 		std::string						root;			//the root repository
 		std::string						index;			//the default page
-		struct timeval					timeout;		//the max time select waits for a request
+		size_t							timeout;		//max response time for the server
 		size_t							max_body;		//max body size the client can recieve
 		std::map<size_t, std::string>	error_page;		//List of error pages
 		std::vector<Location*>			locations;		//list of page locations
@@ -68,7 +68,7 @@ class	Server
 		void		setName(std::string name);
 		void		setRoot(std::string root);
 		void		setIndex(std::string index);
-		void		setTimeout(size_t timeout);
+		void		setTimeout(size_t time);
 		void		setMaxBody(size_t max_body);
 		void		addErrorpage(size_t code, std::string page);
 		int			addLocation(Location *new_location);
@@ -77,7 +77,7 @@ class	Server
 		std::string	getName();
 		std::string	getRoot();
 		std::string	getIndex();
-		struct timeval		getTimeout();
+		size_t		getTimeout();
 		size_t		getMaxBody();
 		std::string						&getErrorpage(size_t code);
 		std::map<size_t, std::string>	getErrorpage();

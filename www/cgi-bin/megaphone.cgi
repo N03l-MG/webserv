@@ -11,7 +11,7 @@ VOICE=${QUERY_STRING#voice=}
 VOICE=$(echo "$VOICE" | sed 's/+/ /g' | sed 's/%20/ /g')
 
 echo "<html>"
-echo "<head><title>Push Swap Result</title></head>"
+echo "<head><title>Megaphone Result</title></head>"
 echo "<body>"
 echo "<div class='output-container'>"
 
@@ -21,10 +21,11 @@ echo "<h3>Output:</h3>"
 echo "<pre>"
 
 if [ -z "$VOICE" ]; then
-    ./www/cgi-bin/megaphone $VOICE 2>&1
+	./www/cgi-bin/megaphone $VOICE 2>&1
 else
-    ./www/cgi-bin/megaphone "$VOICE" 2>&1
+	./www/cgi-bin/megaphone "$VOICE" 2>&1
 fi
 
+echo "</pre>"
 echo "</div>"
 echo "</body></html>"

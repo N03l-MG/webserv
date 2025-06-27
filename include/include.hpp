@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   include.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:13 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/26 14:56:14 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/26 19:07:06 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <csignal>
+#include <poll.h>
 #include <ctime>
 #include "exceptions.hpp"
 
@@ -62,9 +63,6 @@ typedef struct s_tokens
 //	Definitions
 typedef std::vector<std::string>	t_vecstr;
 typedef std::vector<t_tokens>		t_vectok;
-#ifndef TIMEOUT
-# define TIMEOUT 30
-#endif
 
 
 //	Parsing
