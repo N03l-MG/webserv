@@ -5,9 +5,11 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/02 11:18:11 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/27 13:04:47 by jgraf            ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2025/06/27 14:57:38 by jgraf            ###   ########.fr       */
 /*                                                                            */
+/* ************************************************************************** */
+
 /* ************************************************************************** */
 
 //	Guard
@@ -21,6 +23,8 @@
 #include <map>
 #include "include.hpp"
 #include "Location.hpp"
+
+class	Location;
 
 class	Location;
 
@@ -73,6 +77,7 @@ class	Server
 		void		setRoot(std::string root);
 		void		setIndex(std::string index);
 		void		setTimeout(size_t time);
+		void		setMaxBody(size_t max_body);
 		void		setMaxBody(size_t max_body);
 		void		addErrorpage(size_t code, std::string page);
 		int			addLocation(Location *new_location);

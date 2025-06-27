@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/27 14:32:20 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 14:59:36 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,8 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 					setStore(value);
 				else if (key == "max_body")
 					setMaxBody(std::stoi(value));
+				else if (key == "max_body")
+					setMaxBody(std::stoi(value));
 				else if (key == "methods")
 					addMethod(strToMeth(value));
 				else if (key == "cgi_path")
@@ -134,6 +136,8 @@ void	Location::print_status()
 			<< "Index:\t\t" << getIndex() << "\n"
 			<< "Return:\t\t" << getReturn() << "\n"
 			<< "Alias:\t\t" << getAlias() << "\n"
+			<< "Upload Store:\t" << getStore() << "\n"
+			<< "Body Size\t" << getMaxBody() << std::endl;
 			<< "Upload Store:\t" << getStore() << "\n"
 			<< "Body Size\t" << getMaxBody() << std::endl;
 	

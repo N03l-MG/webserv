@@ -6,13 +6,15 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:11 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/27 11:48:18 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 14:58:09 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #pragma once
 
 #include "Socket.hpp"
+#include "include.hpp"
 #include "include.hpp"
 
 class SocketManager
