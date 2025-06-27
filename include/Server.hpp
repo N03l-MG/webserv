@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/06/27 15:11:59 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 16:16:57 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,6 @@
 #include <map>
 #include "include.hpp"
 #include "Location.hpp"
-
-class	Location;
 
 class	Location;
 
@@ -55,6 +53,7 @@ class	Server
 
 		//request handling
 		HttpRequest	parseRequest(const std::string &raw_request);
+		bool		checkMethods(const HttpRequest &request);
 		std::string	createResponse(int status_code, const std::string &content_type, const std::string &body);
 		void		handleGet(int client_fd, const HttpRequest &request);
 		void		handlePost(int client_fd, const HttpRequest &request);
@@ -64,7 +63,7 @@ class	Server
 		//request utils
 		bool		isCgiRequest(const std::string &path);
 		std::string	executeCgi(const std::string &script_path, const std::string &query_string, const std::string &method, const std::string &body);
-		void		saveFile(const std::string &filename, const std::string &file_content, int client_fd);
+		void		saveFile(const std::string &filename, const std::string &file_content, int client_fd, const std::string &path);
 		std::pair<std::string, std::string>	extractFileInfo(const HttpRequest &request);
 
 	public:

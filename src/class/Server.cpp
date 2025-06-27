@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/27 15:12:25 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 17:53:51 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void	Server::setName(std::string name)					{ this->name = name; }
 void	Server::setRoot(std::string root)					{ this->root = root; }
 void	Server::setIndex(std::string index)					{ this->index = index; }
 void	Server::setTimeout(size_t timeout)					{ this->timeout = timeout; }
-void	Server::setMaxBody(size_t max_body)						{ this->max_body = max_body; }
+void	Server::setMaxBody(size_t max_body)					{ this->max_body = max_body; }
 void	Server::addErrorpage(size_t code, std::string page)	{ this->error_page[code] = page; }
 int		Server::addLocation(Location *new_location)
 {
@@ -269,10 +269,10 @@ Server::HttpRequest	Server::parseRequest(const std::string &raw_request)
 void	Server::respond(int client_fd, const std::string &raw_request)
 {
 	HttpRequest	request = parseRequest(raw_request);
-	
+	log(LOG_INFO, "Method: " + request.method + " Version: " + request.version + " Location: " + request.path);
 	if (isCgiRequest(request.path))
 		handleCgi(client_fd, request);
-	else if (request.method == "POST" && request.path == "/upload")
+	else if (request.method == "POST")
 		handlePost(client_fd, request);
 	else if (request.method == "DELETE")
 		handleDelete(client_fd, request);
@@ -280,6 +280,53 @@ void	Server::respond(int client_fd, const std::string &raw_request)
 		handleGet(client_fd, request);
 }
 
+bool Server::checkMethods(const HttpRequest &request)
+{
+	std::string longest_match = "";
+	Location* matching_location = nullptr;
+	std::string request_path = request.path;
+
+	if (request_path[0] != '/')
+		request_path = "/" + request_path;
+	if (request_path.back() != '/')
+		request_path += '/';
+	for (Location *location : locations)
+	{
+		std::string loc_path = location->getPath();
+		if (loc_path[0] != '/')
+			loc_path = "/" + loc_path;
+		if (loc_path.back() != '/')
+			loc_path += '/';
+		// Get the first directory of the request path
+		size_t request_first_dir = request_path.find('/', 1);
+		if (request_first_dir == std::string::npos)
+			request_first_dir = request_path.length();
+		std::string request_dir = request_path.substr(0, request_first_dir);
+		// Check if this location matches
+		if (request_path.find(loc_path) == 0 || // Full path match
+			(loc_path == "/" && request_path != "/") || // Root location as fallback
+			(loc_path.substr(0, loc_path.length() - 1) == request_dir + "/")) // Directory match
+		{
+			// Update if this is the longest match so far
+			if (loc_path.length() > longest_match.length())
+			{
+				longest_match = loc_path;
+				matching_location = location;
+			}
+		}
+	}
+
+	// If we found a matching location, check if the method is allowed
+	if (matching_location)
+	{
+		t_vecstr allowed_methods = matching_location->getMethod();
+		for (const std::string &method : allowed_methods)
+			if (method == request.method)
+				return true;
+	}
+
+	return false;
+}
 
 //	Create response using code
 std::string	Server::createResponse(int status_code, const std::string &content_type, const std::string &body)
@@ -308,15 +355,21 @@ void	Server::handleGet(int client_fd, const HttpRequest &request)
 	std::string	content_type;
 
 	//check path and replace with default
-    if (path.empty() || path == "/")
-        path = "/" + this->index;
+	if (path.empty() || path == "/")
+		path = "/" + this->index;
 
 	//get file and send error if not found
-    std::string		filepath = this->root + path;
+	std::string		filepath = this->root + path;
 	std::ifstream	file(filepath, std::ios::binary | std::ios::ate);
 	if (!file.is_open())
 	{
 		response = createResponse(404, "text/plain", "404 Not Found\r\n");
+		send(client_fd, response.c_str(), response.size(), 0);
+		return;
+	}
+	else if (!checkMethods(request))
+	{
+		response = createResponse(405, "text/plain", "Method Not Allowed\r\n");
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -374,13 +427,13 @@ std::pair<std::string, std::string>	Server::extractFileInfo(const HttpRequest &r
 }
 
 //	Save the file to the server
-void	Server::saveFile(const std::string &filename, const std::string &file_content, int client_fd)
+void	Server::saveFile(const std::string &filename, const std::string &file_content, int client_fd, const std::string &path)
 {
 	std::string	response;
 	std::string	filepath;
-	std::string	upload_dir = "www/uploads";
+	std::string	upload_dir = getRoot() + path;
 
-	//upload failed due to missing and uninstaciable (<--- likely misspelled ¯\_(ツ)_/¯) upload directory
+	//upload failed due to missing and uninstatiable (<--- likely misspelled ¯\_(ツ)_/¯) upload directory
 	if (!std::filesystem::exists(upload_dir) && !std::filesystem::create_directory(upload_dir))
 	{
 		response = createResponse(500, "text/plain", "Server Error: Failed to create upload directory\n");
@@ -414,10 +467,17 @@ void Server::handlePost(int client_fd, const HttpRequest &request)
 {
 	std::string	response;
 
+	if (!checkMethods(request))
+	{
+		response = createResponse(405, "text/plain", "Method Not Allowed\r\n");
+		send(client_fd, response.c_str(), response.size(), 0);
+		return;
+	}
+
 	try
 	{
 		auto [filename, file_content] = extractFileInfo(request);
-		saveFile(filename, file_content, client_fd);
+		saveFile(filename, file_content, client_fd, request.path);
 	}
 	catch (const std::runtime_error &e)
 	{
@@ -438,9 +498,8 @@ void	Server::handleDelete(int client_fd, const HttpRequest &request)
 	std::string	full_path;
 
 	//check to make sure users can't delete the entire server
-	if (request.path.substr(0, 9) != "/uploads/")
+	if (!checkMethods(request))
 	{
-		std::cout << request.path.substr(0, 9) << std::endl;
 		response = createResponse(405, "text/plain", "Method Not Allowed\r\n");
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;

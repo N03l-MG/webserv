@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   include.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:13 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/27 14:55:41 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 16:09:03 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,16 +50,6 @@ typedef enum	e_logtype
 	LOG_WARN,
 	LOG_ERR
 }	t_logtype;
-
-
-typedef enum	e_methods
-{
-	METHOD_GET,
-	METHOD_POST,
-	METHOD_DELETE,
-	METHOD_INVALID
-}	t_methods;
-
 
 //	Tokens
 typedef struct s_tokens
