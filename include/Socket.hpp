@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 14:15:14 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/23 11:03:05 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 11:56:18 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,11 @@ class Socket
 		const char	*host;
 	
 	public:
-		int server_fd;
-		Server *server;
 		Socket(Server *serv);
 		~Socket();
 
-		int setupSocket();
+		int		server_fd;
+		Server	*server;
+
+		int	setupSocket();
 };

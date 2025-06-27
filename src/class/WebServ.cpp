@@ -15,7 +15,7 @@
 //	Constructor
 WebServ::WebServ()
 {
-	log(LOG_LOG, "WebServ created!");
+	log(LOG_INFO, "WebServ created!");
 	is_running = false;
 }
 
@@ -27,11 +27,11 @@ WebServ::~WebServ()
 	for (Server *serv : servers)
 		delete serv;
 	servers.clear();
-	log(LOG_LOG, "WebServ destroyed!");
+	log(LOG_INFO, "WebServ destroyed!");
 }
 
 //	Setters
-void	WebServ::setTokens(t_vectok tokens) { this->tokens = tokens;}
+void	WebServ::setTokens(t_vectok tokens)	{ this->tokens = tokens;}
 int		WebServ::addServer(Server *new_server)
 {
 	if (!new_server)
@@ -42,15 +42,15 @@ int		WebServ::addServer(Server *new_server)
 
 
 //	Getters
-bool		WebServ::isRunning() { return (this->is_running); }
-t_vectok	WebServ::getTokens() { return (this->tokens);}
+bool		WebServ::isRunning()				{ return (this->is_running); }
+t_vectok	WebServ::getTokens()				{ return (this->tokens);}
 t_tokens	*WebServ::getToken(size_t index)
 {
 	if (index < tokens.size())
 		return (&tokens[index]);
 	return (NULL);
 }
-std::vector<Server*>	WebServ::getServer() {return (servers);}
+std::vector<Server*>	WebServ::getServer()	{return (servers);}
 Server	*WebServ::getServer(size_t index)
 {
 	if (index < servers.size())
@@ -66,7 +66,7 @@ void	WebServ::parseConfig()
 	{
 		if (tokens[i].type == TOK_DIRECTIVE && tokens[i].token == "server")
 		{
-			Server *new_server = new Server;
+			Server	*new_server = new Server;
 			new_server->configure(tokens, ++i);
 			servers.push_back(new_server);
 		}
@@ -78,7 +78,6 @@ void	WebServ::parseConfig()
 void	WebServ::start()
 {
 	parseConfig();
-
 	socketManager = new SocketManager(servers);
 	socketManager->run();
 }

@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:40:10 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/23 09:13:02 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 13:01:53 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ t_vectok	read_config_file(std::string const &in_file)
 	{
 		if (file.is_open())
 			file.close();
-		throw WrongFileException();
+		throw	WrongFileException();
 	}
 
 	//loop through input file

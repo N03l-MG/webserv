@@ -32,9 +32,9 @@
 			fetch('/cgi-bin/megaphone.cgi?voice=' + encodeURIComponent(voice))
 				.then(response => {
 					if (!response.ok) {
-						throw new Error('Network response was not ok');
+						throw	new Error('Network response was not ok');
 					}
-					return response.text();
+					return (response.text());
 				})
 				.then(html => {
 					document.getElementById('cgi-output').innerHTML = html;

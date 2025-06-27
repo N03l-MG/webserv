@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   include.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:13 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/26 19:07:06 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/27 11:10:27 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,9 @@ typedef enum	e_toktype
 
 typedef enum	e_logtype
 {
-	LOG_LOG,
-	LOG_WARNING,
-	LOG_ERROR
+	LOG_INFO,
+	LOG_WARN,
+	LOG_ERR
 }	t_logtype;
 
 
