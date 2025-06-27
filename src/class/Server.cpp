@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/25 15:33:49 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 14:42:10 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@
 Server::Server()
 {
 	log(LOG_LOG, "Server created!");
-	this->port = 0;
-	this->host = "";
-	this->name = "";
-	this->root = "";
-	this->index = "";
+	this->port = 8080;
+	this->host = "127.0.0.1";
+	this->name = "localhost";
+	this->root = "www/";
+	this->index = "index.html";
 	this->timeout = 15;
-	this->max_body = 10000;
+	this->max_body = 5242880; // 5MB
 
 	// MIME types
 	mimeTypes[".html"] = "text/html";

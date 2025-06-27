@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/26 19:25:59 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/27 14:38:53 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,27 +43,27 @@ void SocketManager::initializeServerSockets()
 void SocketManager::handleNewConnection(pollfd &pfd, time_t now)
 {
 	sockaddr_in client_addr{};
-    socklen_t client_len = sizeof(client_addr);
-    int client_fd = accept(pfd.fd, (sockaddr*)&client_addr, &client_len);
+	socklen_t client_len = sizeof(client_addr);
+	int client_fd = accept(pfd.fd, (sockaddr*)&client_addr, &client_len);
 
-    if (client_fd < 0) {
-        std::cerr << "Accept failed: " << strerror(errno) << "\n";
-        return;
-    }
+	if (client_fd < 0) {
+		std::cerr << "Accept failed: " << strerror(errno) << "\n";
+		return;
+	}
 
-    fcntl(client_fd, F_SETFL, fcntl(client_fd, F_GETFL, 0) | O_NONBLOCK);
-    poll_fds.push_back({client_fd, POLLIN, 0});
+	fcntl(client_fd, F_SETFL, fcntl(client_fd, F_GETFL, 0) | O_NONBLOCK);
+	poll_fds.push_back({client_fd, POLLIN, 0});
 
-    // Defensive: check fd_to_socket
-    if (fd_to_socket.count(pfd.fd) == 0 || fd_to_socket[pfd.fd] == nullptr) {
-        std::cerr << "Error: fd_to_socket missing or null for fd " << pfd.fd << "\n";
-        close(client_fd);
-        return;
-    }
+	// Defensive: check fd_to_socket
+	if (fd_to_socket.count(pfd.fd) == 0 || fd_to_socket[pfd.fd] == nullptr) {
+		std::cerr << "Error: fd_to_socket missing or null for fd " << pfd.fd << "\n";
+		close(client_fd);
+		return;
+	}
 
-    client_to_server[client_fd] = fd_to_socket[pfd.fd]->server;
-    client_last_active[client_fd] = now;
-    client_buffers[client_fd] = "";
+	client_to_server[client_fd] = fd_to_socket[pfd.fd]->server;
+	client_last_active[client_fd] = now;
+	client_buffers[client_fd] = "";
 }
 
 bool SocketManager::processRequest(int fd, std::string &request)
@@ -129,9 +129,9 @@ void SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 				break;
 		}
 	}
-	std::ostringstream oss;
-	oss << "Request of size " << request.size() << " bytes received from client (fd) " << pfd.fd << " in server " << client_to_server[pfd.fd];
-	log(LOG_LOG, oss.str());
+	log(LOG_LOG, "Request of size " + std::to_string(request.size()) + " bytes received from client (fd) "
+	+ std::to_string(pfd.fd) + " in server "
+	+ client_to_server[pfd.fd]->getName() + ":" + std::to_string(client_to_server[pfd.fd]->getPort()));
 
 	if (bytes_read == 0 || (bytes_read < 0 && errno != EAGAIN && errno != EWOULDBLOCK)) {
 		cleanupClient(pfd.fd, i);
