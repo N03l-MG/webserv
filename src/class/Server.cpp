@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/25 15:33:49 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/26 16:27:18 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,13 @@
 Server::Server()
 {
 	log(LOG_LOG, "Server created!");
-	this->port = 0;
-	this->host = "";
-	this->name = "";
+	this->port = 8080;
+	this->host = "127.0.0.1";
+	this->name = "localhost";
 	this->root = "";
 	this->index = "";
-	this->timeout = 15;
+	this->timeout.tv_sec = 15;
+	this->timeout.tv_usec = 0;
 	this->max_body = 10000;
 
 	// MIME types
@@ -68,7 +69,7 @@ void	Server::setHost(std::string host) { this->host = host; }
 void	Server::setName(std::string name) { this->name = name; }
 void	Server::setRoot(std::string root) { this->root = root; }
 void	Server::setIndex(std::string index) { this->index = index; }
-void	Server::setTimeout(size_t timeout) { this->timeout = timeout; }
+void	Server::setTimeout(size_t timeout) { this->timeout.tv_sec = timeout; }
 void	Server::setMaxBody(size_t max_body) { this->max_body = max_body; }
 void	Server::addErrorpage(size_t code, std::string page) { this->error_page[code] = page; }
 int		Server::addLocation(Location *new_location)
@@ -85,7 +86,7 @@ std::string	Server::getHost() { return (this->host); }
 std::string	Server::getName() { return (this->name); }
 std::string	Server::getRoot() { return (this->root); }
 std::string	Server::getIndex() { return (this->index); }
-size_t		Server::getTimeout() { return (this->timeout); }
+struct timeval		Server::getTimeout() { return (this->timeout); }
 size_t		Server::getMaxBody() { return (this->max_body); }
 std::vector<Location*>	Server::getLocation() { return (this->locations); }
 std::map<size_t, std::string>	Server::getErrorpage() { return (this->error_page); }
@@ -167,7 +168,7 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 	}
 
 	//print data
-	//print_status();
+	print_status();
 }
 
 //	Debug
@@ -179,6 +180,7 @@ void	Server::print_status()
 			<< "Name:\t\t" << getName() << "\n"
 			<< "Root:\t\t" << getRoot() << "\n"
 			<< "Index:\t\t" << getIndex() << "\n"
+			<< "Timeout:\t" << getTimeout().tv_sec << "\n"
 			<< "Max Body:\t" << getMaxBody() << std::endl;
 	
 	for (size_t i = 0; i < locations.size(); i++)

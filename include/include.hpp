@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:13 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/23 10:23:54 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/26 14:56:14 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <csignal>
+#include <ctime>
 #include "exceptions.hpp"
 
 
@@ -61,6 +62,9 @@ typedef struct s_tokens
 //	Definitions
 typedef std::vector<std::string>	t_vecstr;
 typedef std::vector<t_tokens>		t_vectok;
+#ifndef TIMEOUT
+# define TIMEOUT 30
+#endif
 
 
 //	Parsing
