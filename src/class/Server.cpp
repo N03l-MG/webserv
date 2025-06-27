@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/27 15:02:17 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 15:12:25 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 //	Constructor
 Server::Server()
 {
-	log(LOG_LOG, "Server created!");
+	log(LOG_INFO, "Server created!");
 	this->port = 8080;
 	this->host = "127.0.0.1";
 	this->name = "localhost";

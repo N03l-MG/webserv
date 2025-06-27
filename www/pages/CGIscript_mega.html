@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Megaphone CGI</title>
+	<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+	<div class="container">
+		<h1>Megaphone</h1>
+		<div class="push-swap-form">
+			<input type="text" id="voice" placeholder="Speak">
+			<button onclick="runMegaphone()">Enhance your voice</button>
+		</div>
+		<div id="cgi-output" class="markdown-content">
+			Output will appear here...
+		</div>
+		<nav>
+			<ul class="nav-links">
+				<li><a href="/">Back</a></li>
+			</ul>
+		</nav>
+	</div>
+
+	<script>
+		function runMegaphone() {
+			const voice = document.getElementById('voice').value;
+			const output = document.getElementById('cgi-output');
+			output.innerHTML = 'Running megaphone...';
+			
+			fetch('/cgi-bin/megaphone.cgi?voice=' + encodeURIComponent(voice))
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('Network response was not ok');
+					}
+					return response.text();
+				})
+				.then(html => {
+					document.getElementById('cgi-output').innerHTML = html;
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					document.getElementById('cgi-output').innerHTML = 
+						'<p class="error">Error running megaphone: ' + error.message + '</p>';
+				});
+		}
+	</script>
+</body>
+</html>
+

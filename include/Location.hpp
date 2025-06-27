@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:49:46 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/27 14:57:06 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 15:11:51 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ class	Location
 		std::vector<t_methods>	allow_methods;
 	
 	public:
-		Location(Server *parent_server);
 		Location(Server *parent_server);
 		~Location();
 

@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/06/27 14:57:38 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 15:11:59 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,6 @@ class	Server
 		void		setRoot(std::string root);
 		void		setIndex(std::string index);
 		void		setTimeout(size_t time);
-		void		setMaxBody(size_t max_body);
 		void		setMaxBody(size_t max_body);
 		void		addErrorpage(size_t code, std::string page);
 		int			addLocation(Location *new_location);

@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/27 14:59:36 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/06/27 14:59:50 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ void	Location::print_status()
 			<< "Return:\t\t" << getReturn() << "\n"
 			<< "Alias:\t\t" << getAlias() << "\n"
 			<< "Upload Store:\t" << getStore() << "\n"
-			<< "Body Size\t" << getMaxBody() << std::endl;
+			<< "Body Size\t" << getMaxBody() << "\n"
 			<< "Upload Store:\t" << getStore() << "\n"
 			<< "Body Size\t" << getMaxBody() << std::endl;
 	
