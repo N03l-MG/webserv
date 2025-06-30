@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/06/27 16:16:57 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/30 16:31:21 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ class	Server
 		std::string							index;			//the default page
 		size_t								timeout;		//max response time for the server
 		size_t								max_body;		//max body size the client can recieve
-		std::map<size_t, std::string>		error_page;		//List of error pages
+		std::map<size_t, std::string>		error_page;		//list of error pages
 		std::vector<Location*>				locations;		//list of page locations
 		std::map<std::string, std::string>	mimeTypes;		//list of mime types to be handled
 		std::map<size_t, std::string>		statusCodes;	//list of codes to be returned as response

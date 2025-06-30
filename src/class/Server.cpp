@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/27 17:53:51 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/30 17:12:27 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ Server::Server()
 	statusCodes[403] = "Forbidden";
 	statusCodes[404] = "Not Found";
 	statusCodes[405] = "Method Not Allowed";
+	statusCodes[408] = "Timeout";
 	statusCodes[500] = "Internal Server Error";
 }
 
@@ -282,9 +283,9 @@ void	Server::respond(int client_fd, const std::string &raw_request)
 
 bool Server::checkMethods(const HttpRequest &request)
 {
-	std::string longest_match = "";
-	Location* matching_location = nullptr;
-	std::string request_path = request.path;
+	Location	*matching_location = nullptr;
+	std::string	longest_match = "";
+	std::string	request_path = request.path;
 
 	if (request_path[0] != '/')
 		request_path = "/" + request_path;
@@ -292,22 +293,24 @@ bool Server::checkMethods(const HttpRequest &request)
 		request_path += '/';
 	for (Location *location : locations)
 	{
-		std::string loc_path = location->getPath();
+		std::string	loc_path = location->getPath();
 		if (loc_path[0] != '/')
 			loc_path = "/" + loc_path;
 		if (loc_path.back() != '/')
 			loc_path += '/';
-		// Get the first directory of the request path
-		size_t request_first_dir = request_path.find('/', 1);
+		
+		//get the first directory of the request path
+		size_t	request_first_dir = request_path.find('/', 1);
 		if (request_first_dir == std::string::npos)
 			request_first_dir = request_path.length();
 		std::string request_dir = request_path.substr(0, request_first_dir);
-		// Check if this location matches
-		if (request_path.find(loc_path) == 0 || // Full path match
-			(loc_path == "/" && request_path != "/") || // Root location as fallback
-			(loc_path.substr(0, loc_path.length() - 1) == request_dir + "/")) // Directory match
+
+		//check if this location matches
+		if (request_path.find(loc_path) == 0 || //full path match
+			(loc_path == "/" && request_path != "/") || //root location as fallback
+			(loc_path.substr(0, loc_path.length() - 1) == request_dir + "/")) //directory match
 		{
-			// Update if this is the longest match so far
+			//update if this is the longest match so far
 			if (loc_path.length() > longest_match.length())
 			{
 				longest_match = loc_path;
@@ -316,7 +319,7 @@ bool Server::checkMethods(const HttpRequest &request)
 		}
 	}
 
-	// If we found a matching location, check if the method is allowed
+	//if we found a matching location, check if the method is allowed
 	if (matching_location)
 	{
 		t_vecstr allowed_methods = matching_location->getMethod();
@@ -329,22 +332,38 @@ bool Server::checkMethods(const HttpRequest &request)
 }
 
 //	Create response using code
-std::string	Server::createResponse(int status_code, const std::string &content_type, const std::string &body)
+std::string Server::createResponse(int status_code, const std::string &content_type, const std::string &body)
 {
-	std::string status_text = "Internal Server Error";
+	std::string	status_text = "Internal Server Error";
+	std::string	response_body = body;
+	std::string	response_content_type = content_type;
 	if (statusCodes.find(status_code) != statusCodes.end())
 		status_text = statusCodes[status_code];
 
+	//check if an error page is configured for the status code
+	if (error_page.find(status_code) != error_page.end())
+	{
+		std::string		error_page_path = root + error_page[status_code];
+		std::ifstream	error_file(error_page_path, std::ios::binary | std::ios::ate);
+		if (error_file.is_open())
+		{
+			std::streamsize		size = error_file.tellg();
+			std::vector<char>	file_buffer(size);
+			error_file.seekg(0, std::ios::beg);
+			error_file.read(file_buffer.data(), size);
+			error_file.close();
+			response_body = std::string(file_buffer.data(), file_buffer.size());
+			response_content_type = getMimeType(error_page_path);
+		}
+	}
+
 	return ("HTTP/1.1 " + std::to_string(status_code) + " " + status_text + "\r\n"
-		"Content-Type: " + content_type + "\r\n"
-		"Content-Length: " + std::to_string(body.length()) + "\r\n"
-		"Connection: close\r\n"
-		"\r\n" +
-		body);
+			"Content-Type: " + response_content_type + "\r\n"
+			"Content-Length: " + std::to_string(response_body.length()) + "\r\n"
+			"Connection: close\r\n"
+			"\r\n" +
+			response_body);
 }
-
-
-
 
 
 //	GET Method
@@ -354,7 +373,7 @@ void	Server::handleGet(int client_fd, const HttpRequest &request)
 	std::string	path = request.path;
 	std::string	content_type;
 
-	//check path and replace with default
+	//check path and replace with default && 
 	if (path.empty() || path == "/")
 		path = "/" + this->index;
 
