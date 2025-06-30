@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/27 16:45:34 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/06/30 17:56:53 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 	}
 
 	//print debug statement
-	print_status();
+	//print_status();
 }
 
 
