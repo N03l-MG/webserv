@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/01 16:27:53 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/01 16:40:18 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -353,6 +353,7 @@ void	Server::respond(int client_fd, const std::string &raw_request)
 	HttpRequest	request = parseRequest(raw_request);
 	log(LOG_INFO, "Method: " + request.method + " Version: " + request.version + " Location: " + request.path);
 
+	//check max body size and return 413 in case of errors
 	size_t max_body = request.location ? request.location->getMaxBody() : this->max_body;
 	if (max_body > 0 && request.body.size() > max_body)
 	{

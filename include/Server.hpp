@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/07/01 16:05:03 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/01 16:37:12 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ class	Server
 			std::map<std::string, std::string>	headers;
 			std::string	body;
 			std::string	boundary;
-			Location* location;
+			Location	*location;
 		};
 
 		//request handling
