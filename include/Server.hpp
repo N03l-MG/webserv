@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/06/30 16:31:21 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/01 09:30:53 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ class	Server
 		std::string							index;			//the default page
 		size_t								timeout;		//max response time for the server
 		size_t								max_body;		//max body size the client can recieve
-		std::map<size_t, std::string>		error_page;		//list of error pages
+		std::map<size_t, std::string>		error_page;		//List of error pages
 		std::vector<Location*>				locations;		//list of page locations
 		std::map<std::string, std::string>	mimeTypes;		//list of mime types to be handled
 		std::map<size_t, std::string>		statusCodes;	//list of codes to be returned as response
@@ -49,10 +49,13 @@ class	Server
 			std::map<std::string, std::string>	headers;
 			std::string	body;
 			std::string	boundary;
+			Location* location;
 		};
 
 		//request handling
 		HttpRequest	parseRequest(const std::string &raw_request);
+		void		percentDecode(std::string &body);
+		bool		isCgi(const HttpRequest &request);
 		bool		checkMethods(const HttpRequest &request);
 		std::string	createResponse(int status_code, const std::string &content_type, const std::string &body);
 		void		handleGet(int client_fd, const HttpRequest &request);
@@ -61,7 +64,6 @@ class	Server
 		void		handleCgi(int client_fd, const HttpRequest &request);
 
 		//request utils
-		bool		isCgiRequest(const std::string &path);
 		std::string	executeCgi(const std::string &script_path, const std::string &query_string, const std::string &method, const std::string &body);
 		void		saveFile(const std::string &filename, const std::string &file_content, int client_fd, const std::string &path);
 		std::pair<std::string, std::string>	extractFileInfo(const HttpRequest &request);

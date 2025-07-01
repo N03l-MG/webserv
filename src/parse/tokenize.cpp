@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 09:30:28 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/30 15:53:57 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/01 10:11:51 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,8 @@ void	tokenize(const std::string &line, t_vectok &tokens)
 //	Assign types to the individual tokens
 void	assign_token_type(t_vectok &tokens)
 {
-	std::vector<std::string>	directives = {"server", "location"};
-	std::vector<std::string>	keys = {"listen", "host", "server_name", "error_page", "timeout", "path", "root", "index", "upload_store", "methods", "cgi_path", "max_body"};
+	t_vecstr	directives = {"server", "location"};
+	t_vecstr	keys = {"listen", "host", "server_name", "error_page", "timeout", "path", "root", "index", "upload_store", "methods", "cgi", "max_body"};
 
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
