@@ -9,7 +9,7 @@
 
 ## Brief
 
-Our server manages connections using a synchronous I/O multiplexing system. Sockets are kept alive for each incomming connection
+Our server manages connections using a synchronous I/O multiplexing system. Sockets are kept alive for each incoming connection
 and a timeout system ensures that they are closed if no activity occurs in the time given via config. Our config is rather flexible, allowing for precise location premissions and settings. CGI can be executed and configured by setting a CGI script directory. Timeout time and max body size can also be set for each server. Additionally, any amount of servers can be set up in a single config.
 
 ## Features
@@ -17,7 +17,7 @@ and a timeout system ensures that they are closed if no activity occurs in the t
 - _Socket Management:_
   We use `poll()` to manage incoming connections efficiently. Servers can handle any ammout of simultaneous requests without crashing.
 - _HTTP Methods:_
-  Currently the implemented methods are `GET`, `POST` and `DELETE`. They must be set explicitly for each location in the server root through the config file. `GET` sends back requested data to the client. `POST` uploads data from the client to the server's upload store (also set in the config). `DELETE` removes requested data from the server etirely. Obviously, these methods have safety measures.
+  Currently the implemented methods are `GET`, `POST` and `DELETE`. They must be set explicitly for each location in the server root through the config file. `GET` sends back requested data to the client. `POST` uploads data from the client to the server's upload store (also set in the config). `DELETE` removes requested data from the server entirely. Obviously, these methods have safety measures.
 - _Config Directives:_
   There are many configuration directives that can be used to specify various features of your servers. There are always defaults as well, to fall back on any missing directives. A detailed table of these directives is shown in the following section.
 - _CGI Script Execution:_
