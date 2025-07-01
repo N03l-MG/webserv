@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/01 11:03:40 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/01 13:16:17 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ Server::Server()
 
 	//status codes
 	statusCodes[200] = "OK";
+	statusCodes[204] = "No Content";
 	statusCodes[400] = "Bad Request";
 	statusCodes[403] = "Forbidden";
 	statusCodes[404] = "Not Found";
@@ -600,7 +601,7 @@ void	Server::handleDelete(int client_fd, const HttpRequest &request)
 	{
 		if (std::remove(full_path.c_str()) == 0)
 		{
-			response = createResponse(200, "text/plain", "File deleted\r\n");
+			response = createResponse(204, "text/plain", "File deleted\r\n");
 			send(client_fd, response.c_str(), response.size(), 0);
 		}
 		else

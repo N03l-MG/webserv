@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 14:14:48 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/27 13:01:06 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/01 12:28:33 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int	Socket::setupSocket()
 
 	if (bind(server_fd, (sockaddr*)&server_addr, sizeof(server_addr)) < 0)
 	{
-		std::cerr << "Bind failed\n";
+		log(LOG_ERR, "Bind failed: " + std::string(strerror(errno)));
 		close(server_fd);
 		return 1;
 	}
@@ -68,7 +68,7 @@ int	Socket::setupSocket()
 	fcntl(server_fd, F_SETFL, flags | O_NONBLOCK);
 	if (listen(server_fd, SOMAXCONN) < 0)
 	{
-		log(LOG_ERR, "Listen failed!");
+		log(LOG_ERR, "Failed to listen.");
 		close(server_fd);
 		return 1;
 	}
