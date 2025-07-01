@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/07/01 09:30:53 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/01 15:56:48 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ class	Server
 			std::map<std::string, std::string>	headers;
 			std::string	body;
 			std::string	boundary;
-			Location* location;
+			Location	*location;
 		};
 
 		//request handling

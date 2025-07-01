@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/01 13:16:17 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/01 16:28:11 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -352,6 +352,16 @@ void	Server::respond(int client_fd, const std::string &raw_request)
 {
 	HttpRequest	request = parseRequest(raw_request);
 	log(LOG_INFO, "Method: " + request.method + " Version: " + request.version + " Location: " + request.path);
+
+	//check max body size and return 413 in case of errors
+	size_t max_body = request.location ? request.location->getMaxBody() : this->max_body;
+	if (max_body > 0 && request.body.size() > max_body)
+	{
+		std::string	response = createResponse(413, "", "");
+		send(client_fd, response.c_str(), response.size(), 0);
+		return;
+	}
+
 	if (isCgi(request))
 		handleCgi(client_fd, request);
 	else if (request.method == "POST")
@@ -548,14 +558,6 @@ void Server::handlePost(int client_fd, const HttpRequest &request)
 	if (!checkMethods(request))
 	{
 		response = createResponse(405, "", "");
-		send(client_fd, response.c_str(), response.size(), 0);
-		return;
-	}
-
-	size_t max_body = request.location ? request.location->getMaxBody() : this->max_body;
-	if (max_body > 0 && request.body.size() > max_body)
-	{
-		response = createResponse(413, "", "");
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
