@@ -6,10 +6,8 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/06/27 16:16:57 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/01 16:05:03 by nmonzon          ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
-
 /* ************************************************************************** */
 
 //	Guard
@@ -54,9 +52,10 @@ class	Server
 
 		//request handling
 		HttpRequest	parseRequest(const std::string &raw_request);
+		void		percentDecode(std::string &body);
 		bool		isCgi(const HttpRequest &request);
 		bool		checkMethods(const HttpRequest &request);
-		std::string	createResponse(int code, const std::string &content_type, const std::string &body, bool error);
+		std::string	createResponse(int status_code, const std::string &content_type, const std::string &body);
 		void		handleGet(int client_fd, const HttpRequest &request);
 		void		handlePost(int client_fd, const HttpRequest &request);
 		void		handleDelete(int client_fd, const HttpRequest &request);

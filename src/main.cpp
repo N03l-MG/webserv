@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/27 15:05:49 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/01 11:03:28 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ void signalHandler(int signum)
 		exit(signum);
 	}
 }
+
 
 int main(int ac, char **av)
 {

@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/30 17:56:53 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/01 15:55:04 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	Location::setAlias(std::string alias)		{ this->alias = alias; }
 void	Location::setStore(std::string store)		{ this->store = store; }
 void	Location::setMaxBody(size_t max_body)		{ this->max_body = max_body; }
 void	Location::addMethod(std::string method)		{ this->allow_methods.push_back(method); }
-void	Location::addCgipath(std::string path)		{ this->cgi_path.push_back(path); }
+void	Location::addCgi(std::string path)			{ this->cgi_scripts.push_back(path); }
 
 
 //	Getters
@@ -54,17 +54,17 @@ std::string	Location::getAlias()	{ return (this->alias); }
 std::string	Location::getStore()	{ return (this->store); }
 size_t		Location::getMaxBody()	{ return (this->max_body); }
 t_vecstr	Location::getMethod()	{ return (this->allow_methods); }
-t_vecstr	Location::getCgipath()	{ return (this->cgi_path); }
+t_vecstr	Location::getCgi()		{ return (this->cgi_scripts); }
 std::string	Location::getMethod(size_t index)
 {
 	if (index < allow_methods.size())
 		return (allow_methods[index]);
 	return ("");
 }
-std::string	Location::getCgipath(size_t index)
+std::string	Location::getCgi(size_t index)
 {
-	if (index < cgi_path.size())
-		return (cgi_path[index]);
+	if (index < cgi_scripts.size())
+		return (cgi_scripts[index]);
 	return ("");
 }
 
@@ -107,12 +107,10 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 					setStore(value);
 				else if (key == "max_body")
 					setMaxBody(std::stoi(value));
-				else if (key == "max_body")
-					setMaxBody(std::stoi(value));
 				else if (key == "methods" && checkMethod(value))
 					addMethod(value);
-				else if (key == "cgi_path")
-					addCgipath(value);
+				else if (key == "cgi")
+					addCgi(value);
 			}
 		}
 	}
@@ -137,6 +135,6 @@ void	Location::print_status()
 	
 	for (size_t i = 0; i < allow_methods.size(); i++)
 		std::cout << "Methods:\t" << getMethod(i) << std::endl;
-	for (size_t i = 0; i < cgi_path.size(); i++)
-		std::cout << "CGI Path:\t" << getCgipath(i) << std::endl;
+	for (size_t i = 0; i < cgi_scripts.size(); i++)
+		std::cout << "CGI Path:\t" << getCgi(i) << std::endl;
 }

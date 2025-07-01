@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:49:46 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/27 16:14:59 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/01 10:21:37 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ class	Location
 		std::string	alias;
 		std::string	store;
 		size_t		max_body;
-		t_vecstr	cgi_path;
+		t_vecstr	cgi_scripts;
 		t_vecstr	allow_methods;
 	
 	public:
@@ -48,7 +48,7 @@ class	Location
 		void		setStore(std::string store);
 		void		setMaxBody(size_t max_body);
 		void		addMethod(std::string method);
-		void		addCgipath(std::string path);
+		void		addCgi(std::string path);
 		std::string	getPath();
 		std::string	getRoot();
 		std::string	getIndex();
@@ -58,8 +58,8 @@ class	Location
 		size_t		getMaxBody();
 		std::string	getMethod(size_t index);
 		t_vecstr	getMethod();
-		std::string	getCgipath(size_t index);
-		t_vecstr	getCgipath();
+		std::string	getCgi(size_t index);
+		t_vecstr	getCgi();
 
 		void		configure(t_vectok &tokens, size_t &i);
 		bool		checkMethod(std::string method);

@@ -26,6 +26,8 @@ else
     ./www/cgi-bin/megaphone "$VOICE" 2>&1
 fi
 
+
+
 echo "</pre>"
 
 echo "</div>"

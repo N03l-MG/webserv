@@ -58,8 +58,16 @@ nav {
 	transition: color .3s;
 }
 
+.nav-links a.secondary {
+    color: #252525;
+}
+
 .nav-links a:hover {
 	color: #9803fc;
+}
+
+.nav-links a.secondary:hover {
+    color: #9803fc;
 }
 
 .upload-form {
