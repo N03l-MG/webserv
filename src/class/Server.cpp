@@ -23,7 +23,7 @@ Server::Server()
 	this->root = "www/";
 	this->index = "index.html";
 	this->timeout = 15;
-	this->max_body = 5242880; // 5MB
+	this->max_body = 5000000;
 
 	//mime types
 	mimeTypes[".html"] = "text/html";
@@ -57,6 +57,7 @@ Server::Server()
 	statusCodes[403] = "Forbidden";
 	statusCodes[404] = "Not Found";
 	statusCodes[405] = "Method Not Allowed";
+	statusCodes[413] = "Payload Too Large";
 	statusCodes[500] = "Internal Server Error";
 }
 
@@ -234,6 +235,42 @@ Server::HttpRequest	Server::parseRequest(const std::string &raw_request)
 	std::istringstream	request_line_stream(request_line);
 	request_line_stream >> request.method >> request.path >> request.version;
 
+	std::string longest_match = "";
+	Location* matching_location = nullptr;
+	std::string request_path = request.path;
+
+	if (request_path[0] != '/')
+		request_path = "/" + request_path;
+	if (request_path.back() != '/')
+		request_path += '/';
+	for (Location *location : locations)
+	{
+		std::string loc_path = location->getPath();
+		if (loc_path[0] != '/')
+			loc_path = "/" + loc_path;
+		if (loc_path.back() != '/')
+			loc_path += '/';
+		// Get the first directory of the request path
+		size_t request_first_dir = request_path.find('/', 1);
+		if (request_first_dir == std::string::npos)
+			request_first_dir = request_path.length();
+		std::string request_dir = request_path.substr(0, request_first_dir);
+		// Check if this location matches
+		if (request_path.find(loc_path) == 0 || // Full path match
+			(loc_path == "/" && request_path != "/") || // Root location as fallback
+			(loc_path.substr(0, loc_path.length() - 1) == request_dir + "/")) // Directory match
+		{
+			// Update if this is the longest match so far
+			if (loc_path.length() > longest_match.length())
+			{
+				longest_match = loc_path;
+				matching_location = location;
+			}
+		}
+	}
+	if (matching_location)
+		request.location = matching_location;
+
 	//read header from request
 	while (std::getline(request_stream, header_line) && header_line != "\r")
 	{
@@ -270,7 +307,7 @@ void	Server::respond(int client_fd, const std::string &raw_request)
 {
 	HttpRequest	request = parseRequest(raw_request);
 	log(LOG_INFO, "Method: " + request.method + " Version: " + request.version + " Location: " + request.path);
-	if (isCgiRequest(request.path))
+	if (isCgi(request))
 		handleCgi(client_fd, request);
 	else if (request.method == "POST")
 		handlePost(client_fd, request);
@@ -280,71 +317,46 @@ void	Server::respond(int client_fd, const std::string &raw_request)
 		handleGet(client_fd, request);
 }
 
+bool Server::isCgi(const HttpRequest &request) //FIXME: The reason that CGI is not properly detected at that it is not parsed correctly. CGI path is empty.
+{
+	if (!request.location)
+		return false;
+	t_vecstr cgiPaths = request.location->getCgipath();
+	for (const std::string &cgi : cgiPaths)
+		if (request.path == cgi || (request.path.size() > cgi.size() && request.path.compare(0, cgi.size(), cgi) == 0 && request.path[cgi.size()] == '/'))
+			return true;
+	return false;
+}
+
 bool Server::checkMethods(const HttpRequest &request)
 {
-	std::string longest_match = "";
-	Location* matching_location = nullptr;
-	std::string request_path = request.path;
-
-	if (request_path[0] != '/')
-		request_path = "/" + request_path;
-	if (request_path.back() != '/')
-		request_path += '/';
-	for (Location *location : locations)
-	{
-		std::string loc_path = location->getPath();
-		if (loc_path[0] != '/')
-			loc_path = "/" + loc_path;
-		if (loc_path.back() != '/')
-			loc_path += '/';
-		// Get the first directory of the request path
-		size_t request_first_dir = request_path.find('/', 1);
-		if (request_first_dir == std::string::npos)
-			request_first_dir = request_path.length();
-		std::string request_dir = request_path.substr(0, request_first_dir);
-		// Check if this location matches
-		if (request_path.find(loc_path) == 0 || // Full path match
-			(loc_path == "/" && request_path != "/") || // Root location as fallback
-			(loc_path.substr(0, loc_path.length() - 1) == request_dir + "/")) // Directory match
-		{
-			// Update if this is the longest match so far
-			if (loc_path.length() > longest_match.length())
-			{
-				longest_match = loc_path;
-				matching_location = location;
-			}
-		}
-	}
-
-	// If we found a matching location, check if the method is allowed
-	if (matching_location)
-	{
-		t_vecstr allowed_methods = matching_location->getMethod();
-		for (const std::string &method : allowed_methods)
-			if (method == request.method)
-				return true;
-	}
-
+	t_vecstr allowed_methods = request.location->getMethod();
+	for (const std::string &method : allowed_methods)
+		if (method == request.method)
+			return true;
 	return false;
 }
 
 //	Create response using code
-std::string	Server::createResponse(int status_code, const std::string &content_type, const std::string &body)
+std::string	Server::createResponse(int code, const std::string &content_type, const std::string &body, bool error)
 {
-	std::string status_text = "Internal Server Error";
-	if (statusCodes.find(status_code) != statusCodes.end())
-		status_text = statusCodes[status_code];
-
-	return ("HTTP/1.1 " + std::to_string(status_code) + " " + status_text + "\r\n"
-		"Content-Type: " + content_type + "\r\n"
-		"Content-Length: " + std::to_string(body.length()) + "\r\n"
+	if (!error)
+	{
+		return ("HTTP/1.1 " + std::to_string(code) + " " + statusCodes[code] + "\r\n"
+			"Content-Type: " + content_type + "\r\n"
+			"Content-Length: " + std::to_string(body.length()) + "\r\n"
+			"Connection: close\r\n"
+			"\r\n" +
+			body);
+	}
+	return ("HTTP/1.1 " + std::to_string(code) + " " + statusCodes[code] + "\r\n"
+		"Content-Type: " + "text/plain" + "\r\n"
+		"Content-Length: " + std::to_string(statusCodes[code].length()) + "\r\n"
 		"Connection: close\r\n"
 		"\r\n" +
-		body);
+		statusCodes[code]);
+	
 }
-
-
-
 
 
 //	GET Method
@@ -363,13 +375,13 @@ void	Server::handleGet(int client_fd, const HttpRequest &request)
 	std::ifstream	file(filepath, std::ios::binary | std::ios::ate);
 	if (!file.is_open())
 	{
-		response = createResponse(404, "text/plain", "404 Not Found\r\n");
+		response = createResponse(404, "", "", true);
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
 	else if (!checkMethods(request))
 	{
-		response = createResponse(405, "text/plain", "Method Not Allowed\r\n");
+		response = createResponse(405, "", "", true);
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -382,7 +394,7 @@ void	Server::handleGet(int client_fd, const HttpRequest &request)
 
 	//send file content
 	content_type = getMimeType(filepath);
-	response = createResponse(200, content_type, std::string(file_buffer.data(), file_buffer.size()));
+	response = createResponse(200, content_type, std::string(file_buffer.data(), file_buffer.size()), false);
     send(client_fd, response.c_str(), response.size(), 0);
 }
 
@@ -436,7 +448,7 @@ void	Server::saveFile(const std::string &filename, const std::string &file_conte
 	//upload failed due to missing and uninstatiable (<--- likely misspelled ¯\_(ツ)_/¯) upload directory
 	if (!std::filesystem::exists(upload_dir) && !std::filesystem::create_directory(upload_dir))
 	{
-		response = createResponse(500, "text/plain", "Server Error: Failed to create upload directory\n");
+		response = createResponse(500, "", "", true);
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -446,7 +458,7 @@ void	Server::saveFile(const std::string &filename, const std::string &file_conte
 	std::ofstream	outfile(filepath, std::ios::binary);
 	if (!outfile.is_open())
 	{
-		response = createResponse(500, "text/plain", "Server Error: Failed to create file\n");
+		response = createResponse(500, "", "", true);
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -458,7 +470,7 @@ void	Server::saveFile(const std::string &filename, const std::string &file_conte
 	//create and send response
 	response = createResponse(200, "text/html",
 		"<h1>Upload successful!</h1>\n"
-		"<p>File '" + filename + "' has been uploaded.</p>\n");
+		"<p>File '" + filename + "' has been uploaded.</p>\n", false);
 	send(client_fd, response.c_str(), response.size(), 0);
 }
 
@@ -469,11 +481,18 @@ void Server::handlePost(int client_fd, const HttpRequest &request)
 
 	if (!checkMethods(request))
 	{
-		response = createResponse(405, "text/plain", "Method Not Allowed\r\n");
+		response = createResponse(405, "", "", true);
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
 
+	size_t max_body = request.location ? request.location->getMaxBody() : this->max_body;
+	if (max_body > 0 && request.body.size() > max_body)
+	{
+		response = createResponse(413, "", "", true);
+		send(client_fd, response.c_str(), response.size(), 0);
+		return;
+	}
 	try
 	{
 		auto [filename, file_content] = extractFileInfo(request);
@@ -481,7 +500,7 @@ void Server::handlePost(int client_fd, const HttpRequest &request)
 	}
 	catch (const std::runtime_error &e)
 	{
-		response = createResponse(400, "text/plain", std::string(e.what()) + "\n");
+		response = createResponse(400, "", "", true);
 		send(client_fd, response.c_str(), response.size(), 0);
 	}
 }
@@ -500,7 +519,7 @@ void	Server::handleDelete(int client_fd, const HttpRequest &request)
 	//check to make sure users can't delete the entire server
 	if (!checkMethods(request))
 	{
-		response = createResponse(405, "text/plain", "Method Not Allowed\r\n");
+		response = createResponse(405, "", "", true);
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
@@ -516,32 +535,22 @@ void	Server::handleDelete(int client_fd, const HttpRequest &request)
 	{
 		if (std::remove(full_path.c_str()) == 0)
 		{
-			response = createResponse(200, "text/plain", "File deleted\r\n");
+			response = createResponse(200, "text/plain", "File deleted\r\n", true);
 			send(client_fd, response.c_str(), response.size(), 0);
 		}
 		else
 		{
-			response = createResponse(403, "text/plain", "Failed to delete file\r\n");
+			response = createResponse(403, "", "", true);
 			send(client_fd, response.c_str(), response.size(), 0);
 		}
 	}
 	else
 	{
-		response = createResponse(404, "text/plain", "404 Not Found\r\n");
+		response = createResponse(404,  "", "", true);
 		send(client_fd, response.c_str(), response.size(), 0);
 	}
 }
 
-
-
-
-
-//	CGI Requests
-bool	Server::isCgiRequest(const std::string &path)
-{
-	//check if the request path starts with "/cgi-bin/"
-	return path.substr(0, 9) == "/cgi-bin/";
-}
 
 void	Server::handleCgi(int client_fd, const HttpRequest &request)
 {
@@ -549,26 +558,18 @@ void	Server::handleCgi(int client_fd, const HttpRequest &request)
 	std::string	response;
 	std::string	output;
 
-	//print request path for debugging
-	std::cout << "Request: " << request.path << std::endl;
-
 	//extract script path and query string
 	std::string script_path = this->root + request.path.substr(0, query_pos);
 	std::string query_string = (query_pos != std::string::npos) ? request.path.substr(query_pos + 1) : "";
-
-	//print parsed path and query for debugging
-	std::cout << "Script Path: " << script_path << std::endl;
-	std::cout << "Query String: " << query_string << std::endl;
-
 	try
 	{
 		output = executeCgi(script_path, query_string, request.method, request.body);
-		response = createResponse(200, "text/html", output);
+		response = createResponse(200, "text/html", output, false);
 		send(client_fd, response.c_str(), response.size(), 0);
 	}
 	catch (const std::exception &e)
 	{
-		response = createResponse(500, "text/plain", "CGI execution failed\r\n");
+		response = createResponse(500,  "", "", true);
 		send(client_fd, response.c_str(), response.size(), 0);
 	}
 }

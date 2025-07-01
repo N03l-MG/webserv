@@ -12,14 +12,14 @@
 		
 		<div style="text-align:center;">
 			<h2>🌐︎ Webserv (42 project)</h2>
-			<p><strong><em>Basic HTTP server based on NGINX written in C++ with a sample webpage and GCI Scripts.</em></strong></p>
+			<p><strong><em>Basic HTTP server based on NGINX written in C++ with a sample webpage and CGI Scripts.</em></strong></p>
 		</div>
 
 		<h3>Brief</h3>
 		<p>
 			Our server manages connections using a synchronous I/O multiplexing system. Sockets are kept alive for each incoming connection
 			and a timeout system ensures that they are closed if no activity occurs in the time given via config. Our config is rather flexible,
-			allowing for precise location permissions and settings. GCI can be executed and configured by setting a GCI script directory.
+			allowing for precise location permissions and settings. CGI can be executed and configured by setting a CGI script directory.
 			Timeout time and max body size can also be set for each server. Additionally, any amount of servers can be set up in a single config.
 		</p>
 
@@ -37,13 +37,13 @@
 			There are many configuration directives that can be used to specify various features of your servers. There are always defaults as well,
 			to fall back on any missing directives. A detailed table of these directives is shown in the following section.
 			</li>
-			<li><strong><em>GCI Script Execution:</em></strong><br>
-			Our servers can handle CGI script execution which can be specified via the <code>gci-path</code> directive.
+			<li><strong><em>CGI Script Execution:</em></strong><br>
+			Our servers can handle CGI script execution which can be specified via the <code>cgi-path</code> directive.
 			This will set the path that the server will use to identify CGI-specific requests.
 			</li>
 			<li><strong><em>Example Pages and Config:</em></strong><br>
 			The project comes with a default configuration file and an example website with multiple HTML pages and CSS styling.
-			We made an upload page where you can easily test POST requests and a GCI testing page where input can be sent to a sample program that will process and respond through a script as HTML.
+			We made an upload page where you can easily test POST requests and a CGI testing page where input can be sent to a sample program that will process and respond through a script as HTML.
 			</li>
 			<li><strong><em>Verbose Logging:</em></strong><br>
 			We also made a robust logging and debugging system that reports useful information back to the user during runtime, such as request information and errors.
@@ -84,7 +84,7 @@
 				<tr><td>root</td><td>directive</td><td>path</td><td>Sets the root directory of the server.</td></tr>
 				<tr><td>index</td><td>directive</td><td>path/filename</td><td>Sets the default response file for a simple request to the server.</td></tr>
 				<tr><td>timeout</td><td>directive</td><td>time (seconds)</td><td>Sets the maximum time the socket connection will stay open awaiting a request before timing out.</td></tr>
-				<tr><td>gci_path</td><td>directive</td><td>path</td><td>Sets the path that will be treated as the CGI execution directory.</td></tr>
+				<tr><td>cgi_path</td><td>directive</td><td>path</td><td>Sets the path that will be treated as the CGI execution directory.</td></tr>
 				<tr><td>max_body</td><td>directive</td><td>size (bytes)</td><td>Sets the maximum body size that can be handled from a <code>POST</code> request for a specific location.</td></tr>
 				<tr><td>methods</td><td>directive</td><td>method names (space separated)</td><td>Sets the allowed methods for a specific location.</td></tr>
 			</tbody>

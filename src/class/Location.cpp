@@ -118,7 +118,7 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 	}
 
 	//print debug statement
-	//print_status();
+	print_status();
 }
 
 

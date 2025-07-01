@@ -49,19 +49,20 @@ class	Server
 			std::map<std::string, std::string>	headers;
 			std::string	body;
 			std::string	boundary;
+			Location* location;
 		};
 
 		//request handling
 		HttpRequest	parseRequest(const std::string &raw_request);
+		bool		isCgi(const HttpRequest &request);
 		bool		checkMethods(const HttpRequest &request);
-		std::string	createResponse(int status_code, const std::string &content_type, const std::string &body);
+		std::string	createResponse(int code, const std::string &content_type, const std::string &body, bool error);
 		void		handleGet(int client_fd, const HttpRequest &request);
 		void		handlePost(int client_fd, const HttpRequest &request);
 		void		handleDelete(int client_fd, const HttpRequest &request);
 		void		handleCgi(int client_fd, const HttpRequest &request);
 
 		//request utils
-		bool		isCgiRequest(const std::string &path);
 		std::string	executeCgi(const std::string &script_path, const std::string &query_string, const std::string &method, const std::string &body);
 		void		saveFile(const std::string &filename, const std::string &file_content, int client_fd, const std::string &path);
 		std::pair<std::string, std::string>	extractFileInfo(const HttpRequest &request);
