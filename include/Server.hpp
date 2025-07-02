@@ -6,10 +6,8 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/07/01 15:56:48 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/02 08:33:51 by jgraf            ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
-
 /* ************************************************************************** */
 
 //	Guard
@@ -55,6 +53,7 @@ class	Server
 		//request handling
 		HttpRequest	parseRequest(const std::string &raw_request);
 		void		percentDecode(std::string &body);
+		void		CheckAlias(std::string &path);
 		bool		isCgi(const HttpRequest &request);
 		bool		checkMethods(const HttpRequest &request);
 		std::string	createResponse(int status_code, const std::string &content_type, const std::string &body);

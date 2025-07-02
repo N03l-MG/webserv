@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/01 16:28:11 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/02 10:46:43 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,6 +267,40 @@ void	Server::percentDecode(std::string &body)
 }
 
 
+//	Replace the alias path with the original location path
+std::string normalizePath(const std::string &path)
+{
+	size_t		pos;
+	std::string	normalized = path;
+
+	while ((pos = normalized.find("//")) != std::string::npos)
+		normalized.erase(pos, 1);
+	if (normalized.length() > 1 && normalized.back() == '/')
+		normalized.pop_back();
+	return (normalized);
+}
+
+void Server::CheckAlias(std::string &path)
+{
+	//separate the path and arguments if a ? is found
+	size_t		args_pos = path.find('?');
+	std::string	base_path = normalizePath((args_pos != std::string::npos) ? path.substr(0, args_pos) : path);
+	std::string	arguments = (args_pos != std::string::npos) ? path.substr(args_pos) : "";
+
+	//loop through all locations and their aliases, replace the alias with the location path
+	for (Location *location : locations)
+		for (const std::string &alias : location->getReturn())
+		{
+			std::string	normalized_alias = normalizePath(alias);
+			if (base_path.find(normalized_alias) == 0)
+			{
+				path = location->getPath() + base_path.substr(normalized_alias.length()) + arguments;
+				return;
+			}
+		}
+}
+
+
 Server::HttpRequest	Server::parseRequest(const std::string &raw_request) 
 {
 	HttpRequest			request;
@@ -342,6 +376,7 @@ Server::HttpRequest	Server::parseRequest(const std::string &raw_request)
 	size_t	header_end = raw_request.find("\r\n\r\n");
 	if (header_end != std::string::npos)
 		request.body = raw_request.substr(header_end + 4);
+	CheckAlias(request.path);
 	percentDecode(request.path);
 	return request;
 }
@@ -438,17 +473,29 @@ std::string	Server::createResponse(int status_code, const std::string &content_t
 //	GET Method
 void	Server::handleGet(int client_fd, const HttpRequest &request)
 {
-	std::string	response;
 	std::string	path = request.path;
+	std::string	response;
 	std::string	content_type;
+	std::string	filepath;
 
-	//check path and replace with default
+	//check if the path is empty or root, and replace with default index
 	if (path.empty() || path == "/")
 		path = "/" + this->index;
+	filepath = this->root + path;
 
-	//get file and send error if not found
-	std::string		filepath = this->root + path;
-	std::ifstream	file(filepath, std::ios::binary | std::ios::ate);
+	//if directory replace with the indexed file if it exists
+	if (std::filesystem::is_directory(filepath))
+	{
+		if (request.location && !request.location->getIndex().empty())
+			filepath += "/" + request.location->getIndex();
+		else
+			filepath += "/" + this->index;
+	}
+
+	log(LOG_ERR, filepath);
+
+	//open the file and send an error if not found
+	std::ifstream file(filepath, std::ios::binary | std::ios::ate);
 	if (!file.is_open())
 	{
 		response = createResponse(404, "", "");
@@ -462,16 +509,17 @@ void	Server::handleGet(int client_fd, const HttpRequest &request)
 		return;
 	}
 
+	//read file content
 	std::streamsize		size = file.tellg();
 	std::vector<char>	file_buffer(size);
 	file.seekg(0, std::ios::beg);
 	file.read(file_buffer.data(), size);
 	file.close();
 
-	//send file content
+	//send the file content
 	content_type = getMimeType(filepath);
 	response = createResponse(200, content_type, std::string(file_buffer.data(), file_buffer.size()));
-    send(client_fd, response.c_str(), response.size(), 0);
+	send(client_fd, response.c_str(), response.size(), 0);
 }
 
 
