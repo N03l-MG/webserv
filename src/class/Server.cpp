@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/02 10:46:43 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/02 16:54:06 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,19 @@ Location	*Server::getLocation(size_t index)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 //	Configuration
 bool	Server::braceCheck(t_vectok tokens)
 {
@@ -205,6 +218,18 @@ void	Server::print_status()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 //	Get Mime type
 std::string	Server::getMimeType(const std::string &filepath)
 {
@@ -219,11 +244,86 @@ std::string	Server::getMimeType(const std::string &filepath)
 	return ("application/octet-stream");
 }
 
+//	Check if request has cgi permissions
+bool	Server::isCgi(const HttpRequest &request)
+{
+	if (!request.location)
+		return false;
+
+	t_vecstr	cgiScripts = request.location->getCgi();
+	for (const std::string &cgi : cgiScripts)
+	{
+		size_t	s = request.path.find_last_of("/");
+		size_t	e = request.path.find_first_of("?");
+		if (s == std::string::npos || e == std::string::npos)
+			continue;
+		if (cgi == request.path.substr(s + 1, e - (s + 1)))
+			return true;
+	}
+	return false;
+}
+
+//	Check if requested method is allowed
+bool	Server::checkMethods(const HttpRequest &request)
+{
+	t_vecstr allowed_methods = request.location->getMethod();
+	for (const std::string &method : allowed_methods)
+		if (method == request.method)
+			return true;
+	return false;
+}
 
 
 
 
-//	HTTP Repsonse
+
+
+
+
+
+
+
+
+
+
+
+
+
+//	Request parsing utils
+//	Replace the alias path with the original location path
+std::string Server::normalizePath(const std::string &path)
+{
+	size_t		pos;
+	std::string	normalized = path;
+
+	while ((pos = normalized.find("//")) != std::string::npos)
+		normalized.erase(pos, 1);
+	if (normalized.length() > 1 && normalized.back() == '/')
+		normalized.pop_back();
+	return (normalized);
+}
+
+void	Server::CheckAlias(std::string &path)
+{
+	//separate the path and arguments if a ? is found
+	size_t		args_pos = path.find('?');
+	std::string	base_path = normalizePath((args_pos != std::string::npos) ? path.substr(0, args_pos) : path);
+	std::string	arguments = (args_pos != std::string::npos) ? path.substr(args_pos) : "";
+
+	//loop through all locations and their aliases, replace the alias with the location path
+	for (Location *location : locations)
+		for (const std::string &alias : location->getReturn())
+		{
+			std::string	normalized_alias = normalizePath(alias);
+			if (base_path.find(normalized_alias) == 0)
+			{
+				path = location->getPath() + base_path.substr(normalized_alias.length()) + arguments;
+				return;
+			}
+		}
+}
+
+//	Decode percent encoded paths and arguments
 void	Server::percentDecode(std::string &body)
 {
 	if (body.empty())
@@ -267,40 +367,21 @@ void	Server::percentDecode(std::string &body)
 }
 
 
-//	Replace the alias path with the original location path
-std::string normalizePath(const std::string &path)
-{
-	size_t		pos;
-	std::string	normalized = path;
-
-	while ((pos = normalized.find("//")) != std::string::npos)
-		normalized.erase(pos, 1);
-	if (normalized.length() > 1 && normalized.back() == '/')
-		normalized.pop_back();
-	return (normalized);
-}
-
-void Server::CheckAlias(std::string &path)
-{
-	//separate the path and arguments if a ? is found
-	size_t		args_pos = path.find('?');
-	std::string	base_path = normalizePath((args_pos != std::string::npos) ? path.substr(0, args_pos) : path);
-	std::string	arguments = (args_pos != std::string::npos) ? path.substr(args_pos) : "";
-
-	//loop through all locations and their aliases, replace the alias with the location path
-	for (Location *location : locations)
-		for (const std::string &alias : location->getReturn())
-		{
-			std::string	normalized_alias = normalizePath(alias);
-			if (base_path.find(normalized_alias) == 0)
-			{
-				path = location->getPath() + base_path.substr(normalized_alias.length()) + arguments;
-				return;
-			}
-		}
-}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+//	Parse request
 Server::HttpRequest	Server::parseRequest(const std::string &raw_request) 
 {
 	HttpRequest			request;
@@ -382,7 +463,21 @@ Server::HttpRequest	Server::parseRequest(const std::string &raw_request)
 }
 
 
-// Modify your respond method to use the parser:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//	Call the requested method and call their handler
 void	Server::respond(int client_fd, const std::string &raw_request)
 {
 	HttpRequest	request = parseRequest(raw_request);
@@ -405,33 +500,6 @@ void	Server::respond(int client_fd, const std::string &raw_request)
 		handleDelete(client_fd, request);
 	else
 		handleGet(client_fd, request);
-}
-
-bool	Server::isCgi(const HttpRequest &request)
-{
-	if (!request.location)
-		return false;
-
-	t_vecstr	cgiScripts = request.location->getCgi();
-	for (const std::string &cgi : cgiScripts)
-	{
-		size_t	s = request.path.find_last_of("/");
-		size_t	e = request.path.find_first_of("?");
-		if (s == std::string::npos || e == std::string::npos)
-			continue;
-		if (cgi == request.path.substr(s + 1, e - (s + 1)))
-			return true;
-	}
-	return false;
-}
-
-bool	Server::checkMethods(const HttpRequest &request)
-{
-	t_vecstr allowed_methods = request.location->getMethod();
-	for (const std::string &method : allowed_methods)
-		if (method == request.method)
-			return true;
-	return false;
 }
 
 //	Create response using code
@@ -470,6 +538,19 @@ std::string	Server::createResponse(int status_code, const std::string &content_t
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 //	GET Method
 void	Server::handleGet(int client_fd, const HttpRequest &request)
 {
@@ -491,8 +572,6 @@ void	Server::handleGet(int client_fd, const HttpRequest &request)
 		else
 			filepath += "/" + this->index;
 	}
-
-	log(LOG_ERR, filepath);
 
 	//open the file and send an error if not found
 	std::ifstream file(filepath, std::ios::binary | std::ios::ate);
@@ -521,6 +600,17 @@ void	Server::handleGet(int client_fd, const HttpRequest &request)
 	response = createResponse(200, content_type, std::string(file_buffer.data(), file_buffer.size()));
 	send(client_fd, response.c_str(), response.size(), 0);
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -592,13 +682,11 @@ void	Server::saveFile(const std::string &filename, const std::string &file_conte
 	outfile.close();
 
 	//create and send response
-	response = createResponse(200, "text/html",
-		"<h1>Upload successful!</h1>\n"
-		"<p>File '" + filename + "' has been uploaded.</p>\n");
+	response = createResponse(201, "text/html", "");
 	send(client_fd, response.c_str(), response.size(), 0);
 }
 
-// Refactored handlePost function
+// Main POST function
 void Server::handlePost(int client_fd, const HttpRequest &request)
 {
 	std::string	response;
@@ -620,6 +708,17 @@ void Server::handlePost(int client_fd, const HttpRequest &request)
 		send(client_fd, response.c_str(), response.size(), 0);
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -668,6 +767,94 @@ void	Server::handleDelete(int client_fd, const HttpRequest &request)
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+//	CGI
+std::string	Server::executeCgi(const std::string &script_path, const std::string &query_string, const std::string &method, const std::string &body)
+{
+	// Set up environment variables
+	setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
+	setenv("REQUEST_METHOD", method.c_str(), 1);
+	setenv("SCRIPT_NAME", script_path.c_str(), 1);
+	setenv("QUERY_STRING", query_string.c_str(), 1);
+
+	// Create pipes for communication
+	int input_pipe[2], output_pipe[2];
+	if (pipe(input_pipe) < 0 || pipe(output_pipe) < 0)
+		throw std::runtime_error("Failed to create pipes");
+
+	// Attempt fork
+	pid_t pid = fork();
+	if (pid < 0)
+		throw std::runtime_error("Fork failed");
+
+	if (pid == 0) {
+		// Child process
+		close(input_pipe[1]);
+		close(output_pipe[0]);
+
+		// Redirect stdin/stdout
+		dup2(input_pipe[0], STDIN_FILENO);
+		dup2(output_pipe[1], STDOUT_FILENO);
+
+		// Execute the script
+		execl(script_path.c_str(), script_path.c_str(), nullptr);
+		exit(1);
+	}
+
+	// Parent process
+	close(input_pipe[0]);
+	close(output_pipe[1]);
+
+	// Write POST data
+	if (!body.empty())
+		write(input_pipe[1], body.c_str(), body.length());
+	close(input_pipe[1]);
+
+	// Monitor CGI execution with timeout
+	std::string output;
+	char buffer[4096];
+	int status;
+	ssize_t bytes_read;
+	time_t start_time = time(nullptr);
+	time_t timeout = this->timeout; // Use the server's timeout value
+
+	while (true)
+	{
+		// Check timeout
+		if (difftime(time(nullptr), start_time) > timeout) {
+			kill(pid, SIGKILL);
+			throw std::runtime_error("CGI script timed out");
+		}
+
+		// Read response
+		bytes_read = read(output_pipe[0], buffer, sizeof(buffer));
+		if (bytes_read > 0)
+			output.append(buffer, bytes_read);
+		else if (bytes_read == 0)
+			break;
+		else if (errno != EAGAIN && errno != EWOULDBLOCK)
+			break;
+	}
+	close(output_pipe[0]);
+
+	// Wait for child process
+	waitpid(pid, &status, 0);
+	return output;
+}
+
+//	Main CGI Function
 void	Server::handleCgi(int client_fd, const HttpRequest &request)
 {
 	size_t		query_pos = request.path.find('?');
@@ -688,61 +875,4 @@ void	Server::handleCgi(int client_fd, const HttpRequest &request)
 		response = createResponse(500,  "", "");
 		send(client_fd, response.c_str(), response.size(), 0);
 	}
-}
-
-//	Execute CGI
-std::string	Server::executeCgi(const std::string &script_path, const std::string &query_string, const std::string &method, const std::string &body)
-{
-	//set up environment variables
-	setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
-	setenv("REQUEST_METHOD", method.c_str(), 1);
-	setenv("SCRIPT_NAME", script_path.c_str(), 1);
-	setenv("QUERY_STRING", query_string.c_str(), 1);
-	
-	//create pipes for communication
-	int	input_pipe[2], output_pipe[2];
-	if (pipe(input_pipe) < 0 || pipe(output_pipe) < 0)
-		throw	std::runtime_error("Failed to create pipes");
-
-	//attempt fork
-	pid_t	pid = fork();
-	if (pid < 0)
-		throw	std::runtime_error("Fork failed");
-
-	//child process
-	if (pid == 0)
-	{
-		close(input_pipe[1]);
-		close(output_pipe[0]);
-		
-		//redirect stdin/stdout
-		dup2(input_pipe[0], STDIN_FILENO);
-		dup2(output_pipe[1], STDOUT_FILENO);
-		
-		//execute the script
-		execl(script_path.c_str(), script_path.c_str(), nullptr);
-		exit(1);
-	}
-
-	//parent process
-	close(input_pipe[0]);
-	close(output_pipe[1]);
-
-	//write POST data
-	if (!body.empty())
-		write(input_pipe[1], body.c_str(), body.length());
-	close(input_pipe[1]);
-
-	//read response
-	std::string	output;
-	char		buffer[4096];
-	int			status;
-	ssize_t		bytes_read;
-	while ((bytes_read = read(output_pipe[0], buffer, sizeof(buffer))) > 0)
-		output.append(buffer, bytes_read);
-	close(output_pipe[0]);
-
-	//wait for child process
-	waitpid(pid, &status, 0);
-	return output;
 }

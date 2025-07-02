@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/07/02 08:33:51 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/02 15:56:27 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,9 @@ class	Server
 		HttpRequest	parseRequest(const std::string &raw_request);
 		void		percentDecode(std::string &body);
 		void		CheckAlias(std::string &path);
+		std::string	normalizePath(const std::string &path);
 		bool		isCgi(const HttpRequest &request);
 		bool		checkMethods(const HttpRequest &request);
-		std::string	createResponse(int status_code, const std::string &content_type, const std::string &body);
 		void		handleGet(int client_fd, const HttpRequest &request);
 		void		handlePost(int client_fd, const HttpRequest &request);
 		void		handleDelete(int client_fd, const HttpRequest &request);
@@ -93,8 +93,9 @@ class	Server
 		Location						*getLocation(size_t index);
 		std::vector<Location*>			getLocation();
 
-		void	configure(t_vectok &tokens, size_t &i);
-		bool	braceCheck(t_vectok tokens);
-		void	print_status();
-		void	respond(int client_fd, const std::string &request);
+		void		configure(t_vectok &tokens, size_t &i);
+		bool		braceCheck(t_vectok tokens);
+		void		print_status();
+		void		respond(int client_fd, const std::string &request);
+		std::string	createResponse(int status_code, const std::string &content_type, const std::string &body);
 };
