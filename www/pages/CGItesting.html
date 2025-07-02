@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>CGI Testing</title>
+	<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+	<div class="container">
+		<h1>CGI Testing</h1>
+
+		<!-- GET form: sends query to pyscript.py -->
+		<div class="push-swap-form">
+			<h2>Calculator (Python CGI - GET)</h2>
+			<form action="/cgi-bin/pyscript.py" method="get">
+				<input type="text" name="operand1" placeholder="First number" required>
+				<select name="operation" required>
+					<option value="add">+</option>
+					<option value="subtract">−</option>
+					<option value="multiply">×</option>
+					<option value="divide">÷</option>
+				</select>
+				<input type="text" name="operand2" placeholder="Second number" required>
+				<input type="submit" value="Run (GET)">
+			</form>
+		</div>
+
+		<!-- POST form: sends data to bashscript.sh -->
+		<div class="push-swap-form">
+			<h2>Push Swap (Ran through Bash - POST)</h2>
+			<form action="/cgi-bin/bashscript.sh" method="post">
+				<input type="text" name="numbers" placeholder="Enter numbers separated by spaces" required>
+				<input type="submit" value="Run (POST)">
+			</form>
+		</div>
+
+		<div class="push-swap-form">
+			<h2>Infinite Loop</h2>
+			<form action="/cgi-bin/infinite.py" method="get">
+				<input type="submit" value="...and beyond!">
+			</form>
+		</div>		
+
+		<nav>
+			<ul class="nav-links">
+				<li><a href="/">Back</a></li>
+			</ul>
+		</nav>
+	</div>
+</body>
+</html>

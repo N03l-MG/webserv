@@ -3,11 +3,13 @@
 echo "Content-type: text/html"
 echo ""
 
-# Get query string from environment variable
-QUERY_STRING=${QUERY_STRING:-"numbers="}
-NUMBERS=${QUERY_STRING#numbers=}
+# Read the POST data from stdin
+read -n "$CONTENT_LENGTH" POST_DATA
 
-# URL decode the numbers
+# Extract the "numbers" value from POST data
+NUMBERS=$(echo "$POST_DATA" | sed -n 's/^numbers=//p')
+
+# URL decode (replace + and %20 with spaces)
 NUMBERS=$(echo "$NUMBERS" | sed 's/+/ /g' | sed 's/%20/ /g')
 
 echo "<html>"
@@ -22,8 +24,7 @@ else
     echo "<pre>$NUMBERS</pre>"
     echo "<h3>Output:</h3>"
     echo "<pre>"
-    # Execute push_swap with the provided numbers
-    ./www/cgi-bin/push_swap "$NUMBERS" 2>&1
+    ./www/cgi-bin/push_swap $NUMBERS 2>&1
     echo "</pre>"
 fi
 

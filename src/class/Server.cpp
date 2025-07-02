@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/01 16:40:18 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/02 16:15:48 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -376,17 +376,23 @@ bool	Server::isCgi(const HttpRequest &request)
 {
 	if (!request.location)
 		return false;
+	const std::vector<std::string>& cgiSuffixes = request.location->getCgi();
+	const std::string& path = request.path;
 
-	t_vecstr	cgiScripts = request.location->getCgi();
-	for (const std::string &cgi : cgiScripts)
-	{
-		size_t	s = request.path.find_last_of("/");
-		size_t	e = request.path.find_first_of("?");
-		if (s == std::string::npos || e == std::string::npos)
-			continue;
-		if (cgi == request.path.substr(s + 1, e - (s + 1)))
+	// Strip query string
+	size_t query_pos = path.find('?');
+	std::string clean_path = (query_pos != std::string::npos) ? path.substr(0, query_pos) : path;
+
+	// Find file extension
+	size_t dot_pos = clean_path.find_last_of('.');
+	if (dot_pos == std::string::npos)
+		return false;
+
+	std::string ext = clean_path.substr(dot_pos);
+	// Match against configured suffixes
+	for (const std::string& suffix : cgiSuffixes)
+		if (ext == suffix)
 			return true;
-	}
 	return false;
 }
 
@@ -635,7 +641,7 @@ void	Server::handleCgi(int client_fd, const HttpRequest &request)
 		response = createResponse(200, "text/html", output);
 		send(client_fd, response.c_str(), response.size(), 0);
 	}
-	catch (const std::exception &e)
+	catch (...)
 	{
 		response = createResponse(500,  "", "");
 		send(client_fd, response.c_str(), response.size(), 0);
@@ -643,58 +649,76 @@ void	Server::handleCgi(int client_fd, const HttpRequest &request)
 }
 
 //	Execute CGI
-std::string	Server::executeCgi(const std::string &script_path, const std::string &query_string, const std::string &method, const std::string &body)
+std::string Server::executeCgi(const std::string &script_path, const std::string &query_string,
+								const std::string &method, const std::string &body)
 {
-	//set up environment variables
-	setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
-	setenv("REQUEST_METHOD", method.c_str(), 1);
-	setenv("SCRIPT_NAME", script_path.c_str(), 1);
-	setenv("QUERY_STRING", query_string.c_str(), 1);
-	
-	//create pipes for communication
-	int	input_pipe[2], output_pipe[2];
+	// Prepare environment variables
+	std::vector<std::string> env_vars;
+	env_vars.push_back("GATEWAY_INTERFACE=CGI/1.1");
+	env_vars.push_back("REQUEST_METHOD=" + method);
+	env_vars.push_back("SCRIPT_NAME=" + script_path);
+	env_vars.push_back("QUERY_STRING=" + query_string);
+	env_vars.push_back("SERVER_PROTOCOL=HTTP/1.1");
+
+	if (method == "POST") {
+		env_vars.push_back("CONTENT_LENGTH=" + std::to_string(body.size()));
+		env_vars.push_back("CONTENT_TYPE=application/x-www-form-urlencoded");
+	}
+
+	// Convert env vector to char* array
+	std::vector<char*> envp;
+	for (size_t i = 0; i < env_vars.size(); ++i)
+		envp.push_back(const_cast<char*>(env_vars[i].c_str()));
+	envp.push_back(nullptr);
+
+	// Setup pipes
+	int input_pipe[2];
+	int output_pipe[2];
 	if (pipe(input_pipe) < 0 || pipe(output_pipe) < 0)
-		throw	std::runtime_error("Failed to create pipes");
+		throw std::runtime_error("Failed to create pipes");
 
-	//attempt fork
-	pid_t	pid = fork();
+	pid_t pid = fork();
 	if (pid < 0)
-		throw	std::runtime_error("Fork failed");
+		throw std::runtime_error("Fork failed");
 
-	//child process
-	if (pid == 0)
-	{
-		close(input_pipe[1]);
-		close(output_pipe[0]);
-		
-		//redirect stdin/stdout
+	if (pid == 0) {
+		// In child process
 		dup2(input_pipe[0], STDIN_FILENO);
 		dup2(output_pipe[1], STDOUT_FILENO);
-		
-		//execute the script
-		execl(script_path.c_str(), script_path.c_str(), nullptr);
+
+		close(input_pipe[1]);
+		close(output_pipe[0]);
+
+		char *const argv[] = {const_cast<char*>(script_path.c_str()), nullptr};
+
+		execve(script_path.c_str(), argv, envp.data());
+
+		// If execve fails
 		exit(1);
 	}
 
-	//parent process
+	// In parent process
 	close(input_pipe[0]);
 	close(output_pipe[1]);
 
-	//write POST data
-	if (!body.empty())
+	if (method == "POST" && !body.empty())
 		write(input_pipe[1], body.c_str(), body.length());
 	close(input_pipe[1]);
 
-	//read response
-	std::string	output;
-	char		buffer[4096];
-	int			status;
-	ssize_t		bytes_read;
+	std::string output;
+	char buffer[4096];
+	ssize_t bytes_read;
+
 	while ((bytes_read = read(output_pipe[0], buffer, sizeof(buffer))) > 0)
 		output.append(buffer, bytes_read);
 	close(output_pipe[0]);
 
-	//wait for child process
+	int status;
 	waitpid(pid, &status, 0);
+
+	if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+		throw std::runtime_error("CGI script failed");
+
 	return output;
 }
+
