@@ -1,9 +1,5 @@
 #!/bin/bash
 
-start_time=$(date +%s)
-
-while true; do
-
 echo "Content-type: text/html"
 echo ""
 

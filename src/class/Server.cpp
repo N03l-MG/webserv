@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/03 11:06:24 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/03 11:27:45 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,7 +214,7 @@ void	Server::print_status()
 			<< "Max Body:\t" << getMaxBody() << std::endl;
 	
 	for (size_t i = 0; i < locations.size(); i++)
-		std::cout << "Locations:\t" << getLocation(i) << std::endl;
+		std::cout << "Locations:\t" << getLocation(i)->getPath() << std::endl;
 	for (std::map<size_t, std::string>::iterator it = error_page.begin(); it != error_page.end(); it++)
 		std::cout << "Error Code:\t" << it->first  << "\t-> Page:\t" << it->second << std::endl;
 }
@@ -254,17 +254,23 @@ bool	Server::isCgi(const HttpRequest &request)
 {
 	if (!request.location)
 		return false;
+	const std::vector<std::string>& cgiSuffixes = request.location->getCgi();
+	const std::string& path = request.path;
 
-	t_vecstr	cgiScripts = request.location->getCgi();
-	for (const std::string &cgi : cgiScripts)
-	{
-		size_t	s = request.path.find_last_of("/");
-		size_t	e = request.path.find_first_of("?");
-		if (s == std::string::npos || e == std::string::npos)
-			continue;
-		if (cgi == request.path.substr(s + 1, e - (s + 1)))
+	// Strip query string
+	size_t query_pos = path.find('?');
+	std::string clean_path = (query_pos != std::string::npos) ? path.substr(0, query_pos) : path;
+
+	// Find file extension
+	size_t dot_pos = clean_path.find_last_of('.');
+	if (dot_pos == std::string::npos)
+		return false;
+
+	std::string ext = clean_path.substr(dot_pos);
+	// Match against configured suffixes
+	for (const std::string& suffix : cgiSuffixes)
+		if (ext == suffix)
 			return true;
-	}
 	return false;
 }
 
@@ -505,39 +511,6 @@ void	Server::respond(int client_fd, const std::string &raw_request)
 		handleDelete(client_fd, request);
 	else
 		handleGet(client_fd, request);
-}
-
-bool	Server::isCgi(const HttpRequest &request)
-{
-	if (!request.location)
-		return false;
-	const std::vector<std::string>& cgiSuffixes = request.location->getCgi();
-	const std::string& path = request.path;
-
-	// Strip query string
-	size_t query_pos = path.find('?');
-	std::string clean_path = (query_pos != std::string::npos) ? path.substr(0, query_pos) : path;
-
-	// Find file extension
-	size_t dot_pos = clean_path.find_last_of('.');
-	if (dot_pos == std::string::npos)
-		return false;
-
-	std::string ext = clean_path.substr(dot_pos);
-	// Match against configured suffixes
-	for (const std::string& suffix : cgiSuffixes)
-		if (ext == suffix)
-			return true;
-	return false;
-}
-
-bool	Server::checkMethods(const HttpRequest &request)
-{
-	t_vecstr allowed_methods = request.location->getMethod();
-	for (const std::string &method : allowed_methods)
-		if (method == request.method)
-			return true;
-	return false;
 }
 
 //	Create response using code
@@ -819,80 +792,6 @@ void	Server::handleDelete(int client_fd, const HttpRequest &request)
 
 
 //	CGI
-std::string	Server::executeCgi(const std::string &script_path, const std::string &query_string, const std::string &method, const std::string &body)
-{
-	// Set up environment variables
-	setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
-	setenv("REQUEST_METHOD", method.c_str(), 1);
-	setenv("SCRIPT_NAME", script_path.c_str(), 1);
-	setenv("QUERY_STRING", query_string.c_str(), 1);
-
-	// Create pipes for communication
-	int input_pipe[2], output_pipe[2];
-	if (pipe(input_pipe) < 0 || pipe(output_pipe) < 0)
-		throw std::runtime_error("Failed to create pipes");
-
-	// Attempt fork
-	pid_t pid = fork();
-	if (pid < 0)
-		throw std::runtime_error("Fork failed");
-
-	if (pid == 0) {
-		// Child process
-		close(input_pipe[1]);
-		close(output_pipe[0]);
-
-		// Redirect stdin/stdout
-		dup2(input_pipe[0], STDIN_FILENO);
-		dup2(output_pipe[1], STDOUT_FILENO);
-
-		// Execute the script
-		execl(script_path.c_str(), script_path.c_str(), nullptr);
-		exit(1);
-	}
-
-	// Parent process
-	close(input_pipe[0]);
-	close(output_pipe[1]);
-
-	// Write POST data
-	if (!body.empty())
-		write(input_pipe[1], body.c_str(), body.length());
-	close(input_pipe[1]);
-
-	// Monitor CGI execution with timeout
-	std::string output;
-	char buffer[4096];
-	int status;
-	ssize_t bytes_read;
-	time_t start_time = time(nullptr);
-	time_t timeout = this->timeout; // Use the server's timeout value
-
-	while (true)
-	{
-		// Check timeout
-		if (difftime(time(nullptr), start_time) > timeout) {
-			kill(pid, SIGKILL);
-			throw std::runtime_error("CGI script timed out");
-		}
-
-		// Read response
-		bytes_read = read(output_pipe[0], buffer, sizeof(buffer));
-		if (bytes_read > 0)
-			output.append(buffer, bytes_read);
-		else if (bytes_read == 0)
-			break;
-		else if (errno != EAGAIN && errno != EWOULDBLOCK)
-			break;
-	}
-	close(output_pipe[0]);
-
-	// Wait for child process
-	waitpid(pid, &status, 0);
-	return output;
-}
-
-//	Main CGI Function
 void	Server::handleCgi(int client_fd, const HttpRequest &request)
 {
 	size_t		query_pos = request.path.find('?');
@@ -908,14 +807,16 @@ void	Server::handleCgi(int client_fd, const HttpRequest &request)
 		response = createResponse(200, "text/html", output);
 		send(client_fd, response.c_str(), response.size(), 0);
 	}
-	catch (...)
+	catch (const std::exception &e)
 	{
-		response = createResponse(500,  "", "");
+		if (std::string(e.what()) == "CGI script timeout")
+			response = createResponse(504,  "", "");
+		else
+			response = createResponse(500,  "", "");
 		send(client_fd, response.c_str(), response.size(), 0);
 	}
 }
 
-//	Execute CGI
 std::string Server::executeCgi(const std::string &script_path, const std::string &query_string,
 								const std::string &method, const std::string &body)
 {
@@ -980,10 +881,8 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 	int flags = fcntl(output_pipe[0], F_GETFL, 0);
 	fcntl(output_pipe[0], F_SETFL, flags | O_NONBLOCK);
 
-	// Timeout (in milliseconds)
-	const int timeout_ms = 5000;
-	time_t start = time(NULL);
 
+	time_t start = time(NULL);
 	while (true) {
 		struct pollfd pfd = {output_pipe[0], POLLIN, 0};
 		int poll_result = poll(&pfd, 1, 500);  // check every 0.5 sec
@@ -993,7 +892,7 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 		}
 		else if (poll_result == 0) {
 			// Timeout check
-			if (time(NULL) - start > timeout_ms / 1000) {
+			if (static_cast<size_t>(time(NULL) - start) > timeout) {
 				// Kill child
 				kill(pid, SIGKILL);
 				waitpid(pid, nullptr, 0);
