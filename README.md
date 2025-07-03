@@ -51,9 +51,15 @@ Here is every available directive and scope in our configuration system:
     <tr>
       <td>server</td>
       <td>scope</td>
-      <td>N/A</td>
+      <td>server name</td>
       <td>Defines a server to run upon execution.</td>
     </tr>
+	<tr>
+	  <td>error_page</td>
+	  <td>directive</td>
+	  <td>status code, path to page</td>
+	  <td>Sets the response page to be used for a specified status code.</td>
+	</tr>
     <tr>
       <td>location</td>
       <td>scope</td>
@@ -91,10 +97,10 @@ Here is every available directive and scope in our configuration system:
       <td>Sets the maximum time the socket connection will stay open awaiting a request before timing out.</td>
     </tr>
     <tr>
-      <td>cgi_path</td>
-      <td>directive</td>
-      <td>path</td>
-      <td>Sets the path that will be treated as the CGI execution directory.</td>
+      <td>cgi</td>
+	  <td>directive</td>
+	  <td>file extensions</td>
+	  <td>Defines the file types which will be treated as CGI scripts by the server.</td>
     </tr>
     <tr>
       <td>max_body</td>
