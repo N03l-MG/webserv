@@ -1,0 +1,3 @@
+#!/bin/bash
+
+idk man just something that wont run at all...
