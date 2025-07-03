@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 09:30:28 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/01 16:58:30 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 10:24:15 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	tokenize(const std::string &line, t_vectok &tokens)
 void	assign_token_type(t_vectok &tokens)
 {
 	t_vecstr	directives = {"server", "location"};
-	t_vecstr	keys = {"listen", "host", "server_name", "error_page", "timeout", "path", "return", "root", "index", "upload_store", "methods", "cgi", "max_body"};
+	t_vecstr	keys = {"listen", "host", "root", "index", "path", "return", "timeout", "max_body", "methods", "cgi", "error_page"};
 
 	for (size_t i = 0; i < tokens.size(); i++)
 	{

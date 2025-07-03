@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/07/02 15:56:27 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 09:44:37 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ class	Server
 		void		handlePost(int client_fd, const HttpRequest &request);
 		void		handleDelete(int client_fd, const HttpRequest &request);
 		void		handleCgi(int client_fd, const HttpRequest &request);
+		std::string	createResponse(int status_code, const std::string &content_type, const std::string &body);
 
 		//request utils
 		std::string	executeCgi(const std::string &script_path, const std::string &query_string, const std::string &method, const std::string &body);
@@ -97,5 +98,4 @@ class	Server
 		bool		braceCheck(t_vectok tokens);
 		void		print_status();
 		void		respond(int client_fd, const std::string &request);
-		std::string	createResponse(int status_code, const std::string &content_type, const std::string &body);
 };

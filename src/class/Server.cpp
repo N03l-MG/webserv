@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/02 16:54:06 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 10:54:56 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,10 +146,17 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 {
 	std::string	key;
 	std::string	value;
-
+	
 	//check if all braces cleanly close
-	if (!braceCheck(tokens) || tokens[i].type != TOK_OPEN_BRACE)
+	if (!braceCheck(tokens))
 		throw	ParseException();
+
+	//set server_name
+	while (tokens[i].type != TOK_OPEN_BRACE)
+	{
+		if (tokens[i].type == TOK_VALUE)
+			setName(tokens[i++].token);
+	}
 
 	//configure
 	while (tokens[++i].type != TOK_CLOSE_BRACE)
@@ -165,8 +172,6 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 				setHost(value);
 			else if (key == "listen")
 				setPort(std::stoi(value));
-			else if (key == "server_name")
-				setName(value);
 			else if (key == "root")
 				setRoot(value);
 			else if (key == "index")
@@ -192,7 +197,7 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 	}
 
 	//print data
-	//print_status();
+	print_status();
 }
 
 

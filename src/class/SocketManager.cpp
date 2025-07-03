@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/02 17:17:29 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 09:44:08 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,12 +184,7 @@ void SocketManager::checkTimeouts(time_t now)
 	{
 		fd = poll_fds[i].fd;
 		if (client_to_server.count(fd) && difftime(now, client_last_active[fd]) > client_to_server[fd]->getTimeout())
-		{
-			log(LOG_INFO, "Sent 504 response!");
-			std::string response = client_to_server[fd]->createResponse(504, "text/html", "");
-			send(fd, response.c_str(), response.size(), 0);
 			cleanupClient(fd, i);
-		}
 	}
 }
 

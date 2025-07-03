@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/01 16:58:59 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 10:54:53 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ bool	Location::checkMethod(std::string method)
 
 void	Location::configure(t_vectok &tokens, size_t &i)
 {
-	//	Set path
+	//set path
 	while (tokens[i].type != TOK_OPEN_BRACE)
 	{
 		if (tokens[i].type == TOK_VALUE)
@@ -106,7 +106,7 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 	}
 
 	//print debug statement
-	print_status();
+	//print_status();
 }
 
 
