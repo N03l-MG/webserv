@@ -132,7 +132,7 @@ server {
 
 	location uploads/ {
 		methods GET POST DELETE;
-		max_body 5242880;
+		max_body 8000000;
 	}
 }
 ```

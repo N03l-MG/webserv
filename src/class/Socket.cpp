@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 14:14:48 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/01 12:28:33 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 16:54:20 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ Socket::~Socket()
 //	Socket setup
 int	Socket::setupSocket()
 {
-	int			flags;
 	sockaddr_in	server_addr{};
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
@@ -64,8 +63,7 @@ int	Socket::setupSocket()
 		return 1;
 	}
 
-	flags = fcntl(server_fd, F_GETFL, 0);
-	fcntl(server_fd, F_SETFL, flags | O_NONBLOCK);
+	//fcntl(server_fd, F_SETFL, O_NONBLOCK);
 	if (listen(server_fd, SOMAXCONN) < 0)
 	{
 		log(LOG_ERR, "Failed to listen.");

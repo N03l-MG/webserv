@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/01 11:03:28 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 15:38:09 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void signalHandler(int signum)
 int main(int ac, char **av)
 {
 	if (ac > 2) {
-		log(LOG_ERR, "Too many arguments! (Expected 1 at most)");
+		log(LOG_ERR, "Too many arguments!");
 		return (1);
 	}
 

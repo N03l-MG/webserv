@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/03 11:27:45 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/03 16:46:42 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -878,21 +878,19 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 	ssize_t bytes_read;
 
 	// Set output_pipe non-blocking
-	int flags = fcntl(output_pipe[0], F_GETFL, 0);
-	fcntl(output_pipe[0], F_SETFL, flags | O_NONBLOCK);
+	fcntl(output_pipe[0], F_SETFL, O_NONBLOCK);
 
 
-	time_t start = time(NULL);
+	time_t start = std::time(NULL);
 	while (true) {
 		struct pollfd pfd = {output_pipe[0], POLLIN, 0};
-		int poll_result = poll(&pfd, 1, 500);  // check every 0.5 sec
+		int poll_result = poll(&pfd, 1, 500); // FIXME: no
 
-		if (poll_result < 0) {
+		if (poll_result < 0)
 			throw std::runtime_error("Poll failed");
-		}
 		else if (poll_result == 0) {
 			// Timeout check
-			if (static_cast<size_t>(time(NULL) - start) > timeout) {
+			if (static_cast<size_t>(std::time(NULL) - start) > timeout) {
 				// Kill child
 				kill(pid, SIGKILL);
 				waitpid(pid, nullptr, 0);
@@ -902,15 +900,12 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 		}
 
 		bytes_read = read(output_pipe[0], buffer, sizeof(buffer));
-		if (bytes_read > 0) {
+		if (bytes_read > 0)
 			output.append(buffer, bytes_read);
-		}
-		else if (bytes_read == 0) {
+		else if (bytes_read == 0)
 			break; // EOF
-		}
-		else if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		else if (errno != EAGAIN && errno != EWOULDBLOCK)
 			throw std::runtime_error("Read error");
-		}
 	}
 	close(output_pipe[0]);
 

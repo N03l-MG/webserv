@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   SocketManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/03 09:44:08 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 16:35:42 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	SocketManager::initializeServerSockets()
 	for (Socket *socket : sockets)
 	{
 		fd = socket->server_fd;
-		fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
+		fcntl(fd, F_SETFL, O_NONBLOCK);
 		pfd = {fd, POLLIN, 0};
 		poll_fds.push_back(pfd);
 		fd_to_socket[fd] = socket;
@@ -183,7 +183,7 @@ void SocketManager::checkTimeouts(time_t now)
 	for (size_t i = 0; i < poll_fds.size(); i++)
 	{
 		fd = poll_fds[i].fd;
-		if (client_to_server.count(fd) && difftime(now, client_last_active[fd]) > client_to_server[fd]->getTimeout())
+		if (client_to_server.count(fd) && std::difftime(now, client_last_active[fd]) > client_to_server[fd]->getTimeout())
 			cleanupClient(fd, i);
 	}
 }
@@ -203,7 +203,7 @@ void SocketManager::run()
 			break;
 		}
 
-		time_t	now = time(nullptr);
+		time_t	now = std::time(nullptr);
 		for (size_t i = 0; i < poll_fds.size(); i++)
 		{
 			pollfd	&pfd = poll_fds[i];

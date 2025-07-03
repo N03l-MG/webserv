@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   SocketManager.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:11 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/27 14:58:09 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 15:39:16 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #pragma once
 
 #include "Socket.hpp"
-#include "include.hpp"
 #include "include.hpp"
 
 class SocketManager

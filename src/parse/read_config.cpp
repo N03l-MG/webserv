@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   read_config.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:40:10 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/27 13:01:53 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 15:42:47 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ t_vectok	read_config_file(std::string const &in_file)
 	{
 		if (file.is_open())
 			file.close();
+		if (in_file == "./config/default.conf")
+			throw	MissingDefaultException();
 		throw	WrongFileException();
 	}
 
