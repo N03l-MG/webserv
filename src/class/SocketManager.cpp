@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/01 12:26:56 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 09:44:08 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,14 +178,13 @@ void SocketManager::handleErrors(size_t &i, pollfd &pfd)
 
 void SocketManager::checkTimeouts(time_t now)
 {
+	int	fd;
+
 	for (size_t i = 0; i < poll_fds.size(); i++)
 	{
-		int fd = poll_fds[i].fd;
+		fd = poll_fds[i].fd;
 		if (client_to_server.count(fd) && difftime(now, client_last_active[fd]) > client_to_server[fd]->getTimeout())
-		{
-			log(LOG_INFO, "Timeout: closing client fd " + std::to_string(fd));
 			cleanupClient(fd, i);
-		}
 	}
 }
 

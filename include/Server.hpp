@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/07/01 16:37:12 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/03 11:04:05 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,13 +53,15 @@ class	Server
 		//request handling
 		HttpRequest	parseRequest(const std::string &raw_request);
 		void		percentDecode(std::string &body);
+		void		CheckAlias(std::string &path);
+		std::string	normalizePath(const std::string &path);
 		bool		isCgi(const HttpRequest &request);
 		bool		checkMethods(const HttpRequest &request);
-		std::string	createResponse(int status_code, const std::string &content_type, const std::string &body);
 		void		handleGet(int client_fd, const HttpRequest &request);
 		void		handlePost(int client_fd, const HttpRequest &request);
 		void		handleDelete(int client_fd, const HttpRequest &request);
 		void		handleCgi(int client_fd, const HttpRequest &request);
+		std::string	createResponse(int status_code, const std::string &content_type, const std::string &body);
 
 		//request utils
 		std::string	executeCgi(const std::string &script_path, const std::string &query_string, const std::string &method, const std::string &body);
@@ -92,8 +94,8 @@ class	Server
 		Location						*getLocation(size_t index);
 		std::vector<Location*>			getLocation();
 
-		void	configure(t_vectok &tokens, size_t &i);
-		bool	braceCheck(t_vectok tokens);
-		void	print_status();
-		void	respond(int client_fd, const std::string &request);
+		void		configure(t_vectok &tokens, size_t &i);
+		bool		braceCheck(t_vectok tokens);
+		void		print_status();
+		void		respond(int client_fd, const std::string &request);
 };
