@@ -1,4 +1,6 @@
-print("Content-Type: text/html\n")
+#!/usr/bin/env python3
+
+import time
 
 while True:
-    pass
+	time.sleep(1)

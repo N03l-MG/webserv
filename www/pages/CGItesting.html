@@ -11,36 +11,47 @@
 		<h1>CGI Testing</h1>
 
 		<!-- GET form: sends query to pyscript.py -->
-		<div class="push-swap-form">
+		<div class="cgi-form">
 			<h2>Calculator (Python CGI - GET)</h2>
 			<form action="/cgi-bin/pyscript.py" method="get">
-				<input type="text" name="operand1" placeholder="First number" required>
-				<select name="operation" required>
-					<option value="add">+</option>
-					<option value="subtract">−</option>
-					<option value="multiply">×</option>
-					<option value="divide">÷</option>
-				</select>
-				<input type="text" name="operand2" placeholder="Second number" required>
-				<input type="submit" value="Run (GET)">
+				<div class="form-row">
+					<input type="text" name="operand1" placeholder="First number" required>
+					<select name="operation" required>
+						<option value="add">+</option>
+						<option value="subtract">−</option>
+						<option value="multiply">×</option>
+						<option value="divide">÷</option>
+					</select>
+					<input type="text" name="operand2" placeholder="Second number" required>
+					<input type="submit" value="Run (GET)">
+				</div>
 			</form>
 		</div>
 
 		<!-- POST form: sends data to bashscript.sh -->
-		<div class="push-swap-form">
+		<div class="cgi-form">
 			<h2>Push Swap (Ran through Bash - POST)</h2>
 			<form action="/cgi-bin/bashscript.sh" method="post">
-				<input type="text" name="numbers" placeholder="Enter numbers separated by spaces" required>
-				<input type="submit" value="Run (POST)">
+				<div class="form-row">
+					<input type="text" name="numbers" placeholder="Numbers (space separated)" required>
+					<input type="submit" value="Run (POST)">
+				</div>
 			</form>
 		</div>
 
-		<div class="push-swap-form">
-			<h2>Infinite Loop</h2>
+		<!-- Erronious CGI: runs an infinite loop and a broken script -->
+		<div class="cgi-form">
+			<h2>Infinity</h2>
 			<form action="/cgi-bin/infinite.py" method="get">
-				<input type="submit" value="...and beyond!">
+				<div class="form-row"><input type="submit" value="...and beyond!"></div>
 			</form>
-		</div>		
+		</div>
+		<div class="cgi-form">
+			<h2>Broken Script</h2>
+			<form action="/cgi-bin/badscript.sh" method="post">
+				<div class="form-row"><input type="submit" value="cause chaos"></div>
+			</form>
+		</div>	
 
 		<nav>
 			<ul class="nav-links">

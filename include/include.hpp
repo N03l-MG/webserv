@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:13 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/27 16:09:03 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/03 09:22:32 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 #include <csignal>
 #include <poll.h>
 #include <ctime>
+#include <fcntl.h>
 #include "exceptions.hpp"
 
 

@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/02 16:15:48 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/03 09:22:07 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -709,13 +709,47 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 	char buffer[4096];
 	ssize_t bytes_read;
 
-	while ((bytes_read = read(output_pipe[0], buffer, sizeof(buffer))) > 0)
-		output.append(buffer, bytes_read);
+	// Set output_pipe non-blocking
+	int flags = fcntl(output_pipe[0], F_GETFL, 0);
+	fcntl(output_pipe[0], F_SETFL, flags | O_NONBLOCK);
+
+	// Timeout (in milliseconds)
+	const int timeout_ms = 5000;
+	time_t start = time(NULL);
+
+	while (true) {
+		struct pollfd pfd = {output_pipe[0], POLLIN, 0};
+		int poll_result = poll(&pfd, 1, 500);  // check every 0.5 sec
+
+		if (poll_result < 0) {
+			throw std::runtime_error("Poll failed");
+		}
+		else if (poll_result == 0) {
+			// Timeout check
+			if (time(NULL) - start > timeout_ms / 1000) {
+				// Kill child
+				kill(pid, SIGKILL);
+				waitpid(pid, nullptr, 0);
+				throw std::runtime_error("CGI script timeout");
+			}
+			continue;
+		}
+
+		bytes_read = read(output_pipe[0], buffer, sizeof(buffer));
+		if (bytes_read > 0) {
+			output.append(buffer, bytes_read);
+		}
+		else if (bytes_read == 0) {
+			break; // EOF
+		}
+		else if (errno != EAGAIN && errno != EWOULDBLOCK) {
+			throw std::runtime_error("Read error");
+		}
+	}
 	close(output_pipe[0]);
 
 	int status;
 	waitpid(pid, &status, 0);
-
 	if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
 		throw std::runtime_error("CGI script failed");
 
