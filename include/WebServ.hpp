@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   webserv.hpp                                        :+:      :+:    :+:   */
+/*   WebServ.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 08:32:39 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/24 08:48:38 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 16:14:52 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 #include "include.hpp"
 #include "Server.hpp"
 #include "SocketManager.hpp"
+
+class	SocketManager;
 
 class	WebServ
 {
@@ -39,8 +41,12 @@ class	WebServ
 		t_vectok	getTokens();
 		Server		*getServer(size_t index);
 		std::vector<Server*>	getServer();
+		void		rmServer(Server *server);
 
 		void	start();
 		void	shutdown();
 		bool	isRunning();
 };
+
+//	global
+extern WebServ	*g_webserver;

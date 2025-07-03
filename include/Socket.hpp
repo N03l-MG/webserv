@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 14:15:14 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/27 11:56:18 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 16:50:18 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,12 @@
 #include <fcntl.h>
 #include <map>
 #include <errno.h>
+#include "WebServ.hpp"
 #include "Server.hpp"
 
-class Socket
+class	Server;
+
+class	Socket
 {
 	private:
 		int			port;

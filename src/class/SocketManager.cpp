@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/03 09:44:08 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 17:01:22 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,17 @@
 SocketManager::SocketManager(std::vector<Server*> servers)
 {
 	for (Server *server : servers)
-		sockets.push_back(new Socket(server));
+	{
+		try
+		{
+			sockets.push_back(new Socket(server));
+		}
+		catch (const std::exception &e)
+		{
+			log(LOG_ERR, std::string(e.what()) + " Socket destroyed!");
+			g_webserver->rmServer(server);
+		}
+	}
 }
 
 
@@ -39,7 +49,7 @@ void	SocketManager::initializeServerSockets()
 	for (Socket *socket : sockets)
 	{
 		fd = socket->server_fd;
-		fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
+		fcntl(fd, F_SETFL, O_NONBLOCK);
 		pfd = {fd, POLLIN, 0};
 		poll_fds.push_back(pfd);
 		fd_to_socket[fd] = socket;

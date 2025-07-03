@@ -59,6 +59,19 @@ Server	*WebServ::getServer(size_t index)
 }
 
 
+//	Remove a server from the list
+void	WebServ::rmServer(Server *server)
+{
+	for (std::vector<Server*>::iterator it = this->servers.begin(); it != this->servers.end(); it++)
+		if (*it == server)
+		{
+			this->servers.erase(it);
+			delete server;
+			return;
+		}
+}
+
+
 //	Parse Input
 void	WebServ::parseConfig()
 {

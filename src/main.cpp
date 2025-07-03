@@ -6,14 +6,14 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/01 11:03:28 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 15:37:48 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "include.hpp"
 #include "WebServ.hpp"
 
-WebServ	*g_webserver = nullptr; // Global pointer to the webserver
+WebServ	*g_webserver = nullptr; //global pointer to the webserver
 
 void signalHandler(int signum)
 {

@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:11 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/06/27 14:58:09 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 16:45:17 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,12 @@
 
 #include "Socket.hpp"
 #include "include.hpp"
-#include "include.hpp"
+#include "WebServ.hpp"
+#include "Server.hpp"
 
-class SocketManager
+class	Socket;
+
+class	SocketManager
 {
 	private:
 		std::vector<Socket*>		sockets;
