@@ -6,37 +6,39 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 14:14:48 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/03 16:54:20 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/04 13:23:58 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Socket.hpp"
+#include "SocketManager.hpp"
 
 //	Constructor
-Socket::Socket(Server *serv) : server(serv)
+Socket::Socket(Server *serv)
 {
 	log(LOG_INFO, "Socket created!");
+	server = serv;
 	host = serv->getHost().c_str();
 	port = serv->getPort();
 	
 	//create socket
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (server_fd == -1)
-		throw	std::runtime_error("Failed to create socket");
+		throw	std::runtime_error("Failed to create socket.");
 
 	//set socket options
-	int opt = 1;
+	int	opt = 1;
 	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
 	{
+		throw	std::runtime_error("Failed to set socket options.");
 		close(server_fd);
-		throw	std::runtime_error("Failed to set socket options");
 	}
 
 	//setup the socket
 	if (setupSocket() != 0)
 	{
+		throw	std::runtime_error("Failed to setup socket.");
 		close(server_fd);
-		throw	std::runtime_error("Failed to setup socket");
 	}
 }
 
@@ -63,7 +65,6 @@ int	Socket::setupSocket()
 		return 1;
 	}
 
-	//fcntl(server_fd, F_SETFL, O_NONBLOCK);
 	if (listen(server_fd, SOMAXCONN) < 0)
 	{
 		log(LOG_ERR, "Failed to listen.");

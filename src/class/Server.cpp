@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/03 16:46:42 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/04 13:23:25 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 	
 	//check if all braces cleanly close
 	if (!braceCheck(tokens))
-		throw	ParseException();
+		throw	std::runtime_error("Configuration file is invalid!");
 
 	//set server_name
 	while (tokens[i].type != TOK_OPEN_BRACE)
@@ -166,7 +166,7 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 			key = tokens[i++].token;
 			value = tokens[i].token;
 			if (tokens[i].type != TOK_VALUE)
-				throw	ParseException();
+				throw	std::runtime_error("Configuration file is invalid!");
 
 			if (key == "host")
 				setHost(value);
@@ -183,7 +183,7 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 			else if (key == "error_page")
 			{
 				if (tokens[++i].type != TOK_VALUE)
-					throw	ParseException();
+					throw	std::runtime_error("Configuration file is invalid!");
 				std::string page = tokens[i].token;
 				addErrorpage(std::stoi(value), page);
 			}
@@ -197,7 +197,7 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 	}
 
 	//print data
-	print_status();
+	//print_status();
 }
 
 
@@ -257,17 +257,17 @@ bool	Server::isCgi(const HttpRequest &request)
 	const std::vector<std::string>& cgiSuffixes = request.location->getCgi();
 	const std::string& path = request.path;
 
-	// Strip query string
+	//strip query string
 	size_t query_pos = path.find('?');
 	std::string clean_path = (query_pos != std::string::npos) ? path.substr(0, query_pos) : path;
 
-	// Find file extension
+	//find file extension
 	size_t dot_pos = clean_path.find_last_of('.');
 	if (dot_pos == std::string::npos)
 		return false;
 
 	std::string ext = clean_path.substr(dot_pos);
-	// Match against configured suffixes
+	//match against configured suffixes
 	for (const std::string& suffix : cgiSuffixes)
 		if (ext == suffix)
 			return true;
@@ -302,7 +302,7 @@ bool	Server::checkMethods(const HttpRequest &request)
 
 //	Request parsing utils
 //	Replace the alias path with the original location path
-std::string Server::normalizePath(const std::string &path)
+std::string	Server::normalizePath(const std::string &path)
 {
 	size_t		pos;
 	std::string	normalized = path;
@@ -420,17 +420,19 @@ Server::HttpRequest	Server::parseRequest(const std::string &raw_request)
 			loc_path = "/" + loc_path;
 		if (loc_path.back() != '/')
 			loc_path += '/';
-		// Get the first directory of the request path
+		
+		//get the first directory of the request path
 		size_t request_first_dir = request_path.find('/', 1);
 		if (request_first_dir == std::string::npos)
 			request_first_dir = request_path.length();
 		std::string request_dir = request_path.substr(0, request_first_dir);
-		// Check if this location matches
-		if (request_path.find(loc_path) == 0 || // Full path match
-			(loc_path == "/" && request_path != "/") || // Root location as fallback
-			(loc_path.substr(0, loc_path.length() - 1) == request_dir + "/")) // Directory match
+		
+		//check if this location matches
+		if (request_path.find(loc_path) == 0 ||									//full path match
+			(loc_path == "/" && request_path != "/") ||							//root location as fallback
+			(loc_path.substr(0, loc_path.length() - 1) == request_dir + "/"))	//directory match
 		{
-			// Update if this is the longest match so far
+			//update if this is the longest match so far
 			if (loc_path.length() > longest_match.length())
 			{
 				longest_match = loc_path;
@@ -698,7 +700,7 @@ void	Server::saveFile(const std::string &filename, const std::string &file_conte
 }
 
 // Main POST function
-void Server::handlePost(int client_fd, const HttpRequest &request)
+void	Server::handlePost(int client_fd, const HttpRequest &request)
 {
 	std::string	response;
 
@@ -843,11 +845,11 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 	int input_pipe[2];
 	int output_pipe[2];
 	if (pipe(input_pipe) < 0 || pipe(output_pipe) < 0)
-		throw std::runtime_error("Failed to create pipes");
+		throw	std::runtime_error("Failed to create pipes");
 
 	pid_t pid = fork();
 	if (pid < 0)
-		throw std::runtime_error("Fork failed");
+		throw	std::runtime_error("Fork failed");
 
 	if (pid == 0) {
 		// In child process
@@ -869,6 +871,7 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 	close(input_pipe[0]);
 	close(output_pipe[1]);
 
+	if (method == "POST" && !body.empty())
 	if (method == "POST" && !body.empty())
 		write(input_pipe[1], body.c_str(), body.length());
 	close(input_pipe[1]);

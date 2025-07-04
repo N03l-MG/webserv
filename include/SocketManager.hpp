@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:11 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/03 15:39:16 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/04 13:10:00 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,12 @@
 
 #include "Socket.hpp"
 #include "include.hpp"
+#include "WebServ.hpp"
+#include "Server.hpp"
 
-class SocketManager
+class	Socket;
+
+class	SocketManager
 {
 	private:
 		std::vector<Socket*>		sockets;

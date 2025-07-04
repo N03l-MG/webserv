@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:49:46 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/01 16:51:23 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/03 15:39:40 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include "include.hpp"
+#include "WebServ.hpp"
 #include "Server.hpp"
 
 class	Server;

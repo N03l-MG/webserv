@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/03 16:35:42 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/04 13:24:54 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,17 @@
 SocketManager::SocketManager(std::vector<Server*> servers)
 {
 	for (Server *server : servers)
-		sockets.push_back(new Socket(server));
+	{
+		try
+		{
+			sockets.push_back(new Socket(server));
+		}
+		catch (const std::exception &e)
+		{
+			log(LOG_ERR, std::string(e.what()) + " Socket destroyed!");
+			g_webserver->rmServer(server);
+		}
+	}
 }
 
 
@@ -65,9 +75,10 @@ void	SocketManager::handleNewConnection(pollfd &pfd, time_t now)
 	poll_fds.push_back({client_fd, POLLIN, 0});
 
 
-	// Defensive: check fd_to_socket
-	if (fd_to_socket.count(pfd.fd) == 0 || fd_to_socket[pfd.fd] == nullptr) {
-		std::cerr << "Error: fd_to_socket missing or null for fd " << pfd.fd << "\n";
+	//defensive: check fd_to_socket
+	if (fd_to_socket.count(pfd.fd) == 0 || fd_to_socket[pfd.fd] == nullptr)
+	{
+		log(LOG_ERR, "Error: fd_to_socket missing or null for fd " + std::to_string(pfd.fd));
 		close(client_fd);
 		return;
 	}
@@ -89,14 +100,15 @@ bool	SocketManager::processRequest(int fd, std::string &request)
 		size_t	content_length = 0;
 		size_t	cl_pos = request.find("Content-Length: ");
 
-		if (cl_pos != std::string::npos) {
-			size_t cl_end = request.find("\r\n", cl_pos);
-			std::string cl_str = request.substr(cl_pos + 16, cl_end - (cl_pos + 16));
+		if (cl_pos != std::string::npos)
+		{
+			size_t		cl_end = request.find("\r\n", cl_pos);
+			std::string	cl_str = request.substr(cl_pos + 16, cl_end - (cl_pos + 16));
 			content_length = std::stoul(cl_str);
 		}
-
-		if (content_length == 0 || request.size() >= body_start + content_length) {
-			Server *server = client_to_server[fd];
+		if (content_length == 0 || request.size() >= body_start + content_length)
+		{
+			Server	*server = client_to_server[fd];
 			server->respond(fd, request);
 			return true;
 		}
@@ -105,7 +117,7 @@ bool	SocketManager::processRequest(int fd, std::string &request)
 }
 
 
-void SocketManager::cleanupClient(int fd, size_t &i)
+void	SocketManager::cleanupClient(int fd, size_t &i)
 {
 	close(fd);
 	client_to_server.erase(fd);
@@ -115,7 +127,7 @@ void SocketManager::cleanupClient(int fd, size_t &i)
 }
 
 
-void SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
+void	SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 {
 	std::string		&request = client_buffers[pfd.fd];
 	const size_t	chunk_size = 8192;
@@ -130,17 +142,13 @@ void SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 		chunk[bytes_read] = '\0';
 		request.append(chunk, bytes_read);
 
-		if (!headers_complete)
+		if (!headers_complete && request.find("\r\n\r\n") != std::string::npos)
 		{
-			if (request.find("\r\n\r\n") != std::string::npos)
-			{
-				size_t	cl_pos = request.find("Content-Length: ");
-				headers_complete = true;
-				if (cl_pos != std::string::npos)
-					content_length = std::stoul(request.substr(cl_pos + 16, request.find("\r\n", cl_pos) - (cl_pos + 16)));
-			}
+			size_t	cl_pos = request.find("Content-Length: ");
+			headers_complete = true;
+			if (cl_pos != std::string::npos)
+				content_length = std::stoul(request.substr(cl_pos + 16, request.find("\r\n", cl_pos) - (cl_pos + 16)));
 		}
-
 		if (headers_complete && (content_length == 0 || request.size() >= (request.find("\r\n\r\n") + 4) + content_length))
 			break;
 	}
@@ -169,14 +177,14 @@ void SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 }
 
 
-void SocketManager::handleErrors(size_t &i, pollfd &pfd)
+void	SocketManager::handleErrors(size_t &i, pollfd &pfd)
 {
 	if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL))
 		cleanupClient(pfd.fd, i);
 }
 
 
-void SocketManager::checkTimeouts(time_t now)
+void	SocketManager::checkTimeouts(time_t now)
 {
 	int	fd;
 
@@ -189,7 +197,7 @@ void SocketManager::checkTimeouts(time_t now)
 }
 
 
-void SocketManager::run()
+void	SocketManager::run()
 {
 	initializeServerSockets();
 

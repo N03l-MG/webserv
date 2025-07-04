@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/07/03 11:04:05 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/04 13:09:39 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <filesystem>
 #include <map>
 #include "include.hpp"
+#include "WebServ.hpp"
 #include "Location.hpp"
 
 class	Location;
