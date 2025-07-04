@@ -31,7 +31,7 @@ WebServ::~WebServ()
 }
 
 //	Setters
-void	WebServ::setTokens(t_vectok tokens)	{ this->tokens = tokens;}
+void	WebServ::setTokens(t_vectok tokens)	{ this->tokens = tokens; }
 int		WebServ::addServer(Server *new_server)
 {
 	if (!new_server)
@@ -43,14 +43,14 @@ int		WebServ::addServer(Server *new_server)
 
 //	Getters
 bool		WebServ::isRunning()				{ return (this->is_running); }
-t_vectok	WebServ::getTokens()				{ return (this->tokens);}
+t_vectok	WebServ::getTokens()				{ return (this->tokens); }
 t_tokens	*WebServ::getToken(size_t index)
 {
 	if (index < tokens.size())
 		return (&tokens[index]);
 	return (NULL);
 }
-std::vector<Server*>	WebServ::getServer()	{return (servers);}
+std::vector<Server*>	WebServ::getServer()	{ return (servers); }
 Server	*WebServ::getServer(size_t index)
 {
 	if (index < servers.size())
@@ -97,7 +97,7 @@ void	WebServ::start()
 
 
 //	Shutdown
-void WebServ::shutdown()
+void	WebServ::shutdown()
 {
 	delete socketManager;
 }

@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/03 12:08:11 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/04 09:32:21 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 	
 	//check if all braces cleanly close
 	if (!braceCheck(tokens))
-		throw	ParseException();
+		throw	std::runtime_error("Configuration file is invalid!");
 
 	//set server_name
 	while (tokens[i].type != TOK_OPEN_BRACE)
@@ -166,7 +166,7 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 			key = tokens[i++].token;
 			value = tokens[i].token;
 			if (tokens[i].type != TOK_VALUE)
-				throw	ParseException();
+				throw	std::runtime_error("Configuration file is invalid!");
 
 			if (key == "host")
 				setHost(value);
@@ -183,7 +183,7 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 			else if (key == "error_page")
 			{
 				if (tokens[++i].type != TOK_VALUE)
-					throw	ParseException();
+					throw	std::runtime_error("Configuration file is invalid!");
 				std::string page = tokens[i].token;
 				addErrorpage(std::stoi(value), page);
 			}
@@ -302,7 +302,7 @@ bool	Server::checkMethods(const HttpRequest &request)
 
 //	Request parsing utils
 //	Replace the alias path with the original location path
-std::string Server::normalizePath(const std::string &path)
+std::string	Server::normalizePath(const std::string &path)
 {
 	size_t		pos;
 	std::string	normalized = path;
@@ -698,7 +698,7 @@ void	Server::saveFile(const std::string &filename, const std::string &file_conte
 }
 
 // Main POST function
-void Server::handlePost(int client_fd, const HttpRequest &request)
+void	Server::handlePost(int client_fd, const HttpRequest &request)
 {
 	std::string	response;
 
@@ -817,7 +817,7 @@ void	Server::handleCgi(int client_fd, const HttpRequest &request)
 	}
 }
 
-std::string Server::executeCgi(const std::string &script_path, const std::string &query_string,
+std::string	Server::executeCgi(const std::string &script_path, const std::string &query_string,
 								const std::string &method, const std::string &body)
 {
 	// Prepare environment variables
@@ -828,7 +828,8 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 	env_vars.push_back("QUERY_STRING=" + query_string);
 	env_vars.push_back("SERVER_PROTOCOL=HTTP/1.1");
 
-	if (method == "POST") {
+	if (method == "POST")
+	{
 		env_vars.push_back("CONTENT_LENGTH=" + std::to_string(body.size()));
 		env_vars.push_back("CONTENT_TYPE=application/x-www-form-urlencoded");
 	}
@@ -843,13 +844,14 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 	int input_pipe[2];
 	int output_pipe[2];
 	if (pipe(input_pipe) < 0 || pipe(output_pipe) < 0)
-		throw std::runtime_error("Failed to create pipes");
+		throw	std::runtime_error("Failed to create pipes");
 
 	pid_t pid = fork();
 	if (pid < 0)
-		throw std::runtime_error("Fork failed");
+		throw	std::runtime_error("Fork failed");
 
-	if (pid == 0) {
+	if (pid == 0)
+	{
 		// In child process
 		dup2(input_pipe[0], STDIN_FILENO);
 		dup2(output_pipe[1], STDOUT_FILENO);
@@ -857,7 +859,7 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 		close(input_pipe[1]);
 		close(output_pipe[0]);
 
-		char *const argv[] = {const_cast<char*>(script_path.c_str()), nullptr};
+		char *const	argv[] = {const_cast<char*>(script_path.c_str()), nullptr};
 
 		execve(script_path.c_str(), argv, envp.data());
 
@@ -883,41 +885,40 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 
 
 	time_t start = time(NULL);
-	while (true) {
-		struct pollfd pfd = {output_pipe[0], POLLIN, 0};
-		int poll_result = poll(&pfd, 1, 500);  // check every 0.5 sec
+	while (true)
+	{
+		struct pollfd	pfd = {output_pipe[0], POLLIN, 0};
+		int	poll_result = poll(&pfd, 1, 500);  // check every 0.5 sec
 
-		if (poll_result < 0) {
-			throw std::runtime_error("Poll failed");
-		}
-		else if (poll_result == 0) {
+		if (poll_result < 0)
+			throw	std::runtime_error("Poll failed");
+		else if (poll_result == 0)
+		{
 			// Timeout check
-			if (static_cast<size_t>(time(NULL) - start) > timeout) {
+			if (static_cast<size_t>(time(NULL) - start) > timeout)
+			{
 				// Kill child
 				kill(pid, SIGKILL);
 				waitpid(pid, nullptr, 0);
-				throw std::runtime_error("CGI script timeout");
+				throw	std::runtime_error("CGI script timeout");
 			}
 			continue;
 		}
 
 		bytes_read = read(output_pipe[0], buffer, sizeof(buffer));
-		if (bytes_read > 0) {
+		if (bytes_read > 0)
 			output.append(buffer, bytes_read);
-		}
-		else if (bytes_read == 0) {
-			break; // EOF
-		}
-		else if (errno != EAGAIN && errno != EWOULDBLOCK) {
-			throw std::runtime_error("Read error");
-		}
+		else if (bytes_read == 0)
+			break;
+		else if (errno != EAGAIN && errno != EWOULDBLOCK)
+			throw	std::runtime_error("Read error");
 	}
 	close(output_pipe[0]);
 
-	int status;
+	int	status;
 	waitpid(pid, &status, 0);
 	if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
-		throw std::runtime_error("CGI script failed");
+		throw	std::runtime_error("CGI script failed");
 
 	return output;
 }

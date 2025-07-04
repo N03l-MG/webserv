@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/03 15:37:48 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/04 09:31:19 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ void signalHandler(int signum)
 
 int main(int ac, char **av)
 {
-	if (ac > 2) {
+	if (ac > 2)
+	{
 		log(LOG_ERR, "Too many arguments! (Expected 1 at most)");
 		return (1);
 	}
@@ -51,7 +52,7 @@ int main(int ac, char **av)
 	}
 	catch (std::exception &e)
 	{
-		std::cerr << e.what() << std::endl;
+		log(LOG_ERR, e.what());
 		if (g_webserver)
 			g_webserver->shutdown();
 		return (1);

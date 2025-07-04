@@ -6,11 +6,12 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:40:10 by jgraf             #+#    #+#             */
-/*   Updated: 2025/06/27 13:01:53 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/04 09:17:39 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "include.hpp"
+#include "WebServ.hpp"
 #include <filesystem>
 
 //	Read individual lines and call the tokenisation function on each line.
@@ -25,7 +26,8 @@ t_vectok	read_config_file(std::string const &in_file)
 	{
 		if (file.is_open())
 			file.close();
-		throw	WrongFileException();
+		g_webserver = nullptr;
+		throw	std::invalid_argument("Failed to open or read file! Default config may be missing or corrupt.");
 	}
 
 	//loop through input file
