@@ -6,16 +6,16 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/04 10:21:22 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/04 10:45:25 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "include.hpp"
 #include "WebServ.hpp"
 
-WebServ	*g_webserver = nullptr; //global pointer to the webserver
+WebServ	*g_webserver = nullptr;	//global pointer to the webserver
 
-void signalHandler(int signum)
+void	signalHandler(int signum)
 {
 	if (signum == SIGINT)
 	{
@@ -30,7 +30,7 @@ void signalHandler(int signum)
 }
 
 
-int main(int ac, char **av)
+int	main(int ac, char **av)
 {
 	if (ac > 2)
 	{
@@ -41,8 +41,8 @@ int main(int ac, char **av)
 	try
 	{
 		WebServ *webserver = new WebServ;
-		g_webserver = webserver; // Set the global pointer
-		signal(SIGINT, signalHandler); // Register the signal handler
+		g_webserver = webserver;			//set the global pointer
+		signal(SIGINT, signalHandler);		//register the signal handler
 
 		if (ac == 2)
 			webserver->setTokens(read_config_file(av[1]));

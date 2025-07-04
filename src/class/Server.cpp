@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/04 09:32:21 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/04 10:48:59 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -257,17 +257,17 @@ bool	Server::isCgi(const HttpRequest &request)
 	const std::vector<std::string>& cgiSuffixes = request.location->getCgi();
 	const std::string& path = request.path;
 
-	// Strip query string
+	//strip query string
 	size_t query_pos = path.find('?');
 	std::string clean_path = (query_pos != std::string::npos) ? path.substr(0, query_pos) : path;
 
-	// Find file extension
+	//find file extension
 	size_t dot_pos = clean_path.find_last_of('.');
 	if (dot_pos == std::string::npos)
 		return false;
 
 	std::string ext = clean_path.substr(dot_pos);
-	// Match against configured suffixes
+	//match against configured suffixes
 	for (const std::string& suffix : cgiSuffixes)
 		if (ext == suffix)
 			return true;
@@ -420,17 +420,19 @@ Server::HttpRequest	Server::parseRequest(const std::string &raw_request)
 			loc_path = "/" + loc_path;
 		if (loc_path.back() != '/')
 			loc_path += '/';
-		// Get the first directory of the request path
+		
+		//get the first directory of the request path
 		size_t request_first_dir = request_path.find('/', 1);
 		if (request_first_dir == std::string::npos)
 			request_first_dir = request_path.length();
 		std::string request_dir = request_path.substr(0, request_first_dir);
-		// Check if this location matches
-		if (request_path.find(loc_path) == 0 || // Full path match
-			(loc_path == "/" && request_path != "/") || // Root location as fallback
-			(loc_path.substr(0, loc_path.length() - 1) == request_dir + "/")) // Directory match
+		
+		//check if this location matches
+		if (request_path.find(loc_path) == 0 ||									//full path match
+			(loc_path == "/" && request_path != "/") ||							//root location as fallback
+			(loc_path.substr(0, loc_path.length() - 1) == request_dir + "/"))	//directory match
 		{
-			// Update if this is the longest match so far
+			//update if this is the longest match so far
 			if (loc_path.length() > longest_match.length())
 			{
 				longest_match = loc_path;
@@ -820,7 +822,7 @@ void	Server::handleCgi(int client_fd, const HttpRequest &request)
 std::string	Server::executeCgi(const std::string &script_path, const std::string &query_string,
 								const std::string &method, const std::string &body)
 {
-	// Prepare environment variables
+	//prepare environment variables
 	std::vector<std::string> env_vars;
 	env_vars.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	env_vars.push_back("REQUEST_METHOD=" + method);
@@ -834,13 +836,13 @@ std::string	Server::executeCgi(const std::string &script_path, const std::string
 		env_vars.push_back("CONTENT_TYPE=application/x-www-form-urlencoded");
 	}
 
-	// Convert env vector to char* array
+	//convert env vector to char* array
 	std::vector<char*> envp;
 	for (size_t i = 0; i < env_vars.size(); ++i)
 		envp.push_back(const_cast<char*>(env_vars[i].c_str()));
 	envp.push_back(nullptr);
 
-	// Setup pipes
+	//setup pipes
 	int input_pipe[2];
 	int output_pipe[2];
 	if (pipe(input_pipe) < 0 || pipe(output_pipe) < 0)
@@ -852,7 +854,7 @@ std::string	Server::executeCgi(const std::string &script_path, const std::string
 
 	if (pid == 0)
 	{
-		// In child process
+		//in child process
 		dup2(input_pipe[0], STDIN_FILENO);
 		dup2(output_pipe[1], STDOUT_FILENO);
 
@@ -863,11 +865,11 @@ std::string	Server::executeCgi(const std::string &script_path, const std::string
 
 		execve(script_path.c_str(), argv, envp.data());
 
-		// If execve fails
+		//if execve fails
 		exit(1);
 	}
 
-	// In parent process
+	//in parent process
 	close(input_pipe[0]);
 	close(output_pipe[1]);
 
@@ -879,7 +881,7 @@ std::string	Server::executeCgi(const std::string &script_path, const std::string
 	char buffer[4096];
 	ssize_t bytes_read;
 
-	// Set output_pipe non-blocking
+	//set output_pipe non-blocking
 	int flags = fcntl(output_pipe[0], F_GETFL, 0);
 	fcntl(output_pipe[0], F_SETFL, flags | O_NONBLOCK);
 
@@ -888,16 +890,16 @@ std::string	Server::executeCgi(const std::string &script_path, const std::string
 	while (true)
 	{
 		struct pollfd	pfd = {output_pipe[0], POLLIN, 0};
-		int	poll_result = poll(&pfd, 1, 500);  // check every 0.5 sec
+		int				poll_result = poll(&pfd, 1, 500);	//check every 0.5 sec
 
 		if (poll_result < 0)
 			throw	std::runtime_error("Poll failed");
 		else if (poll_result == 0)
 		{
-			// Timeout check
+			//timeout check
 			if (static_cast<size_t>(time(NULL) - start) > timeout)
 			{
-				// Kill child
+				//kill child (often considered illigal in most countries)
 				kill(pid, SIGKILL);
 				waitpid(pid, nullptr, 0);
 				throw	std::runtime_error("CGI script timeout");

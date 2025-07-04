@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/04 09:31:17 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/04 10:49:51 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void	SocketManager::handleNewConnection(pollfd &pfd, time_t now)
 	poll_fds.push_back({client_fd, POLLIN, 0});
 
 
-	// Defensive: check fd_to_socket
+	//defensive: check fd_to_socket
 	if (fd_to_socket.count(pfd.fd) == 0 || fd_to_socket[pfd.fd] == nullptr)
 	{
 		log(LOG_ERR, "Error: fd_to_socket missing or null for fd " + std::to_string(pfd.fd));
