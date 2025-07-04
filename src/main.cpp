@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/04 09:31:19 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/04 10:21:22 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void signalHandler(int signum)
 		if (g_webserver)
 		{
 			g_webserver->shutdown();
-			g_webserver->~WebServ();
+			delete g_webserver;
 		}
 		exit(signum);
 	}
@@ -40,25 +40,29 @@ int main(int ac, char **av)
 
 	try
 	{
-		WebServ webserver;
-		g_webserver = &webserver; // Set the global pointer
+		WebServ *webserver = new WebServ;
+		g_webserver = webserver; // Set the global pointer
 		signal(SIGINT, signalHandler); // Register the signal handler
 
 		if (ac == 2)
-			webserver.setTokens(read_config_file(av[1]));
+			webserver->setTokens(read_config_file(av[1]));
 		else
-			webserver.setTokens(read_config_file("./config/default.conf"));
-		webserver.start();
+			webserver->setTokens(read_config_file("./config/default.conf"));
+		webserver->start();
 	}
 	catch (std::exception &e)
 	{
 		log(LOG_ERR, e.what());
 		if (g_webserver)
 			g_webserver->shutdown();
+		delete g_webserver;
+		g_webserver = nullptr;
 		return (1);
 	}
 
 	if (g_webserver)
 		g_webserver->shutdown();
+	delete g_webserver;
+	g_webserver = nullptr;
 	return (0);
 }
