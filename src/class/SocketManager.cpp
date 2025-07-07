@@ -123,6 +123,7 @@ void	SocketManager::cleanupClient(int fd, size_t &i)
 	client_to_server.erase(fd);
 	client_last_active.erase(fd);
 	client_buffers.erase(fd);
+	//client_write_buffers.erase(fd);
 	poll_fds.erase(poll_fds.begin() + i--);
 }
 
@@ -145,6 +146,14 @@ void	SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 		if (!headers_complete && request.find("\r\n\r\n") != std::string::npos)
 			headers_complete = true;
 	}
+
+	// if (request.size() > client_to_server[pfd.fd]->getMaxBody())
+	// {
+	// 	std::string response = client_to_server[pfd.fd]->createResponse(413, "", "");
+	// 	client_write_buffers[pfd.fd] = response;
+	// 	poll_fds[i].events |= POLLOUT;
+	// 	return;
+	// }
 
 	//logging
 	log(LOG_INFO, "Request of size " + std::to_string(request.size()) + " bytes received from client (fd) "
@@ -185,7 +194,12 @@ void	SocketManager::checkTimeouts(time_t now)
 	{
 		fd = poll_fds[i].fd;
 		if (client_to_server.count(fd) && std::difftime(now, client_last_active[fd]) > client_to_server[fd]->getTimeout())
+		{
+			// std::string response = client_to_server[fd]->createResponse(504, "", "");
+			// client_write_buffers[fd] = response;
+			// poll_fds[i].events |= POLLOUT;
 			cleanupClient(fd, i);
+		}
 	}
 }
 

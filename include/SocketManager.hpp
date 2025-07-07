@@ -17,6 +17,7 @@
 #include "include.hpp"
 #include "WebServ.hpp"
 #include "Server.hpp"
+#include <unordered_map>
 
 class	Socket;
 
@@ -29,6 +30,7 @@ class	SocketManager
 		std::map<int, Server*>		client_to_server;
 		std::map<int, time_t>		client_last_active;
 		std::map<int, std::string>	client_buffers;
+		//std::unordered_map<int, std::string> client_write_buffers;
 		size_t						min_timeout;
 
 		void	initializeServerSockets();

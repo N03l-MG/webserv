@@ -12,6 +12,13 @@ NUMBERS=$(echo "$POST_DATA" | sed -n 's/^numbers=//p')
 # URL decode (replace + and %20 with spaces)
 NUMBERS=$(echo "$NUMBERS" | sed 's/+/ /g' | sed 's/%20/ /g')
 
+UNAME_OUT="$(uname -s)"
+case "${UNAME_OUT}" in
+    Linux*)     EXEC="./www/cgi-bin/push_swap_linux";;
+    Darwin*)    EXEC="./www/cgi-bin/push_swap_macOS";;
+    *)          EXEC="./www/cgi-bin/push_swap";;  # Fallback (missing)
+esac
+
 echo "<html>"
 echo "<head><title>Push Swap Result</title></head>"
 echo "<body>"
@@ -24,7 +31,7 @@ else
     echo "<pre>$NUMBERS</pre>"
     echo "<h3>Output:</h3>"
     echo "<pre>"
-    ./www/cgi-bin/push_swap $NUMBERS 2>&1
+    $EXEC $NUMBERS 2>&1
     echo "</pre>"
 fi
 

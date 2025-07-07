@@ -205,7 +205,7 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 	}
 
 	//print data
-	//print_status();
+	print_status();
 }
 
 
@@ -260,8 +260,9 @@ std::string	Server::getMimeType(const std::string &filepath)
 //	Check if request has cgi permissions
 bool	Server::isCgi(const HttpRequest &request)
 {
-	if (!request.location)
+	if (request.location == nullptr)
 		return false;
+
 	const std::vector<std::string>& cgiSuffixes = request.location->getCgi();
 	const std::string& path = request.path;
 
@@ -285,7 +286,11 @@ bool	Server::isCgi(const HttpRequest &request)
 //	Check if requested method is allowed
 bool	Server::checkMethods(const HttpRequest &request)
 {
-	t_vecstr allowed_methods = request.location->getMethod();
+	t_vecstr allowed_methods;
+	if (!request.location)
+		allowed_methods = {"GET"};
+	else
+		allowed_methods = request.location->getMethod();
 	for (const std::string &method : allowed_methods)
 		if (method == request.method)
 			return true;
@@ -432,6 +437,7 @@ Server::HttpRequest	Server::parseRequest(const std::string &raw_request)
 		request_path = "/" + request_path;
 	if (request_path.back() != '/')
 		request_path += '/';
+
 	for (Location *location : locations)
 	{
 		std::string loc_path = location->getPath();
@@ -459,8 +465,7 @@ Server::HttpRequest	Server::parseRequest(const std::string &raw_request)
 			}
 		}
 	}
-	if (matching_location)
-		request.location = matching_location;
+	request.location = matching_location;
 
 	//read header from request
 	while (std::getline(request_stream, header_line) && header_line != "\r")
