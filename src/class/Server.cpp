@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/07 15:50:46 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/07 16:29:17 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -800,7 +800,7 @@ void	Server::handleDelete(int client_fd, const HttpRequest &request)
 	{
 		if (std::remove(full_path.c_str()) == 0)
 		{
-			response = createResponse(204, "text/plain", "File deleted\r\n");
+			response = createResponse(204, "", "");
 			send(client_fd, response.c_str(), response.size(), 0);
 		}
 		else
@@ -867,7 +867,8 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 	env_vars.push_back("QUERY_STRING=" + query_string);
 	env_vars.push_back("SERVER_PROTOCOL=HTTP/1.1");
 
-	if (method == "POST") {
+	if (method == "POST")
+	{
 		env_vars.push_back("CONTENT_LENGTH=" + std::to_string(body.size()));
 		env_vars.push_back("CONTENT_TYPE=application/x-www-form-urlencoded");
 	}
@@ -888,7 +889,8 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 	if (pid < 0)
 		throw	std::runtime_error("Fork failed");
 
-	if (pid == 0) {
+	if (pid == 0)
+	{
 		//in child process
 		dup2(input_pipe[0], STDIN_FILENO);
 		dup2(output_pipe[1], STDOUT_FILENO);
@@ -922,7 +924,8 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 
 
 	time_t start = std::time(NULL);
-	while (true) {
+	while (true) 
+	{
 		last_active = std::time(NULL);
 		if (static_cast<size_t>(std::time(NULL) - start) > timeout) {
 			//kill child ( ͡° ͜ʖ ͡°)
