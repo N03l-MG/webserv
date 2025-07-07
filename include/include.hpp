@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   include.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:13 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/04 13:08:05 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/07 15:32:54 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,10 @@
 #include <poll.h>
 #include <ctime>
 #include <fcntl.h>
+
+#include <ifaddrs.h>
+#include <netdb.h>
+#include <net/if.h>
 
 
 //	Enums
@@ -65,7 +69,7 @@ typedef std::vector<t_tokens>		t_vectok;
 
 
 //	Parsing
-t_vectok	read_config_file(std::string const &in_file);
+t_vectok	read_config_file(int ac, std::string const &in_file);
 void		tokenize(const std::string &line, t_vectok &tokens);
 void		assign_token_type(t_vectok &tokens);
 

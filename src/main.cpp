@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/04 13:11:15 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/07 15:23:43 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,14 @@ int	main(int ac, char **av)
 
 	try
 	{
-		WebServ *webserver = new WebServ;
+		WebServ	*webserver = new WebServ;
 		g_webserver = webserver;			//set the global pointer
 		signal(SIGINT, signalHandler);		//register the signal handler
 
 		if (ac == 2)
-			webserver->setTokens(read_config_file(av[1]));
+			webserver->setTokens(read_config_file(ac, av[1]));
 		else
-			webserver->setTokens(read_config_file("./config/default.conf"));
+			webserver->setTokens(read_config_file(ac, "./config/default.conf"));
 		webserver->start();
 	}
 	catch (std::exception &e)

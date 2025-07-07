@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:40:10 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/07 15:15:08 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/07 15:22:27 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static bool	is_comment(const std::string line)
 }
 
 //	Read individual lines and call the tokenisation function on each line.
-t_vectok	read_config_file(std::string const &in_file)
+t_vectok	read_config_file(int ac, std::string const &in_file)
 {
 	t_vectok		tokens;
 	std::ifstream	file(in_file);
@@ -38,7 +38,9 @@ t_vectok	read_config_file(std::string const &in_file)
 	{
 		if (file.is_open())
 			file.close();
-		throw	std::invalid_argument("Failed to open or read file! Default config may be missing or corrupt.");
+		if (ac == 1)
+			throw	std::invalid_argument("Failed to open or read file! Default config may be missing or corrupted.");
+		throw	std::invalid_argument("Failed to open or read file!");
 	}
 
 	//loop through input file
