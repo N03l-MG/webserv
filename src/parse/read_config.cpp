@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 13:40:10 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/04 10:18:43 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/07 12:55:54 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ static bool	is_comment(const std::string line)
 //	Read individual lines and call the tokenisation function on each line.
 t_vectok	read_config_file(std::string const &in_file)
 {
-	t_vectok	tokens;
-	std::ifstream			file(in_file);
-	std::string				line;
+	t_vectok		tokens;
+	std::ifstream	file(in_file);
+	std::string		line;
 
 	//safely open file
 	if (!file.is_open() || file.fail() || std::filesystem::is_directory(in_file))

@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/04 10:48:59 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/07 14:51:46 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,13 @@ Server::Server()
 	mimeTypes[".zip"] = "application/zip";
 	mimeTypes[".gz"] = "application/gzip";
 	mimeTypes[".tar"] = "application/x-tar";
+	mimeTypes[".ttf"] = "font/ttf";
+	mimeTypes[".csv"] = "text/csv";
+	mimeTypes[".tsv"] = "text/tab-separated-values";
+	mimeTypes[".webp"] = "image/webp";
+	mimeTypes[".bmp"] = "image/bmp";
+	mimeTypes[".ogg"] = "application/ogg";
+	mimeTypes[".ini"] = "text/plain";
 
 	//status codes
 	statusCodes[200] = "OK";
@@ -246,7 +253,7 @@ std::string	Server::getMimeType(const std::string &filepath)
 		if (it != mimeTypes.end())
 			return (it->second);
 	}
-	return ("application/octet-stream");
+	return ("text/plain");
 }
 
 //	Check if request has cgi permissions
@@ -300,39 +307,50 @@ bool	Server::checkMethods(const HttpRequest &request)
 
 
 
-//	Request parsing utils
 //	Replace the alias path with the original location path
 std::string	Server::normalizePath(const std::string &path)
 {
 	size_t		pos;
 	std::string	normalized = path;
 
+	//remove repeated slashes
 	while ((pos = normalized.find("//")) != std::string::npos)
 		normalized.erase(pos, 1);
+
+	//remove trailing slash (maintain root /)
 	if (normalized.length() > 1 && normalized.back() == '/')
 		normalized.pop_back();
+
+	//add first shlash if missing
+	if (normalized.find('/') != 0)
+		return ("/" + normalized);
 	return (normalized);
 }
 
 void	Server::CheckAlias(std::string &path)
 {
-	//separate the path and arguments if a ? is found
 	size_t		args_pos = path.find('?');
 	std::string	base_path = normalizePath((args_pos != std::string::npos) ? path.substr(0, args_pos) : path);
 	std::string	arguments = (args_pos != std::string::npos) ? path.substr(args_pos) : "";
 
-	//loop through all locations and their aliases, replace the alias with the location path
+	//loop through all locations
 	for (Location *location : locations)
 		for (const std::string &alias : location->getReturn())
 		{
 			std::string	normalized_alias = normalizePath(alias);
 			if (base_path.find(normalized_alias) == 0)
 			{
-				path = location->getPath() + base_path.substr(normalized_alias.length()) + arguments;
+				std::string	path = location->getPath() + base_path.substr(normalized_alias.length());
+				path += arguments;
+
+				//add index to path to allow for automatic index even after replacement
+				if (!path.empty() && path.back() == '/')
+					path += location->getIndex();
 				return;
 			}
 		}
 }
+
 
 //	Decode percent encoded paths and arguments
 void	Server::percentDecode(std::string &body)
