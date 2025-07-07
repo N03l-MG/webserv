@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   SocketManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/07 15:09:01 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/07 17:07:04 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,6 +200,7 @@ void	SocketManager::run()
 {
 	initializeServerSockets();
 
+
 	while (true)
 	{
 		if (poll(poll_fds.data(), poll_fds.size(), 100) < 0)
@@ -211,6 +212,15 @@ void	SocketManager::run()
 		}
 
 		time_t	now = std::time(nullptr);
+
+		//quit if there are no valid servers running
+		if (poll_fds.size() <= 0)
+		{
+			log(LOG_WARN, "No servers running. Quitting...");
+			break;
+		}
+
+		//loop through all servers
 		for (size_t i = 0; i < poll_fds.size(); i++)
 		{
 			pollfd	&pfd = poll_fds[i];
