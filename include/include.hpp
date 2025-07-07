@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:13 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/07 15:32:54 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/07 15:50:55 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,6 @@
 #include <poll.h>
 #include <ctime>
 #include <fcntl.h>
-
-#include <ifaddrs.h>
-#include <netdb.h>
-#include <net/if.h>
 
 
 //	Enums

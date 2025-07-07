@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/07 15:46:07 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/07 15:50:46 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,32 +134,6 @@ Location	*Server::getLocation(size_t index)
 
 
 //	Configuration
-static std::string	get_ip()
-{
-	struct ifaddrs	*ifaddr, *ifa;
-	char			host[NI_MAXHOST];
-
-	if (getifaddrs(&ifaddr) == -1)
-	{
-		perror("getifaddrs");
-		return "";
-	}
-
-	for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
-	{
-		if (ifa->ifa_addr == nullptr)
-			continue;
-		if (ifa->ifa_addr->sa_family == AF_INET && !(ifa->ifa_flags & IFF_LOOPBACK)
-			&& (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, nullptr, 0, NI_NUMERICHOST) == 0))
-		{
-				freeifaddrs(ifaddr);
-				return (host);
-		}
-	}
-	freeifaddrs(ifaddr);
-	return ("127.0.0.1");
-}
-
 bool	Server::braceCheck(t_vectok tokens)
 {
 	int	cnt = 0;
@@ -203,12 +177,7 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 				throw	std::runtime_error("Configuration file is invalid!");
 
 			if (key == "host")
-			{
-				if (value == "public")
-					setHost(get_ip());
-				else
-					setHost(value);
-			}
+				setHost(value);
 			else if (key == "listen")
 				setPort(std::stoi(value));
 			else if (key == "root")
