@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/07 15:37:07 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/07 15:46:07 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,32 @@ Location	*Server::getLocation(size_t index)
 
 
 //	Configuration
+static std::string	get_ip()
+{
+	struct ifaddrs	*ifaddr, *ifa;
+	char			host[NI_MAXHOST];
+
+	if (getifaddrs(&ifaddr) == -1)
+	{
+		perror("getifaddrs");
+		return "";
+	}
+
+	for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+	{
+		if (ifa->ifa_addr == nullptr)
+			continue;
+		if (ifa->ifa_addr->sa_family == AF_INET && !(ifa->ifa_flags & IFF_LOOPBACK)
+			&& (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, nullptr, 0, NI_NUMERICHOST) == 0))
+		{
+				freeifaddrs(ifaddr);
+				return (host);
+		}
+	}
+	freeifaddrs(ifaddr);
+	return ("127.0.0.1");
+}
+
 bool	Server::braceCheck(t_vectok tokens)
 {
 	int	cnt = 0;
@@ -177,7 +203,12 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 				throw	std::runtime_error("Configuration file is invalid!");
 
 			if (key == "host")
-				setHost(value);
+			{
+				if (value == "public")
+					setHost(get_ip());
+				else
+					setHost(value);
+			}
 			else if (key == "listen")
 				setPort(std::stoi(value));
 			else if (key == "root")
@@ -732,19 +763,19 @@ void	Server::handlePost(int client_fd, const HttpRequest &request)
 
 	try
 	{
-		std::string filename;
-		std::string file_content;
+		std::string	filename;
+		std::string	file_content;
 
-		// Extract Content-Type from headers
+		//extract Content-Type from headers
 		auto content_type_it = request.headers.find("Content-Type");
-		std::string content_type = (content_type_it != request.headers.end()) ? content_type_it->second : "text/plain";
+		std::string	content_type = (content_type_it != request.headers.end()) ? content_type_it->second : "text/plain";
 
-		// Check if it's multipart/form-data
+		//check if it's multipart/form-data
 		if (content_type.find("multipart/form-data") != std::string::npos)
 			std::tie(filename, file_content) = extractFileInfo(request);
 		else
 		{
-			// Handle raw/plain requests
+			//handle raw/plain requests
 			filename = "upload_" + std::to_string(std::time(nullptr)) + ".txt";
 			file_content = request.body;
 		}
@@ -859,8 +890,8 @@ void	Server::handleCgi(int client_fd, const HttpRequest &request)
 std::string Server::executeCgi(const std::string &script_path, const std::string &query_string,
 								const std::string &method, const std::string &body)
 {
-	// Prepare environment variables
-	std::vector<std::string> env_vars;
+	//prepare environment variables
+	std::vector<std::string>	env_vars;
 	env_vars.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	env_vars.push_back("REQUEST_METHOD=" + method);
 	env_vars.push_back("SCRIPT_NAME=" + script_path);
@@ -872,24 +903,24 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 		env_vars.push_back("CONTENT_TYPE=application/x-www-form-urlencoded");
 	}
 
-	// Convert env vector to char* array
+	//convert env vector to char* array
 	std::vector<char*> envp;
 	for (size_t i = 0; i < env_vars.size(); ++i)
 		envp.push_back(const_cast<char*>(env_vars[i].c_str()));
 	envp.push_back(nullptr);
 
-	// Setup pipes
+	//setup pipes
 	int input_pipe[2];
 	int output_pipe[2];
 	if (pipe(input_pipe) < 0 || pipe(output_pipe) < 0)
 		throw	std::runtime_error("Failed to create pipes");
 
-	pid_t pid = fork();
+	pid_t	pid = fork();
 	if (pid < 0)
 		throw	std::runtime_error("Fork failed");
 
 	if (pid == 0) {
-		// In child process
+		//in child process
 		dup2(input_pipe[0], STDIN_FILENO);
 		dup2(output_pipe[1], STDOUT_FILENO);
 
@@ -900,11 +931,11 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 
 		execve(script_path.c_str(), argv, envp.data());
 
-		// If execve fails
+		//if execve fails
 		exit(1);
 	}
 
-	// In parent process
+	//in parent process
 	close(input_pipe[0]);
 	close(output_pipe[1]);
 
@@ -913,11 +944,11 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 		write(input_pipe[1], body.c_str(), body.length());
 	close(input_pipe[1]);
 
-	std::string output;
-	char buffer[4096];
-	ssize_t bytes_read;
+	std::string	output;
+	char		buffer[4096];
+	ssize_t		bytes_read;
 
-	// Set output_pipe non-blocking
+	//set output_pipe non-blocking
 	fcntl(output_pipe[0], F_SETFL, O_NONBLOCK);
 
 
@@ -925,10 +956,10 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 	while (true) {
 		last_active = std::time(NULL);
 		if (static_cast<size_t>(std::time(NULL) - start) > timeout) {
-			// Kill child ( ͡° ͜ʖ ͡°)
+			//kill child ( ͡° ͜ʖ ͡°)
 			kill(pid, SIGKILL);
 			waitpid(pid, nullptr, 0);
-			throw std::runtime_error("CGI script timeout");
+			throw	std::runtime_error("CGI script timeout");
 		}
 
 		bytes_read = read(output_pipe[0], buffer, sizeof(buffer));
@@ -938,14 +969,14 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 			last_active = std::time(NULL);
 		}
 		else if (bytes_read == 0)
-			break; // EOF
+			break; //EOF
 	}
 	close(output_pipe[0]);
 
-	int status;
+	int	status;
 	waitpid(pid, &status, 0);
 	if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
-		throw std::runtime_error("CGI script failed");
+		throw	std::runtime_error("CGI script failed");
 
 	return output;
 }

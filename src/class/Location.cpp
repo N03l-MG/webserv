@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 08:51:15 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/04 13:16:54 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/07 15:46:17 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ void	Location::configure(t_vectok &tokens, size_t &i)
 	}
 
 	//print debug statement
-	print_status();
+	//print_status();
 }
 
 
