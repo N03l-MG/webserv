@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 16:28:16 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/07 15:23:43 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/07 16:32:31 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ void	signalHandler(int signum)
 
 int	main(int ac, char **av)
 {
-	if (ac > 2) {
+	if (ac > 2)
+	{
 		log(LOG_ERR, "Too many arguments!");
 		return (1);
 	}

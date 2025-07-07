@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/07 16:29:17 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/07 16:32:30 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -927,7 +927,8 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 	while (true) 
 	{
 		last_active = std::time(NULL);
-		if (static_cast<size_t>(std::time(NULL) - start) > timeout) {
+		if (static_cast<size_t>(std::time(NULL) - start) > timeout)
+		{
 			//kill child ( ͡° ͜ʖ ͡°)
 			kill(pid, SIGKILL);
 			waitpid(pid, nullptr, 0);
