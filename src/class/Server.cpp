@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/04 13:23:25 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/07 15:08:54 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ Server::Server()
 	this->index = "index.html";
 	this->timeout = 15;
 	this->max_body = 5000000;
+	this->last_active = std::time(NULL);
 
 	//mime types
 	mimeTypes[".html"] = "text/html";
@@ -702,7 +703,7 @@ void	Server::saveFile(const std::string &filename, const std::string &file_conte
 // Main POST function
 void	Server::handlePost(int client_fd, const HttpRequest &request)
 {
-	std::string	response;
+	std::string response;
 
 	if (!checkMethods(request))
 	{
@@ -710,9 +711,26 @@ void	Server::handlePost(int client_fd, const HttpRequest &request)
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
+
 	try
 	{
-		auto [filename, file_content] = extractFileInfo(request);
+		std::string filename;
+		std::string file_content;
+
+		// Extract Content-Type from headers
+		auto content_type_it = request.headers.find("Content-Type");
+		std::string content_type = (content_type_it != request.headers.end()) ? content_type_it->second : "text/plain";
+
+		// Check if it's multipart/form-data
+		if (content_type.find("multipart/form-data") != std::string::npos)
+			std::tie(filename, file_content) = extractFileInfo(request);
+		else
+		{
+			// Handle raw/plain requests
+			filename = "upload_" + std::to_string(std::time(nullptr)) + ".txt";
+			file_content = request.body;
+		}
+
 		saveFile(filename, file_content, client_fd, request.path);
 	}
 	catch (const std::runtime_error &e)
@@ -721,6 +739,7 @@ void	Server::handlePost(int client_fd, const HttpRequest &request)
 		send(client_fd, response.c_str(), response.size(), 0);
 	}
 }
+
 
 
 
@@ -886,29 +905,22 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 
 	time_t start = std::time(NULL);
 	while (true) {
-		struct pollfd pfd = {output_pipe[0], POLLIN, 0};
-		int poll_result = poll(&pfd, 1, 500); // FIXME: no
-
-		if (poll_result < 0)
-			throw std::runtime_error("Poll failed");
-		else if (poll_result == 0) {
-			// Timeout check
-			if (static_cast<size_t>(std::time(NULL) - start) > timeout) {
-				// Kill child
-				kill(pid, SIGKILL);
-				waitpid(pid, nullptr, 0);
-				throw std::runtime_error("CGI script timeout");
-			}
-			continue;
+		last_active = std::time(NULL);
+		if (static_cast<size_t>(std::time(NULL) - start) > timeout) {
+			// Kill child ( ͡° ͜ʖ ͡°)
+			kill(pid, SIGKILL);
+			waitpid(pid, nullptr, 0);
+			throw std::runtime_error("CGI script timeout");
 		}
 
 		bytes_read = read(output_pipe[0], buffer, sizeof(buffer));
 		if (bytes_read > 0)
+		{
 			output.append(buffer, bytes_read);
+			last_active = std::time(NULL);
+		}
 		else if (bytes_read == 0)
 			break; // EOF
-		else if (errno != EAGAIN && errno != EWOULDBLOCK)
-			throw std::runtime_error("Read error");
 	}
 	close(output_pipe[0]);
 
