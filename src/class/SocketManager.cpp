@@ -133,7 +133,6 @@ void	SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 	const size_t	chunk_size = 8192;
 	char			chunk[chunk_size];
 	ssize_t			bytes_read;
-	size_t			content_length = 0;
 	bool			headers_complete = false;
 
 	//recieve data
@@ -144,12 +143,7 @@ void	SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 		request.append(chunk, bytes_read);
 
 		if (!headers_complete && request.find("\r\n\r\n") != std::string::npos)
-		{
-			size_t	cl_pos = request.find("Content-Length: ");
 			headers_complete = true;
-			if (cl_pos != std::string::npos)
-				content_length = std::stoul(request.substr(cl_pos + 16, request.find("\r\n", cl_pos) - (cl_pos + 16)));
-		}
 	}
 
 	//logging
