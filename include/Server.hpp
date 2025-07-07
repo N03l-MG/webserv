@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/07/03 15:39:45 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/07 14:20:25 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ class	Server
 		std::vector<Location*>				locations;		//list of page locations
 		std::map<std::string, std::string>	mimeTypes;		//list of mime types to be handled
 		std::map<size_t, std::string>		statusCodes;	//list of codes to be returned as response
+		time_t								last_active;	//keeps track of the last time the server was active
 		struct HttpRequest
 		{
 			std::string	method;

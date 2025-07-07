@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   SocketManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/04 10:49:51 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/07 15:09:01 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	SocketManager::initializeServerSockets()
 	{
 		fd = socket->server_fd;
 		fcntl(fd, F_SETFL, O_NONBLOCK);
-		pfd = {fd, POLLIN, 0};
+		pfd = {fd, POLLIN | POLLOUT, 0};
 		poll_fds.push_back(pfd);
 		fd_to_socket[fd] = socket;
 		min_timeout = std::min(min_timeout, socket->server->getTimeout());
@@ -71,7 +71,7 @@ void	SocketManager::handleNewConnection(pollfd &pfd, time_t now)
 		return;
 	}
 	
-	fcntl(client_fd, F_SETFL, fcntl(client_fd, F_GETFL, 0) | O_NONBLOCK);
+	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 	poll_fds.push_back({client_fd, POLLIN, 0});
 
 
@@ -137,7 +137,8 @@ void	SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 	bool			headers_complete = false;
 
 	//recieve data
-	while ((bytes_read = recv(pfd.fd, chunk, chunk_size - 1, 0)) > 0)
+	bytes_read = recv(pfd.fd, chunk, chunk_size - 1, 0);
+	if (bytes_read > 0)
 	{
 		chunk[bytes_read] = '\0';
 		request.append(chunk, bytes_read);
@@ -149,8 +150,6 @@ void	SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 			if (cl_pos != std::string::npos)
 				content_length = std::stoul(request.substr(cl_pos + 16, request.find("\r\n", cl_pos) - (cl_pos + 16)));
 		}
-		if (headers_complete && (content_length == 0 || request.size() >= (request.find("\r\n\r\n") + 4) + content_length))
-			break;
 	}
 
 	//logging
@@ -159,7 +158,7 @@ void	SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 	+ client_to_server[pfd.fd]->getName() + ":" + std::to_string(client_to_server[pfd.fd]->getPort()));
 
 	//check read error
-	if (bytes_read == 0 || (bytes_read < 0 && errno != EAGAIN && errno != EWOULDBLOCK))
+	if (bytes_read <= 0)
 	{
 		cleanupClient(pfd.fd, i);
 		return;
@@ -191,7 +190,7 @@ void	SocketManager::checkTimeouts(time_t now)
 	for (size_t i = 0; i < poll_fds.size(); i++)
 	{
 		fd = poll_fds[i].fd;
-		if (client_to_server.count(fd) && difftime(now, client_last_active[fd]) > client_to_server[fd]->getTimeout())
+		if (client_to_server.count(fd) && std::difftime(now, client_last_active[fd]) > client_to_server[fd]->getTimeout())
 			cleanupClient(fd, i);
 	}
 }
@@ -211,7 +210,7 @@ void	SocketManager::run()
 			break;
 		}
 
-		time_t	now = time(nullptr);
+		time_t	now = std::time(nullptr);
 		for (size_t i = 0; i < poll_fds.size(); i++)
 		{
 			pollfd	&pfd = poll_fds[i];

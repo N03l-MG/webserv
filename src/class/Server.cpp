@@ -6,7 +6,7 @@
 /*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/07 14:51:46 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/07 15:14:46 by jgraf            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ Server::Server()
 	this->index = "index.html";
 	this->timeout = 15;
 	this->max_body = 5000000;
+	this->last_active = std::time(NULL);
 
 	//mime types
 	mimeTypes[".html"] = "text/html";
@@ -720,7 +721,7 @@ void	Server::saveFile(const std::string &filename, const std::string &file_conte
 // Main POST function
 void	Server::handlePost(int client_fd, const HttpRequest &request)
 {
-	std::string	response;
+	std::string response;
 
 	if (!checkMethods(request))
 	{
@@ -728,9 +729,26 @@ void	Server::handlePost(int client_fd, const HttpRequest &request)
 		send(client_fd, response.c_str(), response.size(), 0);
 		return;
 	}
+
 	try
 	{
-		auto [filename, file_content] = extractFileInfo(request);
+		std::string filename;
+		std::string file_content;
+
+		// Extract Content-Type from headers
+		auto content_type_it = request.headers.find("Content-Type");
+		std::string content_type = (content_type_it != request.headers.end()) ? content_type_it->second : "text/plain";
+
+		// Check if it's multipart/form-data
+		if (content_type.find("multipart/form-data") != std::string::npos)
+			std::tie(filename, file_content) = extractFileInfo(request);
+		else
+		{
+			// Handle raw/plain requests
+			filename = "upload_" + std::to_string(std::time(nullptr)) + ".txt";
+			file_content = request.body;
+		}
+
 		saveFile(filename, file_content, client_fd, request.path);
 	}
 	catch (const std::runtime_error &e)
@@ -739,6 +757,7 @@ void	Server::handlePost(int client_fd, const HttpRequest &request)
 		send(client_fd, response.c_str(), response.size(), 0);
 	}
 }
+
 
 
 
@@ -837,10 +856,10 @@ void	Server::handleCgi(int client_fd, const HttpRequest &request)
 	}
 }
 
-std::string	Server::executeCgi(const std::string &script_path, const std::string &query_string,
+std::string Server::executeCgi(const std::string &script_path, const std::string &query_string,
 								const std::string &method, const std::string &body)
 {
-	//prepare environment variables
+	// Prepare environment variables
 	std::vector<std::string> env_vars;
 	env_vars.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	env_vars.push_back("REQUEST_METHOD=" + method);
@@ -848,19 +867,18 @@ std::string	Server::executeCgi(const std::string &script_path, const std::string
 	env_vars.push_back("QUERY_STRING=" + query_string);
 	env_vars.push_back("SERVER_PROTOCOL=HTTP/1.1");
 
-	if (method == "POST")
-	{
+	if (method == "POST") {
 		env_vars.push_back("CONTENT_LENGTH=" + std::to_string(body.size()));
 		env_vars.push_back("CONTENT_TYPE=application/x-www-form-urlencoded");
 	}
 
-	//convert env vector to char* array
+	// Convert env vector to char* array
 	std::vector<char*> envp;
 	for (size_t i = 0; i < env_vars.size(); ++i)
 		envp.push_back(const_cast<char*>(env_vars[i].c_str()));
 	envp.push_back(nullptr);
 
-	//setup pipes
+	// Setup pipes
 	int input_pipe[2];
 	int output_pipe[2];
 	if (pipe(input_pipe) < 0 || pipe(output_pipe) < 0)
@@ -870,27 +888,27 @@ std::string	Server::executeCgi(const std::string &script_path, const std::string
 	if (pid < 0)
 		throw	std::runtime_error("Fork failed");
 
-	if (pid == 0)
-	{
-		//in child process
+	if (pid == 0) {
+		// In child process
 		dup2(input_pipe[0], STDIN_FILENO);
 		dup2(output_pipe[1], STDOUT_FILENO);
 
 		close(input_pipe[1]);
 		close(output_pipe[0]);
 
-		char *const	argv[] = {const_cast<char*>(script_path.c_str()), nullptr};
+		char *const argv[] = {const_cast<char*>(script_path.c_str()), nullptr};
 
 		execve(script_path.c_str(), argv, envp.data());
 
-		//if execve fails
+		// If execve fails
 		exit(1);
 	}
 
-	//in parent process
+	// In parent process
 	close(input_pipe[0]);
 	close(output_pipe[1]);
 
+	if (method == "POST" && !body.empty())
 	if (method == "POST" && !body.empty())
 		write(input_pipe[1], body.c_str(), body.length());
 	close(input_pipe[1]);
@@ -899,46 +917,35 @@ std::string	Server::executeCgi(const std::string &script_path, const std::string
 	char buffer[4096];
 	ssize_t bytes_read;
 
-	//set output_pipe non-blocking
-	int flags = fcntl(output_pipe[0], F_GETFL, 0);
-	fcntl(output_pipe[0], F_SETFL, flags | O_NONBLOCK);
+	// Set output_pipe non-blocking
+	fcntl(output_pipe[0], F_SETFL, O_NONBLOCK);
 
 
-	time_t start = time(NULL);
-	while (true)
-	{
-		struct pollfd	pfd = {output_pipe[0], POLLIN, 0};
-		int				poll_result = poll(&pfd, 1, 500);	//check every 0.5 sec
-
-		if (poll_result < 0)
-			throw	std::runtime_error("Poll failed");
-		else if (poll_result == 0)
-		{
-			//timeout check
-			if (static_cast<size_t>(time(NULL) - start) > timeout)
-			{
-				//kill child (often considered illigal in most countries)
-				kill(pid, SIGKILL);
-				waitpid(pid, nullptr, 0);
-				throw	std::runtime_error("CGI script timeout");
-			}
-			continue;
+	time_t start = std::time(NULL);
+	while (true) {
+		last_active = std::time(NULL);
+		if (static_cast<size_t>(std::time(NULL) - start) > timeout) {
+			// Kill child ( ͡° ͜ʖ ͡°)
+			kill(pid, SIGKILL);
+			waitpid(pid, nullptr, 0);
+			throw std::runtime_error("CGI script timeout");
 		}
 
 		bytes_read = read(output_pipe[0], buffer, sizeof(buffer));
 		if (bytes_read > 0)
+		{
 			output.append(buffer, bytes_read);
+			last_active = std::time(NULL);
+		}
 		else if (bytes_read == 0)
-			break;
-		else if (errno != EAGAIN && errno != EWOULDBLOCK)
-			throw	std::runtime_error("Read error");
+			break; // EOF
 	}
 	close(output_pipe[0]);
 
-	int	status;
+	int status;
 	waitpid(pid, &status, 0);
 	if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
-		throw	std::runtime_error("CGI script failed");
+		throw std::runtime_error("CGI script failed");
 
 	return output;
 }
