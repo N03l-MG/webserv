@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   SocketManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
+/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/07 17:07:04 by jgraf            ###   ########.fr       */
+/*   Updated: 2025/07/08 15:17:19 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,6 @@ void	SocketManager::cleanupClient(int fd, size_t &i)
 	client_to_server.erase(fd);
 	client_last_active.erase(fd);
 	client_buffers.erase(fd);
-	//client_write_buffers.erase(fd);
 	poll_fds.erase(poll_fds.begin() + i--);
 }
 
@@ -131,13 +130,12 @@ void	SocketManager::cleanupClient(int fd, size_t &i)
 void	SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 {
 	std::string		&request = client_buffers[pfd.fd];
-	const size_t	chunk_size = 8192;
-	char			chunk[chunk_size];
+	char			chunk[4096 * 4];
 	ssize_t			bytes_read;
 	bool			headers_complete = false;
 
 	//recieve data
-	bytes_read = recv(pfd.fd, chunk, chunk_size - 1, 0);
+	bytes_read = recv(pfd.fd, chunk, sizeof(chunk), 0);
 	if (bytes_read > 0)
 	{
 		chunk[bytes_read] = '\0';
@@ -146,14 +144,6 @@ void	SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 		if (!headers_complete && request.find("\r\n\r\n") != std::string::npos)
 			headers_complete = true;
 	}
-
-	// if (request.size() > client_to_server[pfd.fd]->getMaxBody())
-	// {
-	// 	std::string response = client_to_server[pfd.fd]->createResponse(413, "", "");
-	// 	client_write_buffers[pfd.fd] = response;
-	// 	poll_fds[i].events |= POLLOUT;
-	// 	return;
-	// }
 
 	//logging
 	log(LOG_INFO, "Request of size " + std::to_string(request.size()) + " bytes received from client (fd) "
@@ -195,9 +185,8 @@ void	SocketManager::checkTimeouts(time_t now)
 		fd = poll_fds[i].fd;
 		if (client_to_server.count(fd) && std::difftime(now, client_last_active[fd]) > client_to_server[fd]->getTimeout())
 		{
-			// std::string response = client_to_server[fd]->createResponse(504, "", "");
-			// client_write_buffers[fd] = response;
-			// poll_fds[i].events |= POLLOUT;
+			std::string response = client_to_server[fd]->createResponse(504, "", "");
+			send(fd, response.c_str(), response.size(), 0);
 			cleanupClient(fd, i);
 		}
 	}

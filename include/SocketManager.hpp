@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:55:11 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/04 13:10:00 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/08 15:18:30 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 #include "include.hpp"
 #include "WebServ.hpp"
 #include "Server.hpp"
-#include <unordered_map>
 
 class	Socket;
 
@@ -30,7 +29,6 @@ class	SocketManager
 		std::map<int, Server*>		client_to_server;
 		std::map<int, time_t>		client_last_active;
 		std::map<int, std::string>	client_buffers;
-		//std::unordered_map<int, std::string> client_write_buffers;
 		size_t						min_timeout;
 
 		void	initializeServerSockets();

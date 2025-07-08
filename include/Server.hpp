@@ -6,7 +6,7 @@
 /*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/07/07 14:20:25 by nmonzon          ###   ########.fr       */
+/*   Updated: 2025/07/08 15:18:15 by nmonzon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,16 @@ class	Location;
 class	Server
 {
 	private:
+		struct HttpRequest
+		{
+			std::string	method;
+			std::string	path;
+			std::string	version;
+			std::map<std::string, std::string>	headers;
+			std::string	body;
+			std::string	boundary;
+			Location	*location;
+		};
 		std::string							host;			//the host to connect to
 		int									port;			//the port to listen to
 		std::string							name;			//the servers name
@@ -41,19 +51,8 @@ class	Server
 		std::map<std::string, std::string>	mimeTypes;		//list of mime types to be handled
 		std::map<size_t, std::string>		statusCodes;	//list of codes to be returned as response
 		time_t								last_active;	//keeps track of the last time the server was active
-		struct HttpRequest
-		{
-			std::string	method;
-			std::string	path;
-			std::string	version;
-			std::map<std::string, std::string>	headers;
-			std::string	body;
-			std::string	boundary;
-			Location	*location;
-		};
 
 		//request handling
-		HttpRequest	parseRequest(const std::string &raw_request);
 		void		percentDecode(std::string &body);
 		void		CheckAlias(std::string &path);
 		std::string	normalizePath(const std::string &path);
@@ -98,6 +97,7 @@ class	Server
 		void		configure(t_vectok &tokens, size_t &i);
 		bool		braceCheck(t_vectok tokens);
 		void		print_status();
+		HttpRequest	parseRequest(const std::string &raw_request);
 		void		respond(int client_fd, const std::string &request);
 		std::string	createResponse(int status_code, const std::string &content_type, const std::string &body);
 };
