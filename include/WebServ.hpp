@@ -1,19 +1,5 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   WebServ.hpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/28 08:32:39 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/03 16:14:52 by jgraf            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-//	Guard
 #pragma once
 
-//	Include
 #include "include.hpp"
 #include "Server.hpp"
 #include "SocketManager.hpp"
@@ -48,5 +34,4 @@ class	WebServ
 		bool	isRunning();
 };
 
-//	global
 extern WebServ	*g_webserver;

@@ -1,20 +1,5 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Location.hpp                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/03 08:49:46 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/03 15:39:40 by jgraf            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-
-//	Guard
 #pragma once
 
-//	Include
 #include <iostream>
 #include <string>
 #include "include.hpp"
@@ -23,7 +8,6 @@
 
 class	Server;
 
-//	Class
 class	Location
 {
 	private:

@@ -1,18 +1,6 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   SocketManager.cpp                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: nmonzon <nmonzon@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/03 12:55:07 by nmonzon           #+#    #+#             */
-/*   Updated: 2025/07/08 15:17:19 by nmonzon          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "SocketManager.hpp"
 
-//	Constructor
+// Constructor
 SocketManager::SocketManager(std::vector<Server*> servers)
 {
 	for (Server *server : servers)
@@ -29,8 +17,7 @@ SocketManager::SocketManager(std::vector<Server*> servers)
 	}
 }
 
-
-//	Destructor
+// Destructor
 SocketManager::~SocketManager()
 {
 	for (Socket *socket : sockets)
@@ -38,8 +25,7 @@ SocketManager::~SocketManager()
 	sockets.clear();
 }
 
-
-//	Initialize
+// Initialize all the server sockets
 void	SocketManager::initializeServerSockets()
 {
 	int		fd;
@@ -57,8 +43,7 @@ void	SocketManager::initializeServerSockets()
 	}
 }
 
-
-//	New Connections
+// Accept new connections
 void	SocketManager::handleNewConnection(pollfd &pfd, time_t now)
 {
 	sockaddr_in	client_addr{};
@@ -74,8 +59,7 @@ void	SocketManager::handleNewConnection(pollfd &pfd, time_t now)
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 	poll_fds.push_back({client_fd, POLLIN, 0});
 
-
-	//defensive: check fd_to_socket
+	// Check fd_to_socket (catches weird linux-only bug with broken FDs upon first connection)
 	if (fd_to_socket.count(pfd.fd) == 0 || fd_to_socket[pfd.fd] == nullptr)
 	{
 		log(LOG_ERR, "Error: fd_to_socket missing or null for fd " + std::to_string(pfd.fd));
@@ -88,8 +72,7 @@ void	SocketManager::handleNewConnection(pollfd &pfd, time_t now)
 	client_buffers[client_fd] = "";
 }
 
-
-//	Process Request
+//	Process request and respond from the server
 bool	SocketManager::processRequest(int fd, std::string &request)
 {
 	size_t	headers_end = request.find("\r\n\r\n");
@@ -116,7 +99,7 @@ bool	SocketManager::processRequest(int fd, std::string &request)
 	return false;
 }
 
-
+// Close the client connection and clean up all the maps and vectors
 void	SocketManager::cleanupClient(int fd, size_t &i)
 {
 	close(fd);
@@ -126,7 +109,7 @@ void	SocketManager::cleanupClient(int fd, size_t &i)
 	poll_fds.erase(poll_fds.begin() + i--);
 }
 
-
+// Recieves the request and forwards it to the parser in the revelant Server instance.
 void	SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 {
 	std::string		&request = client_buffers[pfd.fd];
@@ -134,7 +117,6 @@ void	SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 	ssize_t			bytes_read;
 	bool			headers_complete = false;
 
-	//recieve data
 	bytes_read = recv(pfd.fd, chunk, sizeof(chunk), 0);
 	if (bytes_read > 0)
 	{
@@ -145,36 +127,32 @@ void	SocketManager::handleClientData(size_t &i, pollfd &pfd, time_t now)
 			headers_complete = true;
 	}
 
-	//logging
+	// Log the request
 	log(LOG_INFO, "Request of size " + std::to_string(request.size()) + " bytes received from client (fd) "
 	+ std::to_string(pfd.fd) + " in server "
 	+ client_to_server[pfd.fd]->getName() + ":" + std::to_string(client_to_server[pfd.fd]->getPort()));
 
-	//check read error
 	if (bytes_read <= 0)
 	{
 		cleanupClient(pfd.fd, i);
 		return;
 	}
 
-	//process request
 	if (processRequest(pfd.fd, request))
 	{
 		cleanupClient(pfd.fd, i);
 		return;
 	}
 
-	//update activity time
+	// Update activity time for timeout check
 	client_last_active[pfd.fd] = now;
 }
-
 
 void	SocketManager::handleErrors(size_t &i, pollfd &pfd)
 {
 	if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL))
 		cleanupClient(pfd.fd, i);
 }
-
 
 void	SocketManager::checkTimeouts(time_t now)
 {
@@ -192,15 +170,13 @@ void	SocketManager::checkTimeouts(time_t now)
 	}
 }
 
-
 void	SocketManager::run()
 {
-	initializeServerSockets();
+	initializeServerSockets(); // Set all the sockets up to read/write and be non-blocking
 
-
-	while (true)
+	while (true) // Runtime loop
 	{
-		if (poll(poll_fds.data(), poll_fds.size(), 100) < 0)
+		if (poll(poll_fds.data(), poll_fds.size(), 100) < 0) // Listen to all sockets for incoming client activity
 		{
 			if (errno == EINTR)
 				continue;
@@ -210,14 +186,14 @@ void	SocketManager::run()
 
 		time_t	now = std::time(nullptr);
 
-		//quit if there are no valid servers running
+		// Quit if there are no valid servers running
 		if (poll_fds.size() <= 0)
 		{
 			log(LOG_WARN, "No servers running. Quitting...");
 			break;
 		}
 
-		//loop through all servers
+		// For every server socket poll-ed: establish a connection from the client and handle incoming request data
 		for (size_t i = 0; i < poll_fds.size(); i++)
 		{
 			pollfd	&pfd = poll_fds[i];
@@ -231,8 +207,8 @@ void	SocketManager::run()
 				handleClientData(i, pfd, now);
 				continue;
 			}
-			handleErrors(i, pfd);
+			handleErrors(i, pfd); // Anything in poll() went wrong
 		}
-		checkTimeouts(now);
+		checkTimeouts(now); // The client took too long to say anything
 	}
 }

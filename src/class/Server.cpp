@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jgraf <jgraf@student.42heilbronn.de>       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/02 11:21:23 by jgraf             #+#    #+#             */
-/*   Updated: 2025/07/07 16:32:30 by jgraf            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "Server.hpp"
 #include <sys/wait.h>
 
@@ -116,23 +104,6 @@ Location	*Server::getLocation(size_t index)
 	return (NULL);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //	Configuration
 bool	Server::braceCheck(t_vectok tokens)
 {
@@ -203,13 +174,11 @@ void	Server::configure(t_vectok &tokens, size_t &i)
 			locations.push_back(new_location);
 		}
 	}
-
-	//print data
-	print_status();
+	//print_status();
 }
 
 
-//	Debug
+//	Debug printing (disabled)
 void	Server::print_status()
 {
 	std::cout << "\n\t--- SERVER CONFIG ---" << std::endl;
@@ -226,22 +195,6 @@ void	Server::print_status()
 	for (std::map<size_t, std::string>::iterator it = error_page.begin(); it != error_page.end(); it++)
 		std::cout << "Error Code:\t" << it->first  << "\t-> Page:\t" << it->second << std::endl;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //	Get Mime type
 std::string	Server::getMimeType(const std::string &filepath)
@@ -297,22 +250,6 @@ bool	Server::checkMethods(const HttpRequest &request)
 	return false;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //	Replace the alias path with the original location path
 std::string	Server::normalizePath(const std::string &path)
 {
@@ -333,7 +270,7 @@ std::string	Server::normalizePath(const std::string &path)
 	return (normalized);
 }
 
-void	Server::CheckAlias(std::string &path)
+std::string	Server::CheckAlias(std::string path)
 {
 	size_t		args_pos = path.find('?');
 	std::string	base_path = normalizePath((args_pos != std::string::npos) ? path.substr(0, args_pos) : path);
@@ -346,17 +283,17 @@ void	Server::CheckAlias(std::string &path)
 			std::string	normalized_alias = normalizePath(alias);
 			if (base_path.find(normalized_alias) == 0)
 			{
-				std::string	path = location->getPath() + base_path.substr(normalized_alias.length());
-				path += arguments;
+				std::string	new_path = location->getPath() + base_path.substr(normalized_alias.length());
+				new_path += arguments;
 
 				//add index to path to allow for automatic index even after replacement
-				if (!path.empty() && path.back() == '/')
-					path += location->getIndex();
-				return;
+				if (!new_path.empty() && new_path.back() == '/')
+					new_path += location->getIndex();
+				return (new_path);
 			}
 		}
+	return (path);
 }
-
 
 //	Decode percent encoded paths and arguments
 void	Server::percentDecode(std::string &body)
@@ -400,21 +337,6 @@ void	Server::percentDecode(std::string &body)
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //	Parse request
 Server::HttpRequest	Server::parseRequest(const std::string &raw_request) 
@@ -494,25 +416,10 @@ Server::HttpRequest	Server::parseRequest(const std::string &raw_request)
 	size_t	header_end = raw_request.find("\r\n\r\n");
 	if (header_end != std::string::npos)
 		request.body = raw_request.substr(header_end + 4);
-	CheckAlias(request.path);
+	request.path = CheckAlias(request.path);
 	percentDecode(request.path);
 	return request;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //	Call the requested method and call their handler
 void	Server::respond(int client_fd, const std::string &raw_request)
@@ -573,21 +480,6 @@ std::string	Server::createResponse(int status_code, const std::string &content_t
 			response_body);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //	GET Method
 void	Server::handleGet(int client_fd, const HttpRequest &request)
 {
@@ -637,21 +529,6 @@ void	Server::handleGet(int client_fd, const HttpRequest &request)
 	response = createResponse(200, content_type, std::string(file_buffer.data(), file_buffer.size()));
 	send(client_fd, response.c_str(), response.size(), 0);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //	POST Method
 //	Get file information
@@ -763,22 +640,6 @@ void	Server::handlePost(int client_fd, const HttpRequest &request)
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //	DELETE Method
 void	Server::handleDelete(int client_fd, const HttpRequest &request)
 {
@@ -820,20 +681,6 @@ void	Server::handleDelete(int client_fd, const HttpRequest &request)
 		send(client_fd, response.c_str(), response.size(), 0);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //	CGI
 void	Server::handleCgi(int client_fd, const HttpRequest &request)
@@ -934,7 +781,6 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 		last_active = std::time(NULL);
 		if (static_cast<size_t>(std::time(NULL) - start) > timeout)
 		{
-			//kill child ( ͡° ͜ʖ ͡°)
 			kill(pid, SIGKILL);
 			waitpid(pid, nullptr, 0);
 			throw	std::runtime_error("CGI script timeout");
@@ -958,4 +804,3 @@ std::string Server::executeCgi(const std::string &script_path, const std::string
 
 	return output;
 }
-

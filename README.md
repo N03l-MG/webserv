@@ -114,6 +114,12 @@ Here is every available directive and scope in our configuration system:
       <td>method names (space separated)</td>
       <td>Sets the allowed methods for a specific location.</td>
     </tr>
+	<tr>
+	  <td>return</td>
+	  <td>directive</td>
+	  <td>path aliases</td>
+	  <td>Adds aliases that will redirect to the location the return directive is in.</td>
+	</tr>
   </tbody>
 </table>
 
