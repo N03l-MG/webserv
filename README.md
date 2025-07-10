@@ -136,7 +136,15 @@ server {
 		methods GET;
 	}
 
+	location scripts/ {
+		index ../pages/scripts.html;
+		methods GET POST;
+		cgi .sh .py .php;
+		return cgi-bin/;
+	}
+
 	location uploads/ {
+		index ../pages/upload.html;
 		methods GET POST DELETE;
 		max_body 8000000;
 	}
